@@ -216,6 +216,38 @@ textarea.json-area:focus { outline:none; border-color:var(--clay); }
 .storage-bar { font-size:11px; color:var(--text3); text-align:right; padding:6px 0 0; display:flex; align-items:center; justify-content:flex-end; gap:5px; }
 .storage-dot { width:6px; height:6px; border-radius:50%; background:#639922; }
 input[type=file] { display:none; }
+
+/* REGISTROS TABLE */
+.reg-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:1rem; border-radius:var(--radius); border:0.5px solid var(--border); }
+.reg-table { width:100%; border-collapse:collapse; font-size:12px; min-width:700px; }
+.reg-table th { background:var(--clay); color:white; font-weight:600; padding:8px 10px; text-align:left; white-space:nowrap; position:sticky; top:0; }
+.reg-table th.right { text-align:right; }
+.reg-table td { padding:7px 10px; border-bottom:0.5px solid var(--border); vertical-align:middle; }
+.reg-table tr:last-child td { border-bottom:none; }
+.reg-table tr:hover td { background:var(--bg3); }
+.reg-table .total-row td { background:var(--clay-light); font-weight:600; color:var(--clay-dark); border-top:1px solid var(--clay); }
+.reg-table .num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.reg-table .date { white-space:nowrap; color:var(--text3); font-size:11px; }
+.reg-table .proveedor { font-weight:500; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.reg-table .concepto { color:var(--text2); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+.op-badge { font-size:10px; padding:2px 6px; border-radius:20px; border:0.5px solid; white-space:nowrap; display:inline-block; }
+.op-INT { background:var(--blue-bg); color:var(--blue); border-color:var(--blue-border); }
+.op-INTRA_S { background:var(--amber-bg); color:var(--amber); border-color:var(--amber-border); }
+.op-EXENTO { background:#F1EFE8; color:#5F5E5A; border-color:#D3D1C7; }
+.op-ALQUILER { background:var(--green-bg); color:var(--green); border-color:var(--green-border); }
+.op-PROF { background:var(--blue-bg); color:var(--blue); border-color:var(--blue-border); }
+.just-badge { font-size:10px; padding:2px 6px; border-radius:20px; background:var(--clay-light); color:var(--clay-dark); display:inline-block; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.totals-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; margin-bottom:12px; }
+.total-box { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius-sm); padding:10px 12px; }
+.total-box-label { font-size:10px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+.total-box-val { font-size:16px; font-weight:700; }
+.total-box-val.red { color:var(--red); }
+.total-box-val.green { color:var(--green); }
+.total-box-val.blue { color:var(--blue); }
+.total-box-val.amber { color:var(--amber); }
+.view-toggle { display:flex; gap:6px; margin-bottom:12px; }
+.view-btn { padding:6px 14px; font-size:13px; border:0.5px solid var(--border2); border-radius:20px; background:var(--bg3); color:var(--text2); cursor:pointer; font-weight:500; }
+.view-btn.active { background:var(--clay); color:white; border-color:var(--clay); }
 </style>
 </head>
 <body>
@@ -281,6 +313,7 @@ input[type=file] { display:none; }
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('facturas',this)">Facturas</button>
+    <button class="tab-btn" onclick="switchTab('registros',this)">Registros</button>
     <button class="tab-btn" onclick="switchTab('manual',this)">Manual</button>
     <button class="tab-btn" onclick="switchTab('modelos',this)">Modelos</button>
     <button class="tab-btn" onclick="switchTab('drive',this)">Drive</button>
@@ -319,6 +352,30 @@ input[type=file] { display:none; }
       <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
     </div>
     <div class="storage-bar"><span class="storage-dot"></span><span id="si">Cargando...</span></div>
+  </div>
+
+
+  <!-- REGISTROS -->
+  <div id="tab-registros" class="tab-pane">
+    <div class="section-label">Trimestre</div>
+    <div class="q-selector" id="qs-r">
+      <button class="q-pill active" onclick="setQReg('1T 2026',this)">1T 2026</button>
+      <button class="q-pill" onclick="setQReg('2T 2026',this)">2T 2026</button>
+      <button class="q-pill" onclick="setQReg('3T 2026',this)">3T 2026</button>
+      <button class="q-pill" onclick="setQReg('4T 2026',this)">4T 2026</button>
+      <button class="q-pill" onclick="setQReg('todos',this)">Todos</button>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="vbtn-gastos" onclick="setView('gastos',this)">Gastos recibidos</button>
+      <button class="view-btn" id="vbtn-ingresos" onclick="setView('ingresos',this)">Ingresos emitidos</button>
+    </div>
+    <div class="totals-bar" id="reg-totals-bar"></div>
+    <div class="reg-table-wrap">
+      <table class="reg-table" id="reg-main-table">
+        <thead id="reg-thead"></thead>
+        <tbody id="reg-tbody"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- MANUAL -->
@@ -447,6 +504,13 @@ input[type=file] { display:none; }
       <div class="config-row"><span class="config-label">Dirección</span><span style="font-size:13px;color:var(--text2);">Badajoz 95 LOC 1, 08005 Barcelona</span></div>
       <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text2);">86.2 Ceramista</span></div>
     </div>
+    <div class="section-label">Google Sheets</div>
+    <div class="card">
+      <div class="config-row">
+        <div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div>
+        <button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear hoja</button>
+      </div>
+    </div>
     <div class="section-label">PIN</div>
     <div class="card">
       <div class="config-row">
@@ -496,7 +560,7 @@ window.addEventListener('load',()=>{ loadLocal();loadCfg(); try{ const s=JSON.pa
 function pp(d){ if(pin.length>=4)return; pin+=d; updateDots(); }
 function pd(){ pin=pin.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent=''; }
 function updateDots(){ for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pin.length); }
-function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.display='none'; document.getElementById('main-screen').style.display='block'; if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);} else{document.getElementById('claude-no-key').style.display='block';} renderAll(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
+function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.display='none'; document.getElementById('main-screen').style.display='block'; if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);} else{document.getElementById('claude-no-key').style.display='block';} updateSheetDisplay(); renderAll(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
 
 // ── CLAUDE API ──
 const SYSTEM_PROMPT=`Eres un asistente fiscal español experto en autónomos. Analiza esta factura y extrae los datos fiscales.
@@ -620,12 +684,17 @@ async function exportToSheets(){
   document.getElementById('sheets-dot').className='dot dot-sync';
   document.getElementById('sheets-lbl').textContent='Sheets';
   try{
-    // Create or reuse spreadsheet
+    // Create or reuse spreadsheet inside MiGestor folder
     if(!sheetId){
+      if(!rootFId) await initDrive();
       const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({properties:{title:'MiGestor — Registros Fiscales'}})});
       const s=await r.json();
       sheetId=s.spreadsheetId;
       saveCfg();
+      // Move to MiGestor folder
+      if(rootFId){
+        await fetch(`https://www.googleapis.com/drive/v3/files/${sheetId}?addParents=${rootFId}&removeParents=root`,{method:'PATCH',headers:{Authorization:'Bearer '+token}});
+      }
     }
     // Get all quarters with data
     const quarters=Object.keys(data).filter(q=>data[q]&&data[q].length);
@@ -633,7 +702,7 @@ async function exportToSheets(){
     const sr=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+token}});
     const sd=await sr.json();
     const existingSheets=(sd.sheets||[]).map(s=>s.properties.title);
-    // Create missing sheets
+    // Create missing sheets and wait
     const requests=[];
     for(const q of quarters){
       if(!existingSheets.includes(q)) requests.push({addSheet:{properties:{title:q}}});
@@ -641,6 +710,8 @@ async function exportToSheets(){
     if(!existingSheets.includes('Resumen')) requests.push({addSheet:{properties:{title:'Resumen'}}});
     if(requests.length){
       await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({requests})});
+      // Small wait to ensure sheets are ready
+      await new Promise(r=>setTimeout(r,800));
     }
     // Write data to each quarter sheet
     const HEADERS=['Fecha','Tipo','Proveedor/Cliente','NIF','Concepto','Nº Factura','Operación','Base IVA','% IVA','Cuota IVA','Base IRPF','% Retención','Importe Retención','Ingresos Brutos','Justificación','Notas'];
@@ -680,9 +751,9 @@ function clearQ(){ if(!confirm('Borrar todos los registros de '+Q+'?')) return; 
 function delR(id){ data[Q]=(data[Q]||[]).filter(f=>f._id!==id); saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); }
 
 // ── RENDER ──
-function switchTab(id,btn){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+id).classList.add('active'); if(id==='drive') renderDriveTab(); }
+function switchTab(id,btn){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+id).classList.add('active'); if(id==='drive') renderDriveTab(); if(id==='registros') renderRegistros(); }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('qbadge').textContent=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
-function renderAll(){ renderList(); recalc(); updateSI(); }
+function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
 function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros en este trimestre</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text3);font-size:11px;">${f.fecha||''}</span></div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><button class="reg-del" onclick="delR(${f._id})">✕</button></div>`).join(''); }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
@@ -697,7 +768,153 @@ function tx(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
 function fmt(n){ if(!n&&n!==0||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
 function fmtN(n){ return n.toFixed(2).replace('.',',')+' €'; }
 
-function loadDemo(){ const demo=[{tipo:'ingreso',proveedor_cliente:'SumUp enero 2026',nif:'IE9813461A',fecha:'2026-02-01',concepto:'Ventas tarjeta enero 2026',operacion:'INT',base_iva:790.08,pct_iva:21,cuota_iva:165.92,base_irpf:790.08,ingresos_brutos:956,retencion_pct:0,retencion_importe:0,justificacion:'Ingresos por ventas de ceramica y talleres'},{tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-02-01',concepto:'Comision TPV enero 2026',operacion:'EXENTO',base_iva:14.34,pct_iva:0,cuota_iva:0,base_irpf:14.34,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-01-01',concepto:'Alquiler local enero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-02-01',concepto:'Alquiler local febrero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-03-01',concepto:'Alquiler local marzo',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'OpenAI Ireland Limited',fecha:'2026-02-15',concepto:'Suscripcion OpenAI',operacion:'INTRA_S',base_iva:57.03,pct_iva:0,cuota_iva:0,base_irpf:57.03,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'}]; if(!data['1T 2026']) data['1T 2026']=[]; demo.forEach(f=>{f._quarter='1T 2026';f._id=Date.now()+Math.random();data['1T 2026'].push(f);}); saveLocal();Q='1T 2026'; document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); document.getElementById('qbadge').textContent='1T 2026'; renderAll(); }
+// ── REGISTROS ──
+let regQ='1T 2026', regView='gastos';
+
+function setQReg(q,btn){ regQ=q; document.querySelectorAll('#qs-r .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
+function setView(v,btn){ regView=v; document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
+
+function getRegFacts(){
+  if(regQ==='todos') return Object.values(data).flat();
+  return getF(regQ);
+}
+
+function fmtEur(n){ if(!n||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
+
+function renderRegistros(){
+  const all=getRegFacts();
+  const facts=all.filter(f=>f.tipo===(regView==='gastos'?'gasto':'ingreso'));
+
+  // Totales bar
+  const totBar=document.getElementById('reg-totals-bar');
+  if(regView==='gastos'){
+    const tBase=facts.reduce((a,f)=>a+(f.base_iva||0),0);
+    const tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0);
+    const tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0);
+    const tIrpf=facts.reduce((a,f)=>a+(f.base_irpf||f.base_iva||0),0);
+    totBar.innerHTML=`
+      <div class="total-box"><div class="total-box-label">Base imponible</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div>
+      <div class="total-box"><div class="total-box-label">IVA soportado</div><div class="total-box-val green">${fmtEur(tIva)}</div></div>
+      <div class="total-box"><div class="total-box-label">Retenciones pagadas</div><div class="total-box-val amber">${fmtEur(tRet)}</div></div>
+      <div class="total-box"><div class="total-box-label">Base IRPF (gasto)</div><div class="total-box-val red">${fmtEur(tIrpf)}</div></div>
+      <div class="total-box"><div class="total-box-label">Nº facturas</div><div class="total-box-val blue">${facts.length}</div></div>`;
+  } else {
+    const tBase=facts.reduce((a,f)=>a+(f.base_irpf||0),0);
+    const tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0);
+    const tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0);
+    const tBruto=facts.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+    totBar.innerHTML=`
+      <div class="total-box"><div class="total-box-label">Ingresos brutos</div><div class="total-box-val green">${fmtEur(tBruto)}</div></div>
+      <div class="total-box"><div class="total-box-label">Base imponible</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div>
+      <div class="total-box"><div class="total-box-label">IVA repercutido</div><div class="total-box-val amber">${fmtEur(tIva)}</div></div>
+      <div class="total-box"><div class="total-box-label">Retenciones soportadas</div><div class="total-box-val red">${fmtEur(tRet)}</div></div>
+      <div class="total-box"><div class="total-box-label">Nº facturas</div><div class="total-box-val blue">${facts.length}</div></div>`;
+  }
+
+  // Cabecera tabla
+  const thead=document.getElementById('reg-thead');
+  const tbody=document.getElementById('reg-tbody');
+
+  if(regView==='gastos'){
+    thead.innerHTML=`<tr>
+      <th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>Nº Factura</th>
+      <th>Op.</th><th class="right">Base</th><th class="right">% IVA</th>
+      <th class="right">IVA</th><th class="right">Base IRPF</th>
+      <th class="right">% Ret.</th><th class="right">Retención</th>
+      <th>Justificación</th><th></th>
+    </tr>`;
+
+    if(!facts.length){ tbody.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:2rem;color:var(--text3);">Sin gastos en este trimestre</td></tr>`; return; }
+
+    // Group by operacion
+    const groups={ ALQUILER:[], INTRA_S:[], INT:[], EXENTO:[], PROF:[], otros:[] };
+    facts.forEach(f=>{ const g=groups[f.operacion]||groups.otros; g.push(f); });
+
+    const groupLabels={ ALQUILER:'Alquiler local (→ 115 + 303 + 130)', INTRA_S:'Servicios intracomunitarios (→ 349 + 303 cas.10 + 130)', INT:'Gastos interiores con IVA (→ 303 + 130)', EXENTO:'Exentos de IVA (→ 130)', PROF:'Profesionales con retención (→ 111 + 303 + 130)', otros:'Otros' };
+    const groupColors={ ALQUILER:'var(--blue-bg)', INTRA_S:'var(--amber-bg)', INT:'var(--green-bg)', EXENTO:'#F1EFE8', PROF:'var(--blue-bg)', otros:'var(--bg3)' };
+    const groupText={ ALQUILER:'var(--blue)', INTRA_S:'var(--amber)', INT:'var(--green)', EXENTO:'#5F5E5A', PROF:'var(--blue)', otros:'var(--text2)' };
+
+    let rows='';
+    let gBase=0,gIva=0,gIrpf=0,gRet=0;
+
+    Object.entries(groups).forEach(([op,items])=>{
+      if(!items.length) return;
+      rows+=`<tr><td colspan="13" style="background:${groupColors[op]};color:${groupText[op]};font-weight:600;font-size:11px;padding:5px 10px;letter-spacing:.03em;">${groupLabels[op]} · ${items.length} registro(s)</td></tr>`;
+      items.forEach(f=>{
+        const base=f.base_iva||0, iva=f.cuota_iva||0, irpf=f.base_irpf||f.base_iva||0, ret=f.retencion_importe||0;
+        gBase+=base; gIva+=iva; gIrpf+=irpf; gRet+=ret;
+        rows+=`<tr>
+          <td class="date">${f.fecha||'—'}</td>
+          <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
+          <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
+          <td class="date">${f.num_factura||'—'}</td>
+          <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
+          <td class="num">${fmtEur(base)}</td>
+          <td class="num">${f.pct_iva||0}%</td>
+          <td class="num" style="color:${iva>0?'var(--green)':'var(--text3)'}">${fmtEur(iva)}</td>
+          <td class="num">${fmtEur(irpf)}</td>
+          <td class="num">${f.retencion_pct||0}%</td>
+          <td class="num" style="color:${ret>0?'var(--amber)':'var(--text3)'}">${fmtEur(ret)}</td>
+          <td>${f.justificacion?`<span class="just-badge" title="${f.justificacion}">${f.justificacion}</span>`:''}</td>
+          <td><button class="reg-del" onclick="delR(${f._id})">✕</button></td>
+        </tr>`;
+      });
+    });
+
+    // Fila total
+    rows+=`<tr class="total-row">
+      <td colspan="5">TOTAL</td>
+      <td class="num">${fmtEur(gBase)}</td><td></td>
+      <td class="num">${fmtEur(gIva)}</td>
+      <td class="num">${fmtEur(gIrpf)}</td><td></td>
+      <td class="num">${fmtEur(gRet)}</td>
+      <td colspan="2"></td>
+    </tr>`;
+    tbody.innerHTML=rows;
+
+  } else {
+    // INGRESOS
+    thead.innerHTML=`<tr>
+      <th>Fecha</th><th>Cliente</th><th>Concepto</th><th>Nº Factura</th>
+      <th>Op.</th><th class="right">Bruto cobrado</th>
+      <th class="right">Base</th><th class="right">% IVA</th><th class="right">IVA</th>
+      <th class="right">% Ret.</th><th class="right">Retención</th><th></th>
+    </tr>`;
+
+    if(!facts.length){ tbody.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--text3);">Sin ingresos en este trimestre</td></tr>`; return; }
+
+    let rows='';
+    let gBruto=0,gBase=0,gIva=0,gRet=0;
+    facts.forEach(f=>{
+      const bruto=f.ingresos_brutos||f.base_iva||0, base=f.base_irpf||0, iva=f.cuota_iva||0, ret=f.retencion_importe||0;
+      gBruto+=bruto; gBase+=base; gIva+=iva; gRet+=ret;
+      rows+=`<tr>
+        <td class="date">${f.fecha||'—'}</td>
+        <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
+        <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
+        <td class="date">${f.num_factura||'—'}</td>
+        <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
+        <td class="num" style="color:var(--green);font-weight:600">${fmtEur(bruto)}</td>
+        <td class="num">${fmtEur(base)}</td>
+        <td class="num">${f.pct_iva||0}%</td>
+        <td class="num" style="color:var(--amber)">${fmtEur(iva)}</td>
+        <td class="num">${f.retencion_pct||0}%</td>
+        <td class="num" style="color:${ret>0?'var(--red)':'var(--text3)'}">${fmtEur(ret)}</td>
+        <td><button class="reg-del" onclick="delR(${f._id})">✕</button></td>
+      </tr>`;
+    });
+    rows+=`<tr class="total-row">
+      <td colspan="5">TOTAL</td>
+      <td class="num">${fmtEur(gBruto)}</td>
+      <td class="num">${fmtEur(gBase)}</td><td></td>
+      <td class="num">${fmtEur(gIva)}</td><td></td>
+      <td class="num">${fmtEur(gRet)}</td><td></td>
+    </tr>`;
+    tbody.innerHTML=rows;
+  }
+}
+function resetSheet(){ sheetId=null; saveCfg(); document.getElementById('sheet-id-display').textContent='Sin crear'; document.getElementById('sheets-dot').className='dot dot-off'; alert('Hoja reseteada. La próxima exportación creará una nueva dentro de la carpeta MiGestor.'); }
+function updateSheetDisplay(){ const el=document.getElementById('sheet-id-display'); if(el) el.textContent=sheetId?'ID: '+sheetId.slice(0,20)+'...':'Sin crear'; } const demo=[{tipo:'ingreso',proveedor_cliente:'SumUp enero 2026',nif:'IE9813461A',fecha:'2026-02-01',concepto:'Ventas tarjeta enero 2026',operacion:'INT',base_iva:790.08,pct_iva:21,cuota_iva:165.92,base_irpf:790.08,ingresos_brutos:956,retencion_pct:0,retencion_importe:0,justificacion:'Ingresos por ventas de ceramica y talleres'},{tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-02-01',concepto:'Comision TPV enero 2026',operacion:'EXENTO',base_iva:14.34,pct_iva:0,cuota_iva:0,base_irpf:14.34,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-01-01',concepto:'Alquiler local enero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-02-01',concepto:'Alquiler local febrero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-03-01',concepto:'Alquiler local marzo',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'OpenAI Ireland Limited',fecha:'2026-02-15',concepto:'Suscripcion OpenAI',operacion:'INTRA_S',base_iva:57.03,pct_iva:0,cuota_iva:0,base_irpf:57.03,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'}]; if(!data['1T 2026']) data['1T 2026']=[]; demo.forEach(f=>{f._quarter='1T 2026';f._id=Date.now()+Math.random();data['1T 2026'].push(f);}); saveLocal();Q='1T 2026'; document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); document.getElementById('qbadge').textContent='1T 2026'; renderAll(); }
 </script>
 </body>
 </html>

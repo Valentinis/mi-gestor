@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MiGestor">
+<title>MiGestor — Gestor Fiscal</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --clay:#C4763A; --clay-light:#F5EBE0; --clay-dark:#7A4520;
+  --bg:#F7F5F2; --bg2:#FFFFFF; --bg3:#EFEDE9;
+  --text:#1A1A1A; --text2:#666; --text3:#999;
+  --border:rgba(0,0,0,0.10); --border2:rgba(0,0,0,0.18);
+  --green:#0F6E56; --green-bg:#EAF3DE; --green-border:#C0DD97;
+  --red:#A32D2D; --red-bg:#FCEBEB; --red-border:#F7C1C1;
+  --blue:#185FA5; --blue-bg:#E6F1FB; --blue-border:#B5D4F4;
+  --amber:#854F0B; --amber-bg:#FAEEDA; --amber-border:#FAC775;
+  --radius:12px; --radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); }
+
+/* PIN */
+#pin-screen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2rem; padding:2rem; background:var(--bg); }
+.logo-wrap { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.logo-circle { width:72px; height:72px; background:var(--clay); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; box-shadow:0 4px 12px rgba(196,118,58,0.3); }
+.app-name { font-size:22px; font-weight:600; color:var(--text); }
+.app-sub { font-size:14px; color:var(--text2); }
+.pin-card { background:var(--bg2); border-radius:var(--radius); padding:2rem; width:100%; max-width:300px; box-shadow:var(--shadow); border:0.5px solid var(--border); }
+.pin-dots { display:flex; gap:14px; justify-content:center; margin-bottom:2rem; }
+.pin-dot { width:14px; height:14px; border-radius:50%; border:2px solid var(--border2); background:transparent; transition:all .15s; }
+.pin-dot.filled { background:var(--clay); border-color:var(--clay); transform:scale(1.1); }
+.pin-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.pin-btn { height:56px; background:var(--bg3); border:0.5px solid var(--border); border-radius:var(--radius-sm); font-size:20px; font-weight:500; color:var(--text); cursor:pointer; transition:all .1s; -webkit-tap-highlight-color:transparent; }
+.pin-btn:active { transform:scale(0.94); background:var(--border); }
+.pin-btn.del { font-size:16px; color:var(--text2); }
+.pin-btn.enter { background:var(--clay); color:white; border-color:var(--clay); }
+.pin-btn.enter:active { background:var(--clay-dark); }
+.pin-error { color:var(--red); font-size:13px; text-align:center; margin-top:12px; min-height:18px; }
+.pin-hint { font-size:12px; color:var(--text3); }
+
+/* MAIN */
+#main-screen { display:none; min-height:100vh; }
+.top-bar { background:var(--bg2); border-bottom:0.5px solid var(--border); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+.top-left { display:flex; align-items:center; gap:10px; }
+.top-logo { width:30px; height:30px; background:var(--clay); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.top-title { font-size:15px; font-weight:600; color:var(--text); }
+.top-right { display:flex; align-items:center; gap:8px; }
+.q-badge { background:var(--clay-light); color:var(--clay-dark); font-size:12px; font-weight:600; padding:4px 10px; border-radius:var(--radius-sm); }
+.btn-out { background:transparent; border:0.5px solid var(--border2); border-radius:var(--radius-sm); padding:5px 10px; font-size:12px; color:var(--text2); cursor:pointer; }
+
+.tabs { display:flex; background:var(--bg2); border-bottom:0.5px solid var(--border); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab-btn { padding:12px 16px; font-size:13px; color:var(--text2); border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; font-weight:500; -webkit-tap-highlight-color:transparent; }
+.tab-btn.active { color:var(--clay); border-bottom-color:var(--clay); }
+
+.tab-pane { display:none; padding:16px; }
+.tab-pane.active { display:block; }
+
+/* COMPONENTS */
+.section-label { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.q-selector { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.q-pill { padding:6px 14px; font-size:13px; border:0.5px solid var(--border2); border-radius:20px; background:var(--bg3); color:var(--text2); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.q-pill.active { background:var(--clay); color:white; border-color:var(--clay); }
+
+.card { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
+.card-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.card-sub { font-size:12px; color:var(--text2); margin-bottom:12px; line-height:1.6; }
+
+.tip-box { background:var(--clay-light); border:0.5px solid #E8C9A0; border-radius:var(--radius-sm); padding:12px; margin-bottom:12px; }
+.tip-box h4 { font-size:13px; font-weight:600; color:var(--clay-dark); margin-bottom:8px; }
+.tip-box ol { padding-left:18px; color:var(--clay-dark); font-size:13px; line-height:2; }
+.tip-box code { background:rgba(196,118,58,0.15); padding:1px 5px; border-radius:4px; font-size:11px; font-family:monospace; }
+
+textarea.json-area { width:100%; min-height:80px; font-family:monospace; font-size:11px; padding:10px; border:0.5px solid var(--border2); border-radius:var(--radius-sm); background:var(--bg3); color:var(--text); resize:vertical; }
+textarea.json-area:focus { outline:none; border-color:var(--clay); }
+
+.btn-row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.btn-primary { background:var(--clay); color:white; border:none; border-radius:var(--radius-sm); padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer; width:100%; margin-top:10px; -webkit-tap-highlight-color:transparent; }
+.btn-primary:active { background:var(--clay-dark); }
+.btn-sec { background:var(--bg3); color:var(--text); border:0.5px solid var(--border2); border-radius:var(--radius-sm); padding:8px 14px; font-size:13px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.btn-danger-sm { background:transparent; color:var(--red); border:0.5px solid var(--border); border-radius:var(--radius-sm); padding:4px 10px; font-size:12px; cursor:pointer; }
+.feedback { font-size:12px; margin-top:8px; min-height:16px; }
+.feedback.ok { color:var(--green); }
+.feedback.err { color:var(--red); }
+
+/* REGISTRO LIST */
+.reg-panel { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-top:12px; }
+.reg-panel-header { padding:10px 16px; border-bottom:0.5px solid var(--border); font-size:13px; font-weight:600; color:var(--text); display:flex; align-items:center; justify-content:space-between; }
+.reg-list { max-height:300px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.reg-item { padding:10px 16px; border-bottom:0.5px solid var(--border); display:flex; align-items:flex-start; gap:10px; }
+.reg-item:last-child { border-bottom:none; }
+.reg-dot { width:20px; height:20px; border-radius:50%; background:var(--green-bg); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; margin-top:2px; }
+.reg-body { flex:1; min-width:0; }
+.reg-name { font-size:13px; font-weight:600; color:var(--text); }
+.reg-detail { font-size:12px; color:var(--text2); margin-top:2px; }
+.reg-chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
+.chip { font-size:11px; padding:2px 8px; border-radius:20px; border:0.5px solid; }
+.chip-INT { background:var(--blue-bg); color:var(--blue); border-color:var(--blue-border); }
+.chip-INTRA_S { background:var(--amber-bg); color:var(--amber); border-color:var(--amber-border); }
+.chip-EXENTO { background:#F1EFE8; color:#5F5E5A; border-color:#D3D1C7; }
+.chip-ALQUILER { background:var(--green-bg); color:var(--green); border-color:var(--green-border); }
+.chip-PROF { background:var(--blue-bg); color:var(--blue); border-color:var(--blue-border); }
+.chip-ing { background:#E1F5EE; color:#0F6E56; border-color:#9FE1CB; }
+.chip-amt { background:var(--bg3); color:var(--text); border-color:var(--border2); font-weight:600; }
+.chip-ret { background:var(--amber-bg); color:var(--amber); border-color:var(--amber-border); }
+.reg-del { background:none; border:none; cursor:pointer; color:var(--text3); font-size:16px; padding:2px 4px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
+
+/* MODELOS */
+.summary-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
+@media(min-width:500px){ .summary-grid { grid-template-columns:repeat(4,1fr); } }
+.sum-card { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius-sm); padding:12px; }
+.sum-label { font-size:11px; color:var(--text3); margin-bottom:4px; font-weight:500; }
+.sum-val { font-size:18px; font-weight:700; color:var(--text); }
+.sum-val.warn { color:var(--red); }
+.sum-val.good { color:var(--green); }
+
+.mod-card { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius); margin-bottom:10px; overflow:hidden; }
+.mod-header { padding:14px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.mod-left { display:flex; align-items:center; gap:10px; }
+.mod-code { font-size:20px; font-weight:700; color:var(--clay-dark); min-width:44px; }
+.mod-name { font-size:14px; color:var(--text); font-weight:500; }
+.mod-result { font-size:15px; font-weight:700; }
+.mod-result.pagar { color:var(--red); }
+.mod-result.devolver { color:var(--green); }
+.mod-body { border-top:0.5px solid var(--border); padding:12px 16px; display:none; }
+.mod-body.open { display:block; }
+.cas-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:0.5px solid var(--border); font-size:13px; }
+.cas-row:last-child { border-bottom:none; }
+.cas-num { color:var(--text3); min-width:44px; font-weight:500; }
+.cas-desc { color:var(--text); flex:1; padding:0 8px; }
+.cas-base { color:var(--text2); min-width:80px; text-align:right; font-size:12px; }
+.cas-cuota { font-weight:600; min-width:80px; text-align:right; color:var(--text); }
+.cas-total { background:var(--clay-light); border-radius:var(--radius-sm); padding-left:6px; }
+.cas-total .cas-desc { font-weight:600; }
+
+/* VALIDAR */
+.val-card { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:12px; }
+.val-head { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; padding:10px 16px; border-bottom:0.5px solid var(--border); font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; }
+.val-row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; padding:10px 16px; border-bottom:0.5px solid var(--border); font-size:13px; align-items:center; }
+.val-row:last-child { border-bottom:none; }
+.val-ok { color:var(--green); font-weight:700; }
+.val-fail { color:var(--red); font-weight:700; }
+.val-result { margin-top:12px; padding:14px; border-radius:var(--radius-sm); font-size:13px; display:none; line-height:1.6; }
+.val-result.ok { background:var(--green-bg); color:var(--green); border:0.5px solid var(--green-border); }
+.val-result.fail { background:var(--red-bg); color:var(--red); border:0.5px solid var(--red-border); }
+
+.empty { text-align:center; padding:2rem; color:var(--text3); font-size:14px; }
+.storage-bar { font-size:11px; color:var(--text3); text-align:right; padding:6px 0 0; display:flex; align-items:center; justify-content:flex-end; gap:5px; }
+.storage-dot { width:6px; height:6px; border-radius:50%; background:#639922; }
+</style>
+</head>
+<body>
+
+<!-- PIN -->
+<div id="pin-screen">
+  <div class="logo-wrap">
+    <div class="logo-circle">🏺</div>
+    <div class="app-name">MiGestor</div>
+    <div class="app-sub">Valentín López · Ceramista</div>
+  </div>
+  <div class="pin-card">
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pp('1')">1</button>
+      <button class="pin-btn" onclick="pp('2')">2</button>
+      <button class="pin-btn" onclick="pp('3')">3</button>
+      <button class="pin-btn" onclick="pp('4')">4</button>
+      <button class="pin-btn" onclick="pp('5')">5</button>
+      <button class="pin-btn" onclick="pp('6')">6</button>
+      <button class="pin-btn" onclick="pp('7')">7</button>
+      <button class="pin-btn" onclick="pp('8')">8</button>
+      <button class="pin-btn" onclick="pp('9')">9</button>
+      <button class="pin-btn del" onclick="pd()">⌫</button>
+      <button class="pin-btn" onclick="pp('0')">0</button>
+      <button class="pin-btn enter" onclick="pe()">OK</button>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+  <div class="pin-hint">PIN: 1234</div>
+</div>
+
+<!-- MAIN -->
+<div id="main-screen">
+  <div class="top-bar">
+    <div class="top-left">
+      <div class="top-logo">🏺</div>
+      <span class="top-title">MiGestor</span>
+    </div>
+    <div class="top-right">
+      <span class="q-badge" id="qbadge">1T 2026</span>
+      <button class="btn-out" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="st('importar',this)">Importar</button>
+    <button class="tab-btn" onclick="st('modelos',this)">Modelos</button>
+    <button class="tab-btn" onclick="st('facturas',this)">Facturas</button>
+    <button class="tab-btn" onclick="st('validar',this)">Validar 1T</button>
+  </div>
+
+  <!-- IMPORTAR -->
+  <div id="tab-importar" class="tab-pane active">
+    <div class="section-label">Trimestre activo</div>
+    <div class="q-selector" id="qs">
+      <button class="q-pill active" onclick="setQ('1T 2026',this)">1T 2026</button>
+      <button class="q-pill" onclick="setQ('2T 2026',this)">2T 2026</button>
+      <button class="q-pill" onclick="setQ('3T 2026',this)">3T 2026</button>
+      <button class="q-pill" onclick="setQ('4T 2026',this)">4T 2026</button>
+    </div>
+    <div class="tip-box">
+      <h4>Cómo añadir una factura</h4>
+      <ol>
+        <li>Sube la foto o PDF en el chat con Claude</li>
+        <li>Claude te devuelve un <code>JSON</code></li>
+        <li>Cópialo y pégalo abajo</li>
+        <li>Pulsa <strong>Guardar</strong></li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="card-title">Pegar JSON de Claude</div>
+      <div class="card-sub">Acepta objeto único o array de varios.</div>
+      <textarea class="json-area" id="json-in" placeholder='{"tipo":"gasto","proveedor_cliente":"..."}'></textarea>
+      <div class="btn-row">
+        <button class="btn-sec" onclick="clearJ()">Limpiar</button>
+        <button class="btn-sec" onclick="loadDemo()">Demo 1T</button>
+      </div>
+      <button class="btn-primary" onclick="importJ()">Guardar</button>
+      <div class="feedback" id="imp-fb"></div>
+    </div>
+    <div class="reg-panel">
+      <div class="reg-panel-header">
+        <span>Registros — <span id="pq">1T 2026</span></span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="rc" style="font-size:12px;color:var(--text3);">0</span>
+          <button class="btn-danger-sm" onclick="clearQ()">Borrar</button>
+        </div>
+      </div>
+      <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
+    </div>
+    <div class="storage-bar"><span class="storage-dot"></span><span id="si">localStorage</span></div>
+  </div>
+
+  <!-- MODELOS -->
+  <div id="tab-modelos" class="tab-pane">
+    <div class="summary-grid">
+      <div class="sum-card"><div class="sum-label">303 IVA</div><div class="sum-val warn" id="s303">—</div></div>
+      <div class="sum-card"><div class="sum-label">130 IRPF</div><div class="sum-val warn" id="s130">—</div></div>
+      <div class="sum-card"><div class="sum-label">115 Alquiler</div><div class="sum-val warn" id="s115">—</div></div>
+      <div class="sum-card"><div class="sum-label">349 Intracom.</div><div class="sum-val" id="s349">—</div></div>
+    </div>
+
+    <div class="mod-card">
+      <div class="mod-header" onclick="tog('b303')">
+        <div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div>
+        <div class="mod-result pagar" id="r303">—</div>
+      </div>
+      <div class="mod-body" id="b303">
+        <div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div>
+        <div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div>
+        <div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div>
+        <div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div>
+        <div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div>
+        <div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div>
+      </div>
+    </div>
+
+    <div class="mod-card">
+      <div class="mod-header" onclick="tog('b130')">
+        <div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div>
+        <div class="mod-result pagar" id="r130">—</div>
+      </div>
+      <div class="mod-body" id="b130">
+        <div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div>
+        <div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div>
+        <div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div>
+        <div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div>
+        <div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div>
+      </div>
+    </div>
+
+    <div class="mod-card">
+      <div class="mod-header" onclick="tog('b115')">
+        <div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div>
+        <div class="mod-result pagar" id="r115">—</div>
+      </div>
+      <div class="mod-body" id="b115">
+        <div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div>
+      </div>
+    </div>
+
+    <div class="mod-card">
+      <div class="mod-header" onclick="tog('b349')">
+        <div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div>
+        <div class="mod-result" id="r349">—</div>
+      </div>
+      <div class="mod-body" id="b349">
+        <div id="ops349"><div class="empty">Sin operaciones</div></div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="recalc()">Recalcular modelos</button>
+  </div>
+
+  <!-- FACTURAS -->
+  <div id="tab-facturas" class="tab-pane">
+    <div class="section-label">Ingresos</div>
+    <div id="list-ing"><div class="empty">Sin ingresos</div></div>
+    <div style="margin-top:20px;"><div class="section-label">Gastos</div></div>
+    <div id="list-gas"><div class="empty">Sin gastos</div></div>
+  </div>
+
+  <!-- VALIDAR -->
+  <div id="tab-validar" class="tab-pane">
+    <div class="section-label">Comparación con 1T 2026 presentado</div>
+    <div class="val-card">
+      <div class="val-head"><span>Modelo</span><span style="text-align:right">Correcto</span><span style="text-align:right">App</span><span style="text-align:right">Diff</span></div>
+      <div class="val-row"><span>303 IVA</span><span style="text-align:right">528,87€</span><span style="text-align:right" id="v303">—</span><span style="text-align:right" id="dv303">—</span></div>
+      <div class="val-row"><span>130 IRPF</span><span style="text-align:right">129,48€</span><span style="text-align:right" id="v130">—</span><span style="text-align:right" id="dv130">—</span></div>
+      <div class="val-row"><span>115 Alquiler</span><span style="text-align:right">513,00€</span><span style="text-align:right" id="v115">—</span><span style="text-align:right" id="dv115">—</span></div>
+      <div class="val-row"><span>349 Intracom.</span><span style="text-align:right">57,03€</span><span style="text-align:right" id="v349">—</span><span style="text-align:right" id="dv349">—</span></div>
+    </div>
+    <button class="btn-primary" onclick="validar()">Ejecutar validación</button>
+    <div class="val-result" id="val-res"></div>
+  </div>
+</div>
+
+<script>
+const PIN='1234', LS='migestor_v1';
+let pin='', Q='1T 2026', data={};
+
+function load(){ try{ data=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){ data={}; } migrar(); }
+function save(){ localStorage.setItem(LS,JSON.stringify(data)); si(); }
+function getF(q){ if(!data[q]) data[q]=[]; return data[q]; }
+function si(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros guardados'; }
+function migrar(){
+  ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4'].forEach(k=>{
+    try{
+      const old=JSON.parse(localStorage.getItem(k)||'{}');
+      Object.entries(old).forEach(([q,fs])=>{
+        if(!data[q]) data[q]=[];
+        (fs||[]).forEach(f=>{ if(!data[q].find(x=>x._id===f._id)) data[q].push(f); });
+      });
+    }catch(e){}
+  });
+}
+
+function pp(d){ if(pin.length>=4)return; pin+=d; ud(); }
+function pd(){ pin=pin.slice(0,-1); ud(); document.getElementById('pin-error').textContent=''; }
+function ud(){ for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pin.length); }
+function pe(){
+  if(pin===PIN){
+    load();
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('main-screen').style.display='block';
+    renderAll();
+  } else {
+    document.getElementById('pin-error').textContent='PIN incorrecto';
+    pin=''; ud();
+    setTimeout(()=>document.getElementById('pin-error').textContent='',2000);
+  }
+}
+function logout(){
+  pin=''; ud();
+  document.getElementById('main-screen').style.display='none';
+  document.getElementById('pin-screen').style.display='flex';
+}
+
+function st(id,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+function setQ(q,btn){
+  Q=q;
+  document.querySelectorAll('#qs .q-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('qbadge').textContent=q;
+  document.getElementById('pq').textContent=q;
+  renderAll();
+}
+
+function importJ(){
+  const raw=document.getElementById('json-in').value.trim();
+  const fb=document.getElementById('imp-fb');
+  if(!raw){ fb.textContent='Pega un JSON primero.'; fb.className='feedback err'; return; }
+  try{
+    const clean=raw.replace(/```json|```/g,'').trim();
+    let parsed=JSON.parse(clean);
+    const items=Array.isArray(parsed)?parsed:[parsed];
+    if(!data[Q]) data[Q]=[];
+    items.forEach(f=>{ f._quarter=Q; f._id=Date.now()+Math.random(); data[Q].push(f); });
+    save(); renderAll();
+    document.getElementById('json-in').value='';
+    fb.textContent='✓ '+items.length+' registro(s) guardado(s) en '+Q; fb.className='feedback ok';
+    setTimeout(()=>fb.textContent='',3000);
+  }catch(e){ fb.textContent='JSON inválido: '+e.message; fb.className='feedback err'; }
+}
+function clearJ(){ document.getElementById('json-in').value=''; document.getElementById('imp-fb').textContent=''; }
+function clearQ(){ if(!confirm('Borrar todos los registros de '+Q+'?')) return; data[Q]=[]; save(); renderAll(); }
+function delR(id){ data[Q]=(data[Q]||[]).filter(f=>f._id!==id); save(); renderAll(); }
+
+function renderAll(){ renderList(); renderFacts(); recalc(); si(); }
+
+function renderList(){
+  const fs=getF(Q), list=document.getElementById('reg-list');
+  document.getElementById('rc').textContent=fs.length+' reg.';
+  if(!fs.length){ list.innerHTML='<div class="empty">Sin registros en este trimestre</div>'; return; }
+  list.innerHTML=[...fs].reverse().map(f=>`
+    <div class="reg-item">
+      <div class="reg-dot">✓</div>
+      <div class="reg-body">
+        <div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text3);font-size:11px;">${f.fecha||''}</span></div>
+        <div class="reg-detail">${f.concepto||''}</div>
+        <div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div>
+      </div>
+      <button class="reg-del" onclick="delR(${f._id})">✕</button>
+    </div>`).join('');
+}
+
+function renderFacts(){
+  const fs=getF(Q);
+  const ing=fs.filter(f=>f.tipo==='ingreso'), gas=fs.filter(f=>f.tipo==='gasto');
+  const row=f=>`<div class="reg-item"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'}</div><div class="reg-detail">${f.concepto||''} · ${f.fecha||''}</div><div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div></div>`;
+  document.getElementById('list-ing').innerHTML=ing.length?ing.map(row).join(''):'<div class="empty">Sin ingresos</div>';
+  document.getElementById('list-gas').innerHTML=gas.length?gas.map(row).join(''):'<div class="empty">Sin gastos</div>';
+}
+
+function mkChips(f){
+  const r=[], om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'};
+  if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'});
+  if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'});
+  if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'});
+  if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'});
+  if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'});
+  return r;
+}
+
+function recalc(){
+  const fs=getF(Q);
+  let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0;
+  let ing=0,gas=0,ret=0,ab=0,ac=0; let intra={};
+  for(const f of fs){
+    if(f.tipo==='ingreso'){
+      ing+=f.base_irpf||0;
+      if(f.operacion==='INT'||f.operacion==='PROF'){ c07b+=f.base_iva||0; c07q+=f.cuota_iva||0; }
+      ret+=f.retencion_importe||0;
+    } else {
+      gas+=f.base_irpf||f.base_iva||0;
+      if(f.operacion==='INTRA_S'){ c10b+=f.base_iva||0; c10q+=(f.base_iva||0)*0.21; c36b+=f.base_iva||0; c36q+=(f.base_iva||0)*0.21; const p=f.proveedor_cliente||'UE'; intra[p]=(intra[p]||0)+(f.base_iva||0); }
+      else if(f.operacion==='ALQUILER'){ c28b+=f.base_iva||0; c28q+=f.cuota_iva||0; ab+=f.base_irpf||f.base_iva||0; ac+=f.retencion_importe||0; }
+      else if(f.operacion==='INT'||f.operacion==='PROF'){ c28b+=f.base_iva||0; c28q+=f.cuota_iva||0; }
+    }
+  }
+  const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45;
+  const net=ing-gas,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret);
+  const it=Object.values(intra).reduce((a,b)=>a+b,0);
+
+  tx('c07b',fmt(c07b)); tx('c07q',fmt(c07q)); tx('c10b',fmt(c10b)); tx('c10q',fmt(c10q));
+  tx('c27',fmt(c27)); tx('c28b',fmt(c28b)); tx('c28q',fmt(c28q));
+  tx('c36b',fmt(c36b)); tx('c36q',fmt(c36q)); tx('c45',fmt(c45)); tx('c46',fmt(c46));
+  tx('r303',fmt(c46)); tx('s303',fmt(c46));
+  document.getElementById('r303').className='mod-result '+(c46>=0?'pagar':'devolver');
+  document.getElementById('s303').className='sum-val '+(c46>0?'warn':'good');
+
+  tx('m130-i',fmt(ing)); tx('m130-g',fmt(gas)); tx('m130-n',fmt(net));
+  tx('m130-20',fmt(v20)); tx('m130-r',fmt(ret)); tx('m130-res',fmt(res));
+  tx('r130',fmt(res)); tx('s130',fmt(res));
+  document.getElementById('s130').className='sum-val '+(res>0?'warn':'good');
+
+  tx('m115-b',fmt(ab)); tx('m115-c',fmt(ac));
+  tx('r115',fmt(ac)); tx('s115',fmt(ac));
+  document.getElementById('s115').className='sum-val '+(ac>0?'warn':'good');
+
+  const ops=Object.entries(intra);
+  document.getElementById('ops349').innerHTML=ops.length?ops.map(([k,v])=>`<div class="cas-row"><span class="cas-num">I</span><span class="cas-desc">${k}</span><span class="cas-cuota">${fmt(v)}</span></div>`).join(''):'<div class="empty">Sin operaciones</div>';
+  tx('r349',ops.length?fmt(it):'—'); tx('s349',ops.length?fmt(it):'—');
+
+  svSync(c46,res,ac,it);
+}
+
+function svSync(r303,r130,r115,r349){
+  const tg={303:528.87,130:129.48,115:513,349:57.03},ac={303:r303,130:r130,115:r115,349:r349};
+  for(const k of Object.keys(tg)){
+    const v=ac[k]||0,t=tg[k],d=v-t;
+    const ve=document.getElementById('v'+k),de=document.getElementById('dv'+k);
+    if(ve) ve.textContent=v>0?fmtN(v):'—';
+    if(de&&v>0){ de.textContent=(d>=0?'+':'')+d.toFixed(2).replace('.',',')+'€'; de.className=Math.abs(d)<0.02?'val-ok':'val-fail'; }
+  }
+}
+
+function validar(){
+  recalc();
+  const fs=getF('1T 2026');
+  if(!fs.length){ showV(false,'No hay registros del 1T 2026.'); return; }
+  const tg={303:528.87,130:129.48,115:513,349:57.03};
+  const get=id=>parseFloat((document.getElementById('v'+id).textContent||'0').replace(',','.'))||0;
+  const ac={303:get(303),130:get(130),115:get(115),349:get(349)};
+  const wrong=Object.keys(tg).filter(k=>ac[k]>0&&Math.abs(ac[k]-tg[k])>=0.02);
+  const miss=Object.keys(tg).filter(k=>!ac[k]);
+  if(!wrong.length&&!miss.length) showV(true,'✓ Todos los modelos cuadran con el 1T 2026 presentado. La lógica fiscal es correcta.');
+  else { let m=''; if(miss.length) m+='Sin datos: '+miss.map(k=>'Mod.'+k).join(', ')+'. '; if(wrong.length) m+='Diferencias en: '+wrong.map(k=>'Mod.'+k).join(', ')+'.'; showV(false,m); }
+}
+function showV(ok,msg){ const e=document.getElementById('val-res'); e.style.display='block'; e.className='val-result '+(ok?'ok':'fail'); e.textContent=msg; }
+function tog(id){ document.getElementById(id).classList.toggle('open'); }
+function tx(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
+function fmt(n){ if(!n&&n!==0||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
+function fmtN(n){ return n.toFixed(2).replace('.',',')+' €'; }
+
+function loadDemo(){
+  const demo=[
+    {tipo:'ingreso',proveedor_cliente:'SumUp enero 2026',nif:'IE9813461A',fecha:'2026-02-01',concepto:'Ventas tarjeta enero 2026',operacion:'INT',base_iva:790.08,pct_iva:21,cuota_iva:165.92,base_irpf:790.08,ingresos_brutos:956,retencion_pct:0,retencion_importe:0},
+    {tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-02-01',concepto:'Comision TPV enero 2026',operacion:'EXENTO',base_iva:14.34,pct_iva:0,cuota_iva:0,base_irpf:14.34,retencion_pct:0,retencion_importe:0},
+    {tipo:'ingreso',proveedor_cliente:'SumUp febrero 2026',nif:'IE9813461A',fecha:'2026-03-01',concepto:'Ventas tarjeta febrero 2026',operacion:'INT',base_iva:889.26,pct_iva:21,cuota_iva:186.74,base_irpf:889.26,ingresos_brutos:1076,retencion_pct:0,retencion_importe:0},
+    {tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-03-01',concepto:'Comision TPV febrero 2026',operacion:'EXENTO',base_iva:16.16,pct_iva:0,cuota_iva:0,base_irpf:16.16,retencion_pct:0,retencion_importe:0},
+    {tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-01-01',concepto:'Alquiler local enero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171},
+    {tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-02-01',concepto:'Alquiler local febrero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171},
+    {tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-03-01',concepto:'Alquiler local marzo',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171},
+    {tipo:'gasto',proveedor_cliente:'OpenAI Ireland Limited',fecha:'2026-02-15',concepto:'Suscripcion OpenAI',operacion:'INTRA_S',base_iva:57.03,pct_iva:0,cuota_iva:0,base_irpf:57.03,retencion_pct:0,retencion_importe:0},
+  ];
+  if(!data['1T 2026']) data['1T 2026']=[];
+  demo.forEach(f=>{ f._quarter='1T 2026'; f._id=Date.now()+Math.random(); data['1T 2026'].push(f); });
+  save(); Q='1T 2026';
+  document.querySelectorAll('#qs .q-pill').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.getElementById('qbadge').textContent='1T 2026';
+  document.getElementById('pq').textContent='1T 2026';
+  renderAll();
+  const fb=document.getElementById('imp-fb'); fb.textContent='✓ Demo cargado.'; fb.className='feedback ok';
+}
+</script>
+</body>
+</html>

@@ -569,26 +569,64 @@ function loginGoogle(){
     setTimeout(loginGoogle, 800); return;
   }
   document.getElementById('login-status').textContent='Iniciando sesión...';
-  // Detect mobile — use redirect flow
   const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const client=google.accounts.oauth2.initTokenClient({
-    client_id:CLIENT_ID, scope:SCOPES,
-    callback: async(resp)=>{
-      if(resp.error){ document.getElementById('login-status').textContent='Error: '+resp.error; return; }
-      token=resp.access_token;
-      const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}});
-      user=await r.json();
-      localStorage.setItem(LS_AUTH,JSON.stringify({token,user,ts:Date.now()}));
-      showPin();
-    },
-    ux_mode: isMobile ? 'redirect' : 'popup',
-    redirect_uri: window.location.href.split('?')[0].split('#')[0]
-  });
-  client.requestAccessToken({prompt: token ? '' : 'consent'});
+  if(isMobile){
+    // Mobile: manual redirect flow
+    const redirectUri=window.location.origin+window.location.pathname;
+    const params=new URLSearchParams({
+      client_id:CLIENT_ID,
+      redirect_uri:redirectUri,
+      response_type:'token',
+      scope:SCOPES,
+      include_granted_scopes:'true',
+      state:'mobile_auth'
+    });
+    window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
+  } else {
+    const client=google.accounts.oauth2.initTokenClient({
+      client_id:CLIENT_ID, scope:SCOPES,
+      callback: async(resp)=>{
+        if(resp.error){document.getElementById('login-status').textContent='Error: '+resp.error;return;}
+        await handleToken(resp.access_token);
+      }
+    });
+    client.requestAccessToken({prompt:''});
+  }
+}
+
+async function handleToken(access_token){
+  token=access_token;
+  const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}});
+  user=await r.json();
+  localStorage.setItem(LS_AUTH,JSON.stringify({token,user,ts:Date.now()}));
+  showPin();
+}
+
+// Handle redirect callback — token comes back in URL hash
+function checkRedirectToken(){
+  const hash=window.location.hash.substring(1);
+  if(!hash) return;
+  const params=new URLSearchParams(hash);
+  const access_token=params.get('access_token');
+  if(access_token){
+    // Clean URL
+    history.replaceState(null,'',window.location.pathname);
+    loadLocal(); loadCfg();
+    handleToken(access_token).then(()=>{ showPin(); });
+  }
 }
 function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }
 function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
-window.addEventListener('load',()=>{ loadLocal();loadCfg(); try{ const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}'); if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;} }catch(e){} document.getElementById('login-screen').style.display='flex'; });
+window.addEventListener('load',()=>{
+  loadLocal(); loadCfg();
+  // Check if returning from OAuth redirect
+  if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }
+  try{
+    const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
+    if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
+  }catch(e){}
+  document.getElementById('login-screen').style.display='flex';
+});
 
 // ── PIN ──
 function pp(d){ if(pin.length>=4)return; pin+=d; updateDots(); }

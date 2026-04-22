@@ -251,6 +251,8 @@ input[type=file] { display:none; }
 .view-btn.active { background:var(–clay); color:white; border-color:var(–clay); }
 </style>
 
+<script src="https://accounts.google.com/gsi/client" defer></script>
+
 </head>
 <body>
 
@@ -534,8 +536,6 @@ input[type=file] { display:none; }
   </div>
 </div>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <script>
 const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com';
 const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
@@ -563,7 +563,13 @@ function getF(q){ if(!data[q]) data[q]=[]; return data[q]; }
 function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1','migestor_v2','migestor_v3'].forEach(k=>{ try{ const o=JSON.parse(localStorage.getItem(k)||'{}'); Object.entries(o).forEach(([q,fs])=>{ if(!data[q]) data[q]=[]; (fs||[]).forEach(f=>{ if(!data[q].find(x=>x._id===f._id)) data[q].push(f); }); }); }catch(e){} }); }
 
 // ── AUTH ──
-function loginGoogle(){ document.getElementById('login-status').textContent='Iniciando sesión...'; const client=google.accounts.oauth2.initTokenClient({ client_id:CLIENT_ID, scope:SCOPES, callback: async(resp)=>{ if(resp.error){document.getElementById('login-status').textContent='Error: '+resp.error;return;} token=resp.access_token; const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}}); user=await r.json(); localStorage.setItem(LS_AUTH,JSON.stringify({token,user,ts:Date.now()})); showPin(); } }); client.requestAccessToken(); }
+function loginGoogle(){
+  if(typeof google === 'undefined' || !google.accounts){
+    document.getElementById('login-status').textContent='Cargando Google... espera un momento';
+    setTimeout(loginGoogle, 800);
+    return;
+  }
+  document.getElementById('login-status').textContent='Iniciando sesión...'; const client=google.accounts.oauth2.initTokenClient({ client_id:CLIENT_ID, scope:SCOPES, callback: async(resp)=>{ if(resp.error){document.getElementById('login-status').textContent='Error: '+resp.error;return;} token=resp.access_token; const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}}); user=await r.json(); localStorage.setItem(LS_AUTH,JSON.stringify({token,user,ts:Date.now()})); showPin(); } }); client.requestAccessToken(); }
 function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }
 function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
 window.addEventListener('load',()=>{ loadLocal();loadCfg(); try{ const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}'); if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;} }catch(e){} document.getElementById('login-screen').style.display='flex'; });

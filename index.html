@@ -12,13 +12,27 @@
 :root {
   --clay:#C4763A; --clay-light:#F5EBE0; --clay-dark:#7A4520;
   --bg:#F7F5F2; --bg2:#FFFFFF; --bg3:#EFEDE9;
-  --text:#1A1A1A; --text2:#666; --text3:#999;
-  --border:rgba(0,0,0,0.10); --border2:rgba(0,0,0,0.18);
+  --text:#1A1A1A; --text2:#555; --text3:#888;
+  --border:rgba(0,0,0,0.09); --border2:rgba(0,0,0,0.16);
   --green:#0F6E56; --green-bg:#EAF3DE; --green-border:#C0DD97;
   --red:#A32D2D; --red-bg:#FCEBEB; --red-border:#F7C1C1;
   --blue:#185FA5; --blue-bg:#E6F1FB; --blue-border:#B5D4F4;
   --amber:#854F0B; --amber-bg:#FAEEDA; --amber-border:#FAC775;
   --radius:16px; --radius-sm:10px;
+  --shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#111110; --bg2:#1C1C1A; --bg3:#252522;
+    --text:#F0EDE8; --text2:#9A9690; --text3:#605D58;
+    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+    --clay-light:#2A1A0C; --clay-dark:#E8934A;
+    --green-bg:#0A1F17; --green-border:#1A4030; --green:#3DB88A;
+    --red-bg:#1F0A0A; --red-border:#4A1010; --red:#E87070;
+    --blue-bg:#0A1628; --blue-border:#1A3060; --blue:#5B9FE8;
+    --amber-bg:#1F1205; --amber-border:#4A2A05; --amber:#E8A855;
+    --shadow:0 1px 4px rgba(0,0,0,0.4);
+  }
 }
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); -webkit-font-smoothing:antialiased; }
 
@@ -88,23 +102,23 @@ width:100%; max-width:300px;
 .btn-out-white { background:transparent; border:0.5px solid rgba(255,255,255,0.2); border-radius:20px; padding:6px 16px; font-size:12px; color:rgba(255,255,255,0.5); cursor:pointer; }
 
 #main-screen { display:none; }
-.top-bar { background:var(–bg2); border-bottom:0.5px solid var(–border); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+.top-bar { background:var(–bg2); border-bottom:0.5px solid var(–border); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:var(–shadow); }
 .top-left { display:flex; align-items:center; gap:8px; }
-.top-logo { width:28px; height:28px; background:var(–clay); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; }
-.top-title { font-size:15px; font-weight:700; }
-.top-right { display:flex; align-items:center; gap:8px; }
-.q-badge { background:var(–clay-light); color:var(–clay-dark); font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; }
-.status-row { display:flex; align-items:center; gap:5px; font-size:11px; color:var(–text3); }
+.top-title { font-size:15px; font-weight:700; color:var(–text); }
+.top-right { display:flex; align-items:center; gap:6px; }
+.q-badge { background:var(–clay); color:white; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; letter-spacing:.02em; }
+.status-row { display:flex; align-items:center; gap:4px; font-size:10px; color:var(–text3); }
 .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-.dot-ok { background:var(–green); }
-.dot-err { background:var(–red); }
+.dot-ok { background:#3DB88A; }
+.dot-err { background:#E87070; }
 .dot-sync { background:var(–amber); }
 .dot-off { background:var(–text3); }
-.btn-out { background:transparent; border:0.5px solid var(–border2); border-radius:var(–radius-sm); padding:4px 10px; font-size:12px; color:var(–text2); cursor:pointer; }
+.btn-out { background:transparent; border:0.5px solid var(–border2); border-radius:20px; padding:5px 12px; font-size:12px; color:var(–text2); cursor:pointer; }
 
-.tabs { display:flex; background:var(–bg2); border-bottom:0.5px solid var(–border); overflow-x:auto; }
+.tabs { display:flex; background:var(–bg2); border-bottom:0.5px solid var(–border); overflow-x:auto; -webkit-overflow-scrolling:touch; gap:0; }
 .tabs::-webkit-scrollbar { display:none; }
-.tab-btn { padding:11px 16px; font-size:13px; color:var(–text2); border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; font-weight:500; -webkit-tap-highlight-color:transparent; }
+.tab-btn { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 12px; font-size:11px; color:var(–text3); border:none; background:transparent; cursor:pointer; border-bottom:2.5px solid transparent; white-space:nowrap; font-weight:500; -webkit-tap-highlight-color:transparent; transition:color .15s; min-width:60px; }
+.tab-btn .tab-icon { font-size:16px; line-height:1; }
 .tab-btn.active { color:var(–clay); border-bottom-color:var(–clay); }
 .tab-pane { display:none; padding:16px; }
 .tab-pane.active { display:block; }
@@ -304,7 +318,7 @@ input[type=file] { display:none; }
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.8</div>
+    <div class="login-version">v5.9</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
@@ -361,13 +375,13 @@ input[type=file] { display:none; }
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('facturas',this)">Facturas</button>
-    <button class="tab-btn" onclick="switchTab('registros',this)">Registros</button>
-    <button class="tab-btn" onclick="switchTab('manual',this)">Manual</button>
-    <button class="tab-btn" onclick="switchTab('modelos',this)">Modelos</button>
-    <button class="tab-btn" onclick="switchTab('drive',this)">Drive</button>
-    <button class="tab-btn" onclick="switchTab('validar',this)">Validar 1T</button>
-    <button class="tab-btn" onclick="switchTab('config',this)">Config</button>
+    <button class="tab-btn active" onclick="switchTab('facturas',this)"><span class="tab-icon">📄</span>Facturas</button>
+    <button class="tab-btn" onclick="switchTab('registros',this)"><span class="tab-icon">📋</span>Registros</button>
+    <button class="tab-btn" onclick="switchTab('modelos',this)"><span class="tab-icon">🧮</span>Modelos</button>
+    <button class="tab-btn" onclick="switchTab('drive',this)"><span class="tab-icon">☁️</span>Drive</button>
+    <button class="tab-btn" onclick="switchTab('manual',this)"><span class="tab-icon">✏️</span>Manual</button>
+    <button class="tab-btn" onclick="switchTab('validar',this)"><span class="tab-icon">✅</span>Validar</button>
+    <button class="tab-btn" onclick="switchTab('config',this)"><span class="tab-icon">⚙️</span>Config</button>
   </div>
 
   <!-- FACTURAS -->

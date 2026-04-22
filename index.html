@@ -251,8 +251,6 @@ input[type=file] { display:none; }
 .view-btn.active { background:var(–clay); color:white; border-color:var(–clay); }
 </style>
 
-<script src="https://accounts.google.com/gsi/client" defer></script>
-
 </head>
 <body>
 
@@ -263,7 +261,7 @@ input[type=file] { display:none; }
     <div class="logo-circle" style="margin:0 auto 12px;">🏺</div>
     <div class="app-name">MiGestor</div>
     <div class="app-sub">Gestión fiscal · Valentín López</div>
-    <div style="font-size:10px;color:var(--text3);margin-top:2px;">v5.4</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:2px;">v5.5</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para sincronizar tus datos fiscales con Drive.</p>
@@ -565,19 +563,17 @@ function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1',
 
 // ── AUTH ──
 function loginGoogle(){
-  if(typeof google === 'undefined' || !google.accounts){
-    document.getElementById('login-status').textContent='Cargando... espera';
-    setTimeout(loginGoogle, 800); return;
-  }
-  document.getElementById('login-status').textContent='Iniciando sesión...';
-  const client=google.accounts.oauth2.initTokenClient({
-    client_id:CLIENT_ID, scope:SCOPES,
-    callback: async(resp)=>{
-      if(resp.error){document.getElementById('login-status').textContent='Error: '+resp.error;return;}
-      await handleToken(resp.access_token);
-    }
+  // Direct OAuth URL — works on iOS Safari without popup blocking
+  const redirectUri='https://valentinis.github.io/mi-gestor/';
+  const params=new URLSearchParams({
+    client_id: CLIENT_ID,
+    redirect_uri: redirectUri,
+    response_type: 'token',
+    scope: SCOPES,
+    include_granted_scopes: 'true',
+    prompt: 'select_account'
   });
-  client.requestAccessToken({prompt:''});
+  window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
 }
 
 async function handleToken(access_token){

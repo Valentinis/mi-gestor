@@ -263,6 +263,7 @@ input[type=file] { display:none; }
     <div class="logo-circle" style="margin:0 auto 12px;">🏺</div>
     <div class="app-name">MiGestor</div>
     <div class="app-sub">Gestión fiscal · Valentín López</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:2px;">v5.4</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para sincronizar tus datos fiscales con Drive.</p>
@@ -569,29 +570,14 @@ function loginGoogle(){
     setTimeout(loginGoogle, 800); return;
   }
   document.getElementById('login-status').textContent='Iniciando sesión...';
-  const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if(isMobile){
-    // Mobile: manual redirect flow
-    const redirectUri=window.location.origin+window.location.pathname;
-    const params=new URLSearchParams({
-      client_id:CLIENT_ID,
-      redirect_uri:redirectUri,
-      response_type:'token',
-      scope:SCOPES,
-      include_granted_scopes:'true',
-      state:'mobile_auth'
-    });
-    window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
-  } else {
-    const client=google.accounts.oauth2.initTokenClient({
-      client_id:CLIENT_ID, scope:SCOPES,
-      callback: async(resp)=>{
-        if(resp.error){document.getElementById('login-status').textContent='Error: '+resp.error;return;}
-        await handleToken(resp.access_token);
-      }
-    });
-    client.requestAccessToken({prompt:''});
-  }
+  const client=google.accounts.oauth2.initTokenClient({
+    client_id:CLIENT_ID, scope:SCOPES,
+    callback: async(resp)=>{
+      if(resp.error){document.getElementById('login-status').textContent='Error: '+resp.error;return;}
+      await handleToken(resp.access_token);
+    }
+  });
+  client.requestAccessToken({prompt:''});
 }
 
 async function handleToken(access_token){
@@ -602,14 +588,12 @@ async function handleToken(access_token){
   showPin();
 }
 
-// Handle redirect callback — token comes back in URL hash
 function checkRedirectToken(){
   const hash=window.location.hash.substring(1);
   if(!hash) return;
   const params=new URLSearchParams(hash);
   const access_token=params.get('access_token');
   if(access_token){
-    // Clean URL
     history.replaceState(null,'',window.location.pathname);
     loadLocal(); loadCfg();
     handleToken(access_token).then(()=>{ showPin(); });

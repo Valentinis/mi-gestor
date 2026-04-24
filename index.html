@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.40</div>
+    <div class="login-version">v5.45</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.40</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.45</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -390,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.40</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.45</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -428,16 +428,19 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 
   <!-- ADD INVOICE MODAL -->
   <div id="add-modal" onclick="closeAddModal(event)">
-    <div class="add-sheet">
-      <h3>Añadir factura</h3>
-      <div class="q-selector" id="qs-add" style="margin-bottom:16px;">
-        <button class="q-pill active" onclick="setQ('1T 2026',this,'qs-add')">1T 2026</button>
-        <button class="q-pill" onclick="setQ('2T 2026',this,'qs-add')">2T 2026</button>
-        <button class="q-pill" onclick="setQ('3T 2026',this,'qs-add')">3T 2026</button>
-        <button class="q-pill" onclick="setQ('4T 2026',this,'qs-add')">4T 2026</button>
+    <div class="add-sheet" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="margin:0;">Añadir factura</h3>
+        <button onclick="closeAddModal()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-3);">✕</button>
+      </div>
+      <div class="q-selector" id="qs-add" style="margin-bottom:12px;">
+        <button class="q-pill" onclick="setQY(1,this,'add')">1T</button>
+        <button class="q-pill" onclick="setQY(2,this,'add')">2T</button>
+        <button class="q-pill" onclick="setQY(3,this,'add')">3T</button>
+        <button class="q-pill" onclick="setQY(4,this,'add')">4T</button>
       </div>
       <div id="claude-no-key-add" class="tip-box" style="display:none;">Ve a <strong>Config</strong> e introduce tu API key.</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
         <div class="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)" style="margin-bottom:0;">
           <div class="upload-icon">📁</div>
           <div class="upload-title">Seleccionar</div>
@@ -450,13 +453,13 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         </div>
       </div>
       <div id="paste-status" style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;min-height:16px;"></div>
+      <!-- Analysis results appear here, inside the modal -->
+      <div id="analysis-list"></div>
     </div>
-  </div>
   </div>
   <div id="tab-facturas" class="tab-pane active">
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
-    <div id="analysis-list"></div>
     <!-- Trimestre selector -->
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
       <select id="year-f" onchange="updateYearQ('f')" style="padding:6px 10px;font-size:13px;font-weight:600;border:0.5px solid var(--line);border-radius:10px;background:var(--bg-raised);color:var(--text);cursor:pointer;">
@@ -661,6 +664,40 @@ let claudeKey='', userPin='1234';
 const JUST_OPTIONS=[
   '','Material de taller (arcilla, esmaltes, herramientas)','Mobiliario y equipamiento del taller (mesas, sillas, lámparas, almacenamiento)','Alquiler local de actividad','Suministros del local (luz, agua, gas)','Material fotográfico para documentar obra','Seguridad del local','Limpieza y mantenimiento del taller','Material de oficina y administración','Formación y desarrollo profesional','Marketing y promoción de la actividad','Equipamiento informático (uso profesional)','Servicio digital para la actividad','Servicios profesionales externos (autónomo con retención 15%)','Otro (especificar)'
 ];
+const JUST_OPTIONS_ING=[
+  '','Venta de cerámica','Taller o curso de cerámica','Venta online de cerámica','Encargo personalizado de cerámica','Comisión de venta (SumUp/TPV)','Otro ingreso (especificar)'
+];
+
+// Auto-suggest justification based on record
+function autoJust(f){
+  if(!f) return '';
+  const op=f.operacion||'';
+  const conc=(f.concepto||'').toLowerCase();
+  const prov=(f.proveedor_cliente||'').toLowerCase();
+  if(f.tipo==='ingreso'){
+    if(prov.includes('sumup')||conc.includes('comis')) return 'Comisión de venta (SumUp/TPV)';
+    if(conc.includes('taller')||conc.includes('curs')||conc.includes('workshop')) return 'Taller o curso de cerámica';
+    if(conc.includes('venda')||conc.includes('venta')||conc.includes('ceràmica')||conc.includes('ceramica')) return 'Venta de cerámica';
+    if(conc.includes('encàrrec')||conc.includes('encargo')) return 'Encargo personalizado de cerámica';
+    return 'Venta de cerámica';
+  }
+  if(op==='ALQUILER') return 'Alquiler local de actividad';
+  if(op==='PROF') return 'Servicios profesionales externos (autónomo con retención 15%)';
+  if(op==='INTRA_S') return 'Servicio digital para la actividad';
+  if(prov.includes('endesa')||prov.includes('naturgy')||prov.includes('iberdrola')||conc.includes('llum')||conc.includes('luz')||conc.includes('elèctri')) return 'Suministros del local (luz, agua, gas)';
+  if(prov.includes('ikea')||conc.includes('mobi')||conc.includes('làmp')||conc.includes('caixa')||conc.includes('caja')||conc.includes('cadira')) return 'Mobiliario y equipamiento del taller (mesas, sillas, lámparas, almacenamiento)';
+  if(prov.includes('collet')||prov.includes('ceràm')||prov.includes('ceram')||conc.includes('argila')||conc.includes('arcilla')||conc.includes('esmalte')||conc.includes('pigment')) return 'Material de taller (arcilla, esmaltes, herramientas)';
+  if(prov.includes('amazon')||prov.includes('leroy')||prov.includes('brico')) return 'Material de taller (arcilla, esmaltes, herramientas)';
+  if(prov.includes('anthropic')||prov.includes('openai')||prov.includes('google')||prov.includes('adobe')||prov.includes('notion')) return 'Servicio digital para la actividad';
+  if(conc.includes('fotograf')||conc.includes('câmera')||conc.includes('camara')) return 'Material fotográfico para documentar obra';
+  if(conc.includes('netej')||conc.includes('limpiez')) return 'Limpieza y mantenimiento del taller';
+  if(conc.includes('segure')||conc.includes('seguri')) return 'Seguridad del local';
+  if(conc.includes('format')||conc.includes('curs')) return 'Formación y desarrollo profesional';
+  if(conc.includes('market')||conc.includes('publi')||conc.includes('xarxa')||conc.includes('red social')) return 'Marketing y promoción de la actividad';
+  if(conc.includes('inform')||conc.includes('portàtil')||conc.includes('portati')||conc.includes('tablet')) return 'Equipamiento informático (uso profesional)';
+  if(conc.includes('oficin')||conc.includes('paper')||conc.includes('toner')) return 'Material de oficina y administración';
+  return '';
+}
 
 // ── CFG ──
 function loadCfg(){ try{ const c=JSON.parse(localStorage.getItem(LS_CFG)||'{}'); if(c.claudeKey) claudeKey=c.claudeKey; if(c.userPin) userPin=c.userPin; if(c.sheetId) sheetId=c.sheetId; }catch(e){} }
@@ -678,7 +715,21 @@ function changePin(){ const np=document.getElementById('new-pin-input').value.tr
 
 // ── DATA ──
 function loadLocal(){ try{ data=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){ data={}; } migrar(); }
-function saveLocal(){ localStorage.setItem(LS,JSON.stringify(data)); updateSI(); }
+function cleanData(){
+  // Remove exact duplicates (same _id) and records with missing critical fields
+  Object.keys(data).forEach(q=>{
+    if(!Array.isArray(data[q])) { data[q]=[]; return; }
+    const seen=new Set();
+    data[q]=data[q].filter(f=>{
+      if(!f||typeof f!=='object') return false;
+      if(!f._id) f._id=Date.now()+Math.random();
+      if(seen.has(f._id)) return false;
+      seen.add(f._id);
+      return true;
+    });
+  });
+}
+function saveLocal(){ cleanData(); localStorage.setItem(LS,JSON.stringify(data)); updateSI(); }
 function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros · '+Q; }
 function getF(q){ if(!data[q]) data[q]=[]; return data[q]; }
 function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1','migestor_v2','migestor_v3'].forEach(k=>{ try{ const o=JSON.parse(localStorage.getItem(k)||'{}'); Object.entries(o).forEach(([q,fs])=>{ if(!data[q]) data[q]=[]; (fs||[]).forEach(f=>{ if(!data[q].find(x=>x._id===f._id)) data[q].push(f); }); }); }catch(e){} }); }
@@ -776,7 +827,10 @@ REGLAS ESPECÍFICAS POR PROVEEDOR:
 - Endesa: SIEMPRE 2 facturas en 1 PDF. Base IVA = línea "IVA normal 21% s/ XXX". Ignorar impuesto especial electricidad.
 - SumUp: tipo=ingreso. Genera array con 2 registros: [ingreso(base=transacciones/1.21, pct_iva=21, cuota_iva=transacciones-base), gasto comisión(operacion=EXENTO)]
 - OpenAI/Anthropic/servicios IA desde Irlanda: operacion=INTRA_S, pct_iva=0, cuota_iva=0
-- PROF aplica ÚNICAMENTE si: (1) el emisor es una persona física autónoma (nombre y apellidos, no empresa), Y (2) la factura tiene una línea IRPF/retención con importe explícito. Cerámica Collet, IKEA, Amazon y cualquier S.A., S.L., S.A.U., CB o empresa → NUNCA PROF, siempre INT
+- PROF aplica ÚNICAMENTE si SE CUMPLEN LAS DOS condiciones: (1) el emisor es una persona física autónoma identificada con nombre Y apellidos (ej: "María García López"), NO una empresa, NO una S.A., NO una S.L., NO una S.A.U., NO una CB, NO una Ltd, NO ninguna forma societaria. (2) la factura incluye explícitamente una línea "IRPF", "Retención" o "Ret." con un importe numérico.
+- Si el nombre del emisor incluye S.A., S.L., S.A.U., S.L.U., CB, Ltd, Limited, GmbH, B.V., Inc., Corp., o cualquier sigla societaria → operacion=INT, NUNCA PROF.
+- Ejemplos PROF: "Patrícia Peix Roldán", "Joan Martínez García" → persona física con IRPF explícito.
+- Ejemplos NUNCA PROF: "Cerámica Collet S.A.", "IKEA Ibérica S.A.U.", "Amazon EU SARL", "Anthropic Ireland Limited", "Alibau Gestio CB" → siempre INT o ALQUILER.
 - Patrícia Peix Roldán (NIF 47847236Z): tipo=gasto, operacion=PROF, retencion_pct=15
 - Alibau Gestio CB (alquiler): base=900, pct_iva=21, cuota_iva=189, retencion_pct=19, retencion_importe=171, operacion=ALQUILER
 - Amazon (CN/GB vendedores, IVA declarado por Amazon ES): operacion=INT, IVA deducible normal
@@ -865,7 +919,10 @@ async function handleClaudeFiles(files){
       // Build review UI with checkboxes and justification
       const reviewHTML=items.map((f,i)=>{
         const amount=f.cuota_iva>0?`IVA ${f.cuota_iva.toFixed(2)}€`:f.tipo==='ingreso'?`Ingreso ${(f.base_irpf||0).toFixed(2)}€`:`Base ${(f.base_iva||0).toFixed(2)}€`;
-        const justOpts=JUST_OPTIONS.map(o=>`<option value="${o}" ${o===''?'selected':''}>${o===''?'— Seleccionar justificación (opcional) —':o}</option>`).join('');
+        const isIng=f.tipo==='ingreso';
+      const opts=isIng?JUST_OPTIONS_ING:JUST_OPTIONS;
+      const suggested=autoJust(f);
+      const justOpts=opts.map(o=>`<option value="${o}" ${o===suggested&&suggested?'selected':o===''&&!suggested?'selected':''}>${o===''?'— Seleccionar justificación —':o}</option>`).join('');
         return `<div class="factura-review" id="${divId}_r${i}">
           <div class="factura-review-hdr">
             <input type="checkbox" checked onchange="toggleReview('${divId}_r${i}',this.checked)" />
@@ -890,7 +947,24 @@ async function handleClaudeFiles(files){
       // Store items on div element
       window['_analysis_'+divId]=items;
       // Upload file to Drive
-      if(token&&facturasFId){ const f0=items[0]||{}; const fecha=(f0.fecha||'').slice(0,10); const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30); const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20); const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg'; const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext; uploadFileToDrive(new File([file],newName,{type:file.type}),Q).catch(()=>{}); }
+      if(token&&facturasFId){
+        const f0=items[0]||{};
+        const fecha=(f0.fecha||'').slice(0,10);
+        const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
+        const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
+        const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
+        const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
+        uploadFileToDrive(new File([file],newName,{type:file.type}),Q).then(created=>{
+          if(created&&created.webViewLink){
+            // Store drive link on ALL records from this analysis
+            items.forEach(rec=>{
+              const saved=Object.values(data).flat().find(x=>x._id===rec._id);
+              if(saved) saved._driveLink=created.webViewLink;
+            });
+            saveLocal();
+          }
+        }).catch(()=>{});
+      }
     }catch(e){
       div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-error">Error</span></div><div style="font-size:12px;color:var(--red);padding:8px;">${e.message}</div>`;
     }
@@ -900,6 +974,18 @@ async function handleClaudeFiles(files){
 function toggleReview(id, checked){ const el=document.getElementById(id); if(el) el.classList.toggle('discarded',!checked); }
 function toggleJustOther(selId, otherId){ const sel=document.getElementById(selId); const oth=document.getElementById(otherId); if(sel&&oth) oth.style.display=sel.value==='Otro (especificar)'?'block':'none'; }
 
+function isDuplicate(f){
+  const allRecs=Object.values(data).flat();
+  return allRecs.some(existing=>
+    existing.num_factura&&f.num_factura&&
+    existing.num_factura===f.num_factura&&
+    existing.proveedor_cliente===f.proveedor_cliente
+  ) || allRecs.some(existing=>
+    existing.fecha===f.fecha&&
+    existing.proveedor_cliente===f.proveedor_cliente&&
+    Math.abs((existing.base_iva||0)-(f.base_iva||0))<0.01
+  );
+}
 function saveAnalysis(divId, count){
   const items=window['_analysis_'+divId];
   if(!items) return;
@@ -915,14 +1001,18 @@ function saveAnalysis(divId, count){
     f.justificacion=just;
     f._quarter=Q; f._id=Date.now()+Math.random();
     if(!data[Q]) data[Q]=[];
+    if(isDuplicate(f)){
+      const skip=confirm(`⚠️ Posible duplicado detectado:\n${f.proveedor_cliente} · ${f.fecha} · ${fmt(f.base_iva||0)}\n\n¿Guardar igualmente?`);
+      if(!skip) continue;
+    }
     data[Q].push(f); saved++;
   });
   if(saved===0){ alert('No hay facturas seleccionadas.'); return; }
   saveLocal(); renderAll();
   if(token) saveDataToDrive(Q).catch(()=>{});
-  closeAddModal();
   const btn=document.querySelector('#'+divId+' .btn-save-analysis');
   if(btn){btn.textContent='✓ '+saved+' guardada(s)';btn.disabled=true;}
+  setTimeout(()=>closeAddModal(),1200);
 }
 
 // ── DRIVE ──
@@ -1078,7 +1168,12 @@ function openAddModal(){
   document.body.style.overflow='hidden';
 }
 function closeAddModal(e){
-  if(!e||e.target===document.getElementById('add-modal')){ document.getElementById('add-modal').style.display='none'; document.body.style.overflow=''; }
+  if(!e||e.target===document.getElementById('add-modal')||e.target===undefined){
+    document.getElementById('add-modal').style.display='none';
+    document.body.style.overflow='';
+    document.getElementById('analysis-list').innerHTML='';
+    document.getElementById('paste-status').textContent='';
+  }
 }
 let factFilter='todos';
 function normName(s){
@@ -1170,7 +1265,7 @@ function renderList(){
   if(!fs.length){list.innerHTML='<div class="empty">Sin registros</div>';return;}
   list.innerHTML=[...fs].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")).map(f=>{
     const isIng=f.tipo==='ingreso';
-    const amount=isIng?(f.ingresos_brutos||f.base_iva||0):(f.base_iva||0);
+    const amount=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0));
     return `<div class="fact-item" onclick="openModal(${f._id})" style="cursor:pointer;">
       <div class="fact-color-bar ${f.tipo||'gasto'}"></div>
       <div class="fact-main">
@@ -1218,19 +1313,29 @@ function openModal(id){
     return `<div style="display:flex;justify-content:space-between;padding:${hl?'10px':'8px'} 0;border-bottom:0.5px solid var(--line);font-size:${hl?'14px':'13px'};gap:12px;${hl?'background:transparent;':''}"><span style="color:var(--text-3);font-weight:${hl?'600':'500'};flex-shrink:0;">${k}</span><span style="color:${valColor};text-align:right;font-weight:${hl?'700':'400'};">${v}</span></div>`;
   }).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
   // Show Drive button if file link exists
-  const driveFile=driveFiles.find(df=>df.name&&(
-    (f.num_factura&&df.name.toLowerCase().includes(f.num_factura.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)))||
-    (f.fecha&&df.name.includes((f.fecha||'').slice(0,10)))
-  )) || (f._driveLink?{link:f._driveLink}:null);
+  // Use _driveLink stored on record first (most accurate)
+  let driveLink=f._driveLink||null;
+  if(!driveLink&&f.num_factura){
+    const df=driveFiles.find(df=>df.name&&df.name.includes(f.num_factura.replace(/[^a-zA-Z0-9]/g,'').slice(0,8)));
+    if(df) driveLink=df.link;
+  }
+  if(!driveLink&&f.fecha&&f.proveedor_cliente){
+    const pNorm=(f.proveedor_cliente||'').toLowerCase().replace(/[^a-z]/g,'').slice(0,8);
+    const df=driveFiles.find(df=>df.name&&df.name.includes((f.fecha||'').slice(0,10))&&df.name.toLowerCase().replace(/[^a-z]/g,'').includes(pNorm));
+    if(df) driveLink=df.link;
+  }
   const driveBtn=document.getElementById('modal-drive-btn');
-  if(driveFile){ driveBtn.style.display='flex'; driveBtn._link=driveFile.link; driveBtn.textContent='📂 Ver en Drive'; }
+  if(driveLink){ driveBtn.style.display='flex'; driveBtn._link=driveLink; driveBtn.textContent='📂 Ver en Drive'; driveBtn.onclick=()=>openDriveFile(); }
   else{ driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='☁️ Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); }
   // Populate justification select
   const justSec=document.getElementById('modal-just-section');
   justSec.style.display='none';
   document.getElementById('modal-just-btn').textContent='✏️ Justificación';
   const justSel=document.getElementById('modal-just-select');
-  justSel.innerHTML=JUST_OPTIONS.map(o=>`<option value="${o}" ${o===(f.justificacion||'')?'selected':''}>${o===''?'— Seleccionar justificación —':o}</option>`).join('');
+  const isIngM=f.tipo==='ingreso';
+  const optsM=isIngM?JUST_OPTIONS_ING:JUST_OPTIONS;
+  const suggestedM=f.justificacion||autoJust(f);
+  justSel.innerHTML=optsM.map(o=>`<option value="${o}" ${o===suggestedM?'selected':o===''&&!suggestedM?'selected':''}>${o===''?'— Seleccionar justificación —':o}</option>`).join('');
   const justOther=document.getElementById('modal-just-other');
   justOther.style.display='none';
   if(f.justificacion&&!JUST_OPTIONS.includes(f.justificacion)){

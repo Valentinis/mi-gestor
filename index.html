@@ -71,7 +71,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 /* MAIN */
 #main-screen{display:none;}
-.top-bar{background:var(–bg-card);border-bottom:0.5px solid var(–line);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.top-bar{background:#FFFFFF;border-bottom:0.5px solid rgba(0,0,0,0.1);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+@media (prefers-color-scheme:dark){.top-bar{background:#1C1C1E;border-bottom-color:rgba(255,255,255,0.08);}}
 .top-left{display:flex;align-items:center;gap:9px;}
 .top-title{font-size:16px;font-weight:700;color:var(–text);}
 .top-right{display:flex;align-items:center;gap:8px;}
@@ -317,7 +318,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.58</div>
+    <div class="login-version">v5.59</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -352,7 +353,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.58</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.59</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -391,7 +392,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.58</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.59</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">

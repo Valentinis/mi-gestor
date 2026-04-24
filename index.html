@@ -99,8 +99,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .nav-add{width:52px;height:52px;border-radius:50%;background:var(–accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(196,118,58,0.5);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
 .nav-add svg{width:26px;height:26px;}
 /* Add invoice modal */
-#add-modal{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
-#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:var(–bg-card);border-radius:20px 20px 0 0;padding:20px 16px 40px;padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+#add-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:var(–bg-card);border-radius:20px 20px 0 0;padding:20px 16px 32px;max-height:85vh;overflow-y:auto;}
 #add-modal .add-sheet h3{font-size:17px;font-weight:700;margin:0 0 16px;text-align:center;}
 /* Facturas list compact */
 .fact-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(–line);}
@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.26</div>
+    <div class="login-version">v5.28</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,12 +351,12 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.26</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.28</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
 
-<div id="factura-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);overflow-y:auto;padding:1rem;">
+<div id="factura-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);overflow-y:auto;padding:1rem;">
   <div style="background:var(--bg-card);border-radius:20px;max-width:480px;margin:2rem auto;padding:0;overflow:hidden;border:0.5px solid var(--line);">
     <div style="padding:16px;border-bottom:0.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;">
       <span style="font-size:15px;font-weight:700;color:var(--text);" id="modal-title">Detalle factura</span>
@@ -382,7 +382,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.26</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.28</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -582,7 +582,9 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 <script>
 
 const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com';
-const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+const SCOPES='https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+const SCOPE_VERSION='v2'; // bump when scopes change to force re-auth
+if(localStorage.getItem('_scope_v')!==SCOPE_VERSION){ localStorage.removeItem('migestor_auth'); localStorage.setItem('_scope_v',SCOPE_VERSION); }
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
 
 // Auto-detect current quarter
@@ -858,24 +860,26 @@ async function findOrCreate(name,parent){ const q=encodeURIComponent(`name='${na
 async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); await loadFromDrive(); await loadDriveFiles(); setDS('ok','Drive OK'); }catch(e){setDS('err','Error Drive');} }
 async function loadDriveFiles(){
   if(!token||!facturasFId) return;
-  // Load all files recursively from facturas folder
-  const q=encodeURIComponent(`'${facturasFId}' in parents and trashed=false and mimeType='application/vnd.google-apps.folder'`);
-  const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`);
-  const j=await r.json();
-  const subFolders=j.files||[];
-  // Also check files directly in facturas folder
-  const q2=encodeURIComponent(`'${facturasFId}' in parents and trashed=false and mimeType!='application/vnd.google-apps.folder'`);
-  const r2=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q2}&fields=files(id,name,webViewLink,createdTime)`);
-  const j2=await r2.json();
-  (j2.files||[]).forEach(f=>{ if(!driveFiles.find(x=>x.id===f.id)) driveFiles.push({id:f.id,name:f.name,link:f.webViewLink,ts:f.createdTime}); });
-  // Load from each quarter subfolder
-  for(const folder of subFolders){
-    const qf=encodeURIComponent(`'${folder.id}' in parents and trashed=false`);
-    const rf=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qf}&fields=files(id,name,webViewLink,createdTime)`);
-    const jf=await rf.json();
-    (jf.files||[]).forEach(f=>{ if(!driveFiles.find(x=>x.id===f.id)) driveFiles.push({id:f.id,name:f.name,quarter:folder.name,link:f.webViewLink,ts:f.createdTime}); });
-  }
-  renderAll(); renderDriveTab();
+  try{
+    // Get quarter subfolders
+    const q=encodeURIComponent(`'${facturasFId}' in parents and trashed=false`);
+    const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,mimeType,webViewLink,createdTime)&pageSize=100`);
+    const j=await r.json();
+    const items=j.files||[];
+    const folders=items.filter(f=>f.mimeType==='application/vnd.google-apps.folder');
+    const files=items.filter(f=>f.mimeType!=='application/vnd.google-apps.folder');
+    // Files directly in facturas/
+    files.forEach(f=>{ if(!driveFiles.find(x=>x.id===f.id)) driveFiles.push({id:f.id,name:f.name,link:f.webViewLink,ts:f.createdTime}); });
+    // Files in quarter subfolders
+    for(const folder of folders){
+      const qf=encodeURIComponent(`'${folder.id}' in parents and trashed=false`);
+      const rf=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qf}&fields=files(id,name,webViewLink,createdTime)&pageSize=100`);
+      const jf=await rf.json();
+      (jf.files||[]).forEach(f=>{ if(!driveFiles.find(x=>x.id===f.id)) driveFiles.push({id:f.id,name:f.name,quarter:folder.name,link:f.webViewLink,ts:f.createdTime}); });
+    }
+    console.log('Drive files loaded:',driveFiles.length, driveFiles.map(f=>f.name));
+    renderAll(); renderDriveTab();
+  }catch(e){ console.error('loadDriveFiles error:',e); }
 }
 async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); } else { const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
 async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace('_',' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal(); renderAll(); renderDriveTab(); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); }

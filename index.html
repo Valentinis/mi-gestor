@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.37</div>
+    <div class="login-version">v5.38</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.37</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.38</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -390,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.37</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.38</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -1292,7 +1292,9 @@ function hasDriveBackup(f){
   }
   return found;
 }
-function driveIcon(f){ return hasDriveBackup(f)?'<span title="Copia en Drive" style="font-size:14px;color:var(--green);">☁️</span>':'<span title="Sin copia en Drive" style="font-size:14px;color:var(--text-3);opacity:.5;">☁️</span>'; }
+function driveIcon(f){ return hasDriveBackup(f)
+  ?'<span title="Copia en Drive" style="font-size:13px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:1px 4px;font-weight:700;">✓</span>'
+  :'<span title="Sin copia en Drive" style="font-size:13px;background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 4px;font-weight:700;">!</span>'; }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──

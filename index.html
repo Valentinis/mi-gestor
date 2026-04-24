@@ -285,7 +285,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.17</div>
+    <div class="login-version">v5.18</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -320,6 +320,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.18</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -350,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.17</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.18</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -380,11 +381,19 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <button class="q-pill" onclick="setQ('4T 2026',this,'qs-f')">4T 2026</button>
     </div>
     <div id="claude-no-key" class="tip-box" style="display:none;"><h4>Claude API no configurada</h4>Ve a <strong>Config</strong> e introduce tu API key.</div>
-    <div class="upload-zone" id="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
-      <div class="upload-icon">&#x1F4C4;</div>
-      <div class="upload-title">Sube la foto o PDF de la factura</div>
-      <div class="upload-sub">Claude la analiza automáticamente · JPG, PNG o PDF</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div class="upload-zone" id="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)" style="margin-bottom:0;">
+        <div class="upload-icon">📁</div>
+        <div class="upload-title">Seleccionar</div>
+        <div class="upload-sub">Foto o PDF</div>
+      </div>
+      <div class="upload-zone" onclick="pasteFromClipboard()" style="margin-bottom:0;">
+        <div class="upload-icon">📋</div>
+        <div class="upload-title">Pegar</div>
+        <div class="upload-sub">Imagen o PDF</div>
+      </div>
     </div>
+    <div id="paste-status" style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;min-height:16px;"></div>
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <div id="analysis-list"></div>
     <div class="reg-panel" style="margin-top:16px;">
@@ -644,6 +653,43 @@ async function analyzeWithClaude(file){
 }
 function fileToBase64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); }); }
 function triggerUpload(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;} document.getElementById('file-claude').click(); }
+async function pasteFromClipboard(){
+  if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
+  const st=document.getElementById('paste-status');
+  try{
+    if(!navigator.clipboard||!navigator.clipboard.read){
+      st.textContent='Pulsa Ctrl+V / ⌘+V para pegar...';
+      document.addEventListener('paste',handlePasteEvent,{once:true}); return;
+    }
+    st.textContent='Leyendo portapapeles...';
+    const items=await navigator.clipboard.read();
+    let found=false;
+    for(const item of items){
+      if(item.types.includes('application/pdf')){
+        const blob=await item.getType('application/pdf');
+        st.textContent=''; handleClaudeFiles([new File([blob],'pasted.pdf',{type:'application/pdf'})]); found=true; break;
+      }
+      const imgType=item.types.find(t=>t.startsWith('image/'));
+      if(imgType){
+        const blob=await item.getType(imgType);
+        st.textContent=''; handleClaudeFiles([new File([blob],'pasted.'+imgType.split('/')[1],{type:imgType})]); found=true; break;
+      }
+    }
+    if(!found) st.textContent='No hay imagen ni PDF en el portapapeles.';
+  }catch(e){
+    st.textContent='Pulsa Ctrl+V / ⌘+V para pegar...';
+    document.addEventListener('paste',handlePasteEvent,{once:true});
+  }
+}
+function handlePasteEvent(e){
+  const st=document.getElementById('paste-status');
+  const items=[...(e.clipboardData?.items||[])];
+  const pdf=items.find(i=>i.type==='application/pdf');
+  if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';handleClaudeFiles([f]);return;}}
+  const img=items.find(i=>i.type.startsWith('image/'));
+  if(img){const f=img.getAsFile();if(f){st.textContent='';handleClaudeFiles([f]);return;}}
+  st.textContent='No se detectó imagen ni PDF.';
+}
 function dragOver(e){ e.preventDefault(); if(!claudeKey.startsWith('sk-ant-')) return; document.getElementById('upload-zone').classList.add('over'); }
 function dragLeave(){ document.getElementById('upload-zone').classList.remove('over'); }
 function dropFile(e){ e.preventDefault(); dragLeave(); if(!claudeKey.startsWith('sk-ant-')) return; handleClaudeFiles(e.dataTransfer.files); }

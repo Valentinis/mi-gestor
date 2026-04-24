@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.30</div>
+    <div class="login-version">v5.31</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.30</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.31</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -382,7 +382,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.30</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.31</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -462,7 +462,13 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
       <button class="filter-chip" onclick="setFilter('ingreso',this)">Ingresos</button>
       <button class="filter-chip" onclick="setFilter('gasto',this)">Gastos</button>
-      <button class="filter-chip" onclick="setFilter('mes',this)" id="filter-mes">Este mes</button>
+      <button class="filter-chip" onclick="setFilter('mes',this)">Este mes</button>
+      <select id="filter-proveedor" onchange="renderList()" style="flex-shrink:0;padding:5px 8px;font-size:12px;border:0.5px solid var(--line-2);border-radius:20px;background:var(--bg-raised);color:var(--text-2);cursor:pointer;">
+        <option value="">Proveedor</option>
+      </select>
+      <select id="filter-cliente" onchange="renderList()" style="flex-shrink:0;padding:5px 8px;font-size:12px;border:0.5px solid var(--line-2);border-radius:20px;background:var(--bg-raised);color:var(--text-2);cursor:pointer;">
+        <option value="">Cliente</option>
+      </select>
     </div>
     <!-- Search -->
     <div style="position:relative;margin-bottom:12px;">
@@ -884,7 +890,15 @@ async function loadDriveFiles(){
   }catch(e){ console.error('loadDriveFiles error:',e); }
 }
 async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); } else { const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
-async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace('_',' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal(); renderAll(); renderDriveTab(); const el=document.getElementById('drive-last-sync'); if(el) el.textContent='Última sync: '+new Date().toLocaleTimeString('es'); const si=document.getElementById('si'); if(si) si.textContent=Object.values(data).reduce((a,b)=>a+(b||[]).length,0)+' registros'; }
+async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace(/_/g,' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal();
+  // Auto-select current quarter after loading
+  const cq2=currentQuarter();
+  Q=cq2; regQ=cq2;
+  ['qs-f','qs-m','qs-r'].forEach(id=>{ document.querySelectorAll('#'+id+' .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===cq2)); });
+  const qb=document.getElementById('qbadge'); if(qb) qb.textContent=cq2;
+  renderAll(); renderDriveTab();
+  const el=document.getElementById('drive-last-sync'); if(el) el.textContent='Última sync: '+new Date().toLocaleTimeString('es');
+  const si2=document.getElementById('si'); if(si2) si2.textContent=Object.values(data).reduce((a,b)=>a+(b||[]).length,0)+' registros'; }
 async function uploadFileToDrive(file,q){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); renderDriveTab(); return created; }
 async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
 function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
@@ -989,11 +1003,30 @@ function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').f
 function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
 function renderList(){
   let fs=getF(Q);
+  // Populate provider/client dropdowns
+  const gastos=fs.filter(f=>f.tipo==='gasto');
+  const ingresos=fs.filter(f=>f.tipo==='ingreso');
+  const provSel=document.getElementById('filter-proveedor');
+  const cliSel=document.getElementById('filter-cliente');
+  if(provSel){
+    const provs=[...new Set(gastos.map(f=>f.proveedor_cliente).filter(Boolean))].sort();
+    const curProv=provSel.value;
+    provSel.innerHTML='<option value="">Proveedor</option>'+provs.map(p=>`<option value="${p}" ${p===curProv?'selected':''}>${p}</option>`).join('');
+  }
+  if(cliSel){
+    const clis=[...new Set(ingresos.map(f=>f.proveedor_cliente).filter(Boolean))].sort();
+    const curCli=cliSel.value;
+    cliSel.innerHTML='<option value="">Cliente</option>'+clis.map(c=>`<option value="${c}" ${c===curCli?'selected':''}>${c}</option>`).join('');
+  }
   // Filter
   const now=new Date(); const curMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   if(factFilter==='ingreso') fs=fs.filter(f=>f.tipo==='ingreso');
   else if(factFilter==='gasto') fs=fs.filter(f=>f.tipo==='gasto');
   else if(factFilter==='mes') fs=fs.filter(f=>(f.fecha||'').startsWith(curMonth));
+  const prov=(provSel&&provSel.value)||'';
+  const cli=(cliSel&&cliSel.value)||'';
+  if(prov) fs=fs.filter(f=>f.proveedor_cliente===prov);
+  if(cli) fs=fs.filter(f=>f.proveedor_cliente===cli);
   // Search
   const q=(document.getElementById('fact-search')||{}).value||'';
   if(q) fs=fs.filter(f=>(f.proveedor_cliente||'').toLowerCase().includes(q.toLowerCase())||(f.concepto||'').toLowerCase().includes(q.toLowerCase()));
@@ -1005,7 +1038,7 @@ function renderList(){
   const si=document.getElementById('fact-sum-ing'); if(si&&totalIng>0) si.textContent='↑ '+fmt(totalIng);
   const sg=document.getElementById('fact-sum-gas'); if(sg&&totalGas>0) sg.textContent='↓ '+fmt(totalGas);
   if(!fs.length){list.innerHTML='<div class="empty">Sin registros</div>';return;}
-  list.innerHTML=[...fs].reverse().map(f=>{
+  list.innerHTML=[...fs].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")).map(f=>{
     const isIng=f.tipo==='ingreso';
     const amount=isIng?(f.ingresos_brutos||f.base_iva||0):(f.base_iva||0);
     return `<div class="fact-item" onclick="openModal(${f._id})" style="cursor:pointer;">
@@ -1015,7 +1048,7 @@ function renderList(){
         <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}</div>
       </div>
       <div class="fact-right">
-        <div class="fact-amount ${f.tipo||'gasto'}">${isIng?'+':'−'}${fmt(amount)}</div>
+        <div class="fact-amount" style="color:${isIng?'var(--green)':'var(--red)'};font-weight:700;">${isIng?'+':'−'}${fmt(amount)}</div>
         <div class="fact-date">${f.fecha||''} ${driveIcon(f)}</div>
       </div>
     </div>`;
@@ -1048,7 +1081,12 @@ function openModal(id){
     ['Justificación', f.justificacion||'—'],
     ['Notas', f.notas||'—'],
   ];
-  document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:0;">${rows.filter(([k,v])=>v&&v!=='—'&&v!=='0,00 €').map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line);font-size:13px;gap:12px;"><span style="color:var(--text-3);font-weight:500;flex-shrink:0;">${k}</span><span style="color:var(--text);text-align:right;">${v}</span></div>`).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
+  const highlighted=['Base IVA','Cuota IVA','Retención','Base IRPF','Ingresos brutos'];
+  document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:0;">${rows.filter(([k,v])=>v&&v!=='—'&&v!=='0,00 €').map(([k,v])=>{
+    const hl=highlighted.includes(k);
+    const valColor=k==='Cuota IVA'?'var(--amber)':k==='Retención'?'var(--red)':k==='Base IVA'||k==='Base IRPF'?'var(--blue)':k==='Ingresos brutos'?'var(--green)':'var(--text)';
+    return `<div style="display:flex;justify-content:space-between;padding:${hl?'10px':'8px'} 0;border-bottom:0.5px solid var(--line);font-size:${hl?'14px':'13px'};gap:12px;${hl?'background:transparent;':''}"><span style="color:var(--text-3);font-weight:${hl?'600':'500'};flex-shrink:0;">${k}</span><span style="color:${valColor};text-align:right;font-weight:${hl?'700':'400'};">${v}</span></div>`;
+  }).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
   // Show Drive button if file link exists
   const driveFile=driveFiles.find(df=>df.name&&(
     (f.num_factura&&df.name.toLowerCase().includes(f.num_factura.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)))||

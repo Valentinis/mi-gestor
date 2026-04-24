@@ -107,14 +107,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 /* UPLOAD */
 .upload-zone{border:1.5px dashed var(–line-2);border-radius:var(–r);padding:2rem 1rem;text-align:center;cursor:pointer;background:var(–bg-raised);margin-bottom:12px;transition:border-color .2s,background .2s;-webkit-tap-highlight-color:transparent;}
 .upload-zone.over,.upload-zone:active{border-color:var(–accent);background:var(–accent-light);}
-.upload-actions{margin-bottom:12px;}
-.upload-btn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.upload-action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 8px;background:var(–bg-raised);border:0.5px solid var(–line-2);border-radius:var(–r);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s;}
-.upload-action-btn:active{background:var(–accent-light);border-color:var(–accent);}
-.upload-drop-target{border:1.5px dashed var(–line-2);}
-.upload-drop-target.over{border-color:var(–accent);background:var(–accent-light);}
-.upload-action-label{font-size:13px;font-weight:600;color:var(–text);}
-.upload-action-sub{font-size:10px;color:var(–text-3);}
 .upload-icon{font-size:28px;margin-bottom:8px;}
 .upload-title{font-size:14px;font-weight:600;color:var(–text);}
 .upload-sub{font-size:12px;color:var(–text-2);margin-top:4px;}
@@ -293,7 +285,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.22</div>
+    <div class="login-version">v5.17</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -388,28 +380,12 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <button class="q-pill" onclick="setQ('4T 2026',this,'qs-f')">4T 2026</button>
     </div>
     <div id="claude-no-key" class="tip-box" style="display:none;"><h4>Claude API no configurada</h4>Ve a <strong>Config</strong> e introduce tu API key.</div>
-    <div class="upload-actions">
-      <div class="upload-btn-row">
-        <button class="upload-action-btn" onclick="triggerUpload()">
-          <span style="font-size:22px;">📁</span>
-          <span class="upload-action-label">Seleccionar</span>
-          <span class="upload-action-sub">Foto o PDF</span>
-        </button>
-        <button class="upload-action-btn" onclick="pasteFromClipboard()">
-          <span style="font-size:22px;">📋</span>
-          <span class="upload-action-label">Pegar</span>
-          <span class="upload-action-sub">Imagen o PDF</span>
-        </button>
-        <div class="upload-action-btn upload-drop-target" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
-          <span style="font-size:22px;">⬇️</span>
-          <span class="upload-action-label">Arrastrar</span>
-          <span class="upload-action-sub">Suelta aquí</span>
-        </div>
-      </div>
-      <div id="paste-status" style="font-size:12px;color:var(--text-3);text-align:center;min-height:16px;margin-top:6px;"></div>
+    <div class="upload-zone" id="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+      <div class="upload-icon">&#x1F4C4;</div>
+      <div class="upload-title">Sube la foto o PDF de la factura</div>
+      <div class="upload-sub">Claude la analiza automáticamente · JPG, PNG o PDF</div>
     </div>
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
-    <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
     <div id="analysis-list"></div>
     <div class="reg-panel" style="margin-top:16px;">
       <div class="reg-panel-hdr">
@@ -521,7 +497,6 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 <script>
 
 const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com';
-console.log('MiGestor v5.22 loaded');
 const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
 
@@ -593,17 +568,6 @@ window.addEventListener('load',()=>{
     if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
-  // Global paste listener
-  document.addEventListener('paste',(e)=>{
-    const active=document.querySelector('.tab-btn.active');
-    if(!active||active.textContent.trim()!=='Facturas') return;
-    if(!claudeKey.startsWith('sk-ant-')) return;
-    const items=[...(e.clipboardData?.items||[])];
-    const pdfItem=items.find(i=>i.type==='application/pdf');
-    if(pdfItem){ const file=pdfItem.getAsFile(); if(file){handleClaudeFiles([file]);return;} }
-    const imgItem=items.find(i=>i.type.startsWith('image/'));
-    if(imgItem){ const file=imgItem.getAsFile(); if(file) handleClaudeFiles([file]); }
-  });
 });
 
 // ── PIN ──
@@ -683,53 +647,6 @@ function triggerUpload(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura 
 function dragOver(e){ e.preventDefault(); if(!claudeKey.startsWith('sk-ant-')) return; document.getElementById('upload-zone').classList.add('over'); }
 function dragLeave(){ document.getElementById('upload-zone').classList.remove('over'); }
 function dropFile(e){ e.preventDefault(); dragLeave(); if(!claudeKey.startsWith('sk-ant-')) return; handleClaudeFiles(e.dataTransfer.files); }
-async function pasteFromClipboard(){
-  if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
-  const status=document.getElementById('paste-status');
-  try{
-    if(!navigator.clipboard||!navigator.clipboard.read){
-      status.textContent='Pulsa Ctrl+V o ⌘+V para pegar...';
-      document.addEventListener('paste',handlePasteEvent,{once:true});
-      return;
-    }
-    status.textContent='Leyendo portapapeles...';
-    const items=await navigator.clipboard.read();
-    let found=false;
-    for(const item of items){
-      // Try PDF first
-      if(item.types.includes('application/pdf')){
-        const blob=await item.getType('application/pdf');
-        const file=new File([blob],'pasted_'+Date.now()+'.pdf',{type:'application/pdf'});
-        status.textContent='';
-        handleClaudeFiles([file]);
-        found=true; break;
-      }
-      // Then image
-      const imgType=item.types.find(t=>t.startsWith('image/'));
-      if(imgType){
-        const blob=await item.getType(imgType);
-        const file=new File([blob],'pasted_'+Date.now()+'.'+imgType.split('/')[1],{type:imgType});
-        status.textContent='';
-        handleClaudeFiles([file]);
-        found=true; break;
-      }
-    }
-    if(!found) status.textContent='No hay imagen ni PDF en el portapapeles.';
-  }catch(e){
-    status.textContent='Pulsa Ctrl+V o ⌘+V para pegar...';
-    document.addEventListener('paste',handlePasteEvent,{once:true});
-  }
-}
-function handlePasteEvent(e){
-  const status=document.getElementById('paste-status');
-  const items=[...(e.clipboardData?.items||[])];
-  const pdfItem=items.find(i=>i.type==='application/pdf');
-  if(pdfItem){ const file=pdfItem.getAsFile(); if(file){status.textContent='';handleClaudeFiles([file]);return;} }
-  const imgItem=items.find(i=>i.type.startsWith('image/'));
-  if(imgItem){ const file=imgItem.getAsFile(); if(file){status.textContent='';handleClaudeFiles([file]);return;} }
-  status.textContent='No se detectó imagen ni PDF en el portapapeles.';
-}
-// Global paste listener moved to load event
 
 async function handleClaudeFiles(files){
   const list=document.getElementById('analysis-list');
@@ -768,8 +685,8 @@ async function handleClaudeFiles(files){
       div._items=items;
       // Store items on div element
       window['_analysis_'+divId]=items;
-      // Upload file to Drive — link will be stored on record after saveAnalysis
-      if(token&&facturasFId){ const f0=items[0]||{}; const fecha=(f0.fecha||'').slice(0,10); const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30); const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20); const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg'; const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext; window['_pendingUpload_'+divId]={file:new File([file],newName,{type:file.type}),q:Q}; }
+      // Upload file to Drive
+      if(token&&facturasFId){ const f0=items[0]||{}; const fecha=(f0.fecha||'').slice(0,10); const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30); const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20); const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg'; const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext; uploadFileToDrive(new File([file],newName,{type:file.type}),Q).catch(()=>{}); }
     }catch(e){
       div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-error">Error</span></div><div style="font-size:12px;color:var(--red);padding:8px;">${e.message}</div>`;
     }
@@ -799,13 +716,6 @@ function saveAnalysis(divId, count){
   if(saved===0){ alert('No hay facturas seleccionadas.'); return; }
   saveLocal(); renderAll();
   if(token) saveDataToDrive(Q).catch(()=>{});
-  // Upload file to Drive now that we have record IDs, link to first record
-  const pending=window['_pendingUpload_'+divId];
-  if(pending&&token&&facturasFId){
-    const firstSavedId=data[Q]&&data[Q].length?data[Q][data[Q].length-1]._id:null;
-    uploadFileToDrive(pending.file,pending.q,firstSavedId).catch(()=>{});
-    delete window['_pendingUpload_'+divId];
-  }
   const btn=document.querySelector('#'+divId+' .btn-save-analysis');
   if(btn){btn.textContent='✓ '+saved+' guardada(s)';btn.disabled=true;}
 }
@@ -817,7 +727,7 @@ async function findOrCreate(name,parent){ const q=encodeURIComponent(`name='${na
 async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); await loadFromDrive(); setDS('ok','Drive OK'); }catch(e){setDS('err','Error Drive');} }
 async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); } else { const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
 async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace('_',' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal(); renderAll(); renderDriveTab(); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); }
-async function uploadFileToDrive(file,q,linkedRecordId=null){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); // Store link on record if provided if(linkedRecordId&&created.webViewLink){ const all=Object.values(data).flat(); const rec=all.find(f=>f._id===linkedRecordId); if(rec){rec._driveLink=created.webViewLink;saveLocal();} } renderDriveTab(); return created; }
+async function uploadFileToDrive(file,q){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); renderDriveTab(); return created; }
 async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
 function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
 
@@ -928,15 +838,8 @@ function openModal(id){
     ['Notas', f.notas||'—'],
   ];
   document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:0;">${rows.filter(([k,v])=>v&&v!=='—'&&v!=='0,00 €').map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line);font-size:13px;gap:12px;"><span style="color:var(--text-3);font-weight:500;flex-shrink:0;">${k}</span><span style="color:var(--text);text-align:right;">${v}</span></div>`).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
-  // Show Drive button - look up by num_factura, proveedor or date
-  const driveFile=driveFiles.find(df=>{
-    if(!df.name) return false;
-    const n=df.name.toLowerCase();
-    if(f.num_factura&&n.includes(f.num_factura.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10))) return true;
-    if(f.proveedor_cliente&&n.includes((f.proveedor_cliente||'').toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,10))) return true;
-    if(f.fecha&&n.includes((f.fecha||'').slice(0,10))) return true;
-    return false;
-  }) || (f._driveLink ? {link:f._driveLink} : null);
+  // Show Drive button if file link exists
+  const driveFile=driveFiles.find(df=>df.name&&df.name.includes((f.fecha||'').slice(0,10)));
   const driveBtn=document.getElementById('modal-drive-btn');
   driveBtn.style.display=driveFile?'flex':'none';
   driveBtn._link=driveFile?driveFile.link:'';
@@ -945,45 +848,18 @@ function openModal(id){
 }
 function closeModal(){ document.getElementById('factura-modal').style.display='none'; document.body.style.overflow=''; modalFacturaId=null; }
 function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
-function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar este registro?')) return; const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id===modalFacturaId)); if(q){ data[q]=data[q].filter(f=>f._id!==modalFacturaId); saveLocal(); renderAll(); if(token) saveDataToDrive(q).catch(()=>{}); } closeModal(); }
-function reprocessFromModal(){
+function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar este registro?')) return; const q=Object.keys(data).find(q=>data[q].find(f=>f._id===modalFacturaId)); if(q){ data[q]=data[q].filter(f=>f._id!==modalFacturaId); saveLocal(); renderAll(); if(token) saveDataToDrive(q).catch(()=>{}); } closeModal(); }
+async function reprocessFromModal(){
   if(!modalFacturaId) return;
   if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config.'); return; }
-  // Trigger file picker — when file selected, analyze and replace record
-  document.getElementById('file-reprocess').click();
-}
-// Handle reprocess file selection
-async function handleReprocessFile(files){
-  if(!files||!files.length||!modalFacturaId) return;
-  const file=files[0];
-  const oldId=modalFacturaId;
-  // Find which quarter this record belongs to
-  const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id===oldId));
-  if(!q){ closeModal(); return; }
-  // Update modal to show processing
-  document.getElementById('modal-reprocess-btn').textContent='⏳ Analizando...';
-  document.getElementById('modal-reprocess-btn').disabled=true;
-  try{
-    const result=await analyzeWithClaude(file);
-    const items=Array.isArray(result)?result:[result];
-    // Remove old record
-    data[q]=data[q].filter(f=>f._id!==oldId);
-    // Add new records
-    items.forEach(f=>{ f._quarter=q; f._id=Date.now()+Math.random(); data[q].push(f); });
-    saveLocal(); renderAll();
-    if(token){ saveDataToDrive(q).catch(()=>{}); }
-    // Upload new file to Drive
-    if(token&&facturasFId){ const f0=items[0]||{}; const fecha=(f0.fecha||'').slice(0,10); const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30); const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20); const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg'; const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext; uploadFileToDrive(new File([file],newName,{type:file.type}),q).catch(()=>{}); }
-    closeModal();
-    // Open modal for first new record so user can review
-    setTimeout(()=>openModal(items[0]._id),300);
-  }catch(e){
-    document.getElementById('modal-reprocess-btn').textContent='🔄 Reprocesar';
-    document.getElementById('modal-reprocess-btn').disabled=false;
-    alert('Error al reprocesar: '+e.message);
-  }
-  // Reset file input
-  document.getElementById('file-reprocess').value='';
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===modalFacturaId);
+  if(!f){ alert('No se puede reprocesar — archivo original no disponible. Sube la factura de nuevo desde la pestaña Facturas.'); return; }
+  // Find Drive file to reprocess
+  const driveFile=driveFiles.find(df=>df.name&&f.fecha&&df.name.includes((f.fecha||'').slice(0,10)));
+  if(!driveFile){ closeModal(); alert('No se encontró el archivo original en Drive. Sube la factura de nuevo desde la pestaña Facturas para reprocesarla.'); return; }
+  closeModal();
+  alert('Función de reprocesar: sube la factura original de nuevo desde la pestaña Facturas. El resultado se añadirá como nuevo registro y podrás eliminar el anterior.');
 }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
@@ -1073,7 +949,7 @@ function renderRegistros(){
       items.forEach(f=>{
         const base=f.base_iva||0, iva=f.cuota_iva||0, irpf=f.base_irpf||f.base_iva||0, ret=f.retencion_importe||0;
         gBase+=base; gIva+=iva; gIrpf+=irpf; gRet+=ret;
-        rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
+        rows+=`<tr>
           <td class="date">${f.fecha||'—'}</td>
           <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
           <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
@@ -1081,12 +957,12 @@ function renderRegistros(){
           <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
           <td class="num">${fmtEur(base)}</td>
           <td class="num">${f.pct_iva||0}%</td>
-          <td class="num" style="color:${iva>0?'var(--green)':'var(--text-3)'}">${fmtEur(iva)}</td>
+          <td class="num" style="color:${iva>0?'var(--green)':'var(--text3)'}">${fmtEur(iva)}</td>
           <td class="num">${fmtEur(irpf)}</td>
           <td class="num">${f.retencion_pct||0}%</td>
-          <td class="num" style="color:${ret>0?'var(--amber)':'var(--text-3)'}">${fmtEur(ret)}</td>
+          <td class="num" style="color:${ret>0?'var(--amber)':'var(--text3)'}">${fmtEur(ret)}</td>
           <td>${f.justificacion?`<span class="just-badge" title="${f.justificacion}">${f.justificacion}</span>`:''}</td>
-          <td><button class="reg-del" onclick="event.stopPropagation();delR(${f._id})">✕</button></td>
+          <td><button class="reg-del" onclick="delR(${f._id})">✕</button></td>
         </tr>`;
       });
     });
@@ -1118,7 +994,7 @@ function renderRegistros(){
     facts.forEach(f=>{
       const bruto=f.ingresos_brutos||f.base_iva||0, base=f.base_irpf||0, iva=f.cuota_iva||0, ret=f.retencion_importe||0;
       gBruto+=bruto; gBase+=base; gIva+=iva; gRet+=ret;
-      rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
+      rows+=`<tr>
         <td class="date">${f.fecha||'—'}</td>
         <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
         <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
@@ -1129,8 +1005,8 @@ function renderRegistros(){
         <td class="num">${f.pct_iva||0}%</td>
         <td class="num" style="color:var(--amber)">${fmtEur(iva)}</td>
         <td class="num">${f.retencion_pct||0}%</td>
-        <td class="num" style="color:${ret>0?'var(--red)':'var(--text-3)'}">${fmtEur(ret)}</td>
-        <td><button class="reg-del" onclick="event.stopPropagation();delR(${f._id})">✕</button></td>
+        <td class="num" style="color:${ret>0?'var(--red)':'var(--text3)'}">${fmtEur(ret)}</td>
+        <td><button class="reg-del" onclick="delR(${f._id})">✕</button></td>
       </tr>`;
     });
     rows+=`<tr class="total-row">

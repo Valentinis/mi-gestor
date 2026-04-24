@@ -93,9 +93,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
-.q-selector{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.q-pill{padding:6px 14px;font-size:13px;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.q-pill.active{background:var(–accent);color:#fff;border-color:var(–accent);}
+.q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;border:0.5px solid var(–line);}
+.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-3);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;}
+.q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 8px rgba(196,118,58,0.35);}
 
 /* CARDS */
 .card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:16px;margin-bottom:12px;}
@@ -285,7 +285,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.21</div>
+    <div class="login-version">v5.22</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -320,7 +320,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.21</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.22</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.21</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.22</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -510,7 +510,10 @@ const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercon
 const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
 
-let pin='', Q='1T 2026', data={}, token=null, user=null;
+// Auto-detect current quarter
+function currentQuarter(){ const m=new Date().getMonth(); const q=m<3?'1T':m<6?'2T':m<9?'3T':'4T'; return q+' 2026'; }
+let pin='', Q=currentQuarter(), data={}, token=null, user=null;
+let regQ=currentQuarter(), regView='gastos';
 let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
 
@@ -584,7 +587,12 @@ window.addEventListener('load',()=>{
 function pp(d){ if(pin.length>=4)return; pin+=d; updateDots(); }
 function pd(){ pin=pin.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent=''; }
 function updateDots(){ for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pin.length); }
-function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.display='none'; document.getElementById('main-screen').style.display='block'; if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);} else{document.getElementById('claude-no-key').style.display='block';} updateSheetDisplay(); renderAll(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
+function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.display='none'; document.getElementById('main-screen').style.display='block'; if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);} else{document.getElementById('claude-no-key').style.display='block';} updateSheetDisplay();
+  // Set active quarter pill to current quarter
+  const cq=currentQuarter();
+  ['qs-f','qs-m','qs-r'].forEach(id=>{ document.querySelectorAll('#'+id+' .q-pill').forEach(b=>{ b.classList.toggle('active', b.textContent.trim()===cq); }); });
+  document.getElementById('qbadge').textContent=cq;
+  renderAll(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
 
 // ── CLAUDE API ──
 const SYSTEM_PROMPT=`Eres un experto en fiscalidad española para autónomos. Analiza facturas y extrae datos fiscales con máxima precisión.
@@ -960,8 +968,6 @@ function fmt(n){ if(!n&&n!==0||isNaN(n)) return '—'; return n.toFixed(2).repla
 function fmtN(n){ return n.toFixed(2).replace('.',',')+' €'; }
 
 // ── REGISTROS ──
-let regQ='1T 2026', regView='gastos';
-
 function setQReg(q,btn){ regQ=q; document.querySelectorAll('#qs-r .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
 function setView(v,btn){ regView=v; document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
 

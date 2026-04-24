@@ -293,7 +293,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.28</div>
+    <div class="login-version">v5.29</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -593,8 +593,10 @@ function showPin(){ document.getElementById('login-screen').style.display='none'
 function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
 
 function checkAuth(){
-  // Check if returning from Google OAuth — read hash FIRST before anything else
   var hash=window.location.hash;
+  var stored=localStorage.getItem(LS_AUTH);
+  var dbg='hash:'+hash.substring(0,40)+'|stored:'+(stored?'si':'no');
+  // Check if returning from Google OAuth
   if(hash&&hash.indexOf('access_token')!==-1){
     var m=hash.match(/access_token=([^&]+)/);
     if(m){
@@ -605,11 +607,11 @@ function checkAuth(){
   }
   loadLocal(); loadCfg();
   try{
-    const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
+    const s=JSON.parse(stored||'{}');
     if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
-  // Global paste listener
+  document.getElementById('login-status').textContent=dbg;
   document.addEventListener('paste',(e)=>{
     const active=document.querySelector('.tab-btn.active');
     if(!active||active.textContent.trim()!=='Facturas') return;

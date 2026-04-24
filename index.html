@@ -89,7 +89,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .tabs::-webkit-scrollbar{display:none;}
 /* Bottom nav */
 .tab-bar-top{display:none;}
-.tab-pane{display:none;padding:12px 16px 120px;}
+.tab-pane{display:none;padding:12px 16px 160px;}
 .tab-pane.active{display:block;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(–bg-card);border-top:0.5px solid var(–line);display:flex;align-items:center;justify-content:space-around;padding:8px 8px 20px;z-index:9999;box-shadow:0 -8px 24px rgba(0,0,0,0.35);-webkit-backdrop-filter:none;}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 2px;color:var(–text-3);transition:color .15s;min-height:48px;}
@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.56</div>
+    <div class="login-version">v5.57</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.56</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.57</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -390,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.56</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.57</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -425,6 +425,8 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <span>Config</span>
     </button>
   </nav>
+  <!-- Solid block to prevent content bleeding under nav on iOS -->
+  <div style="position:fixed;bottom:0;left:0;right:0;height:20px;background:var(--bg-card);z-index:9998;"></div>
 
   <!-- ADD INVOICE MODAL -->
 

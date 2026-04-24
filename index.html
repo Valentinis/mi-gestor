@@ -71,7 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 /* MAIN */
 #main-screen{display:none;}
-.top-bar{background:#FFFFFF;border-bottom:0.5px solid rgba(0,0,0,0.1);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.top-bar{background:#FFFFFF;border-bottom:0.5px solid rgba(0,0,0,0.1);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;overflow:hidden;}
 @media (prefers-color-scheme:dark){.top-bar{background:#1C1C1E;border-bottom-color:rgba(255,255,255,0.08);}}
 .top-left{display:flex;align-items:center;gap:9px;}
 .top-title{font-size:16px;font-weight:700;color:var(–text);}
@@ -86,7 +86,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .btn-sm{background:var(–bg-raised);border:0.5px solid var(–line-2);border-radius:8px;padding:5px 11px;font-size:12px;color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 
 /* TABS */
-.tabs{display:flex;background:var(–bg-card);border-bottom:0.5px solid var(–line);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tabs{display:flex;background:var(–bg-card);border-bottom:0.5px solid var(–line);overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
 /* Bottom nav */
 .tab-bar-top{display:none;}
@@ -119,7 +119,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .fact-amount.gasto{color:var(–red);}
 .fact-date{font-size:10px;color:var(–text-3);margin-top:1px;}
 /* Filter bar */
-.filter-bar{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
+.filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .filter-bar::-webkit-scrollbar{display:none;}
 .filter-chip{flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
 .filter-chip.active{background:var(–accent);color:#fff;border-color:var(–accent);}
@@ -127,7 +127,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
 .q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;border:0.5px solid var(–line);}
-.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-3);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;}
+.q-pill{flex:1;padding:7px 2px;font-size:11px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-3);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;white-space:nowrap;overflow:hidden;}
 .q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 8px rgba(196,118,58,0.35);}
 
 /* CARDS */
@@ -272,8 +272,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .total-box-val.blue{color:var(–blue);}
 .total-box-val.amber{color:var(–amber);}
 .total-box-val.red{color:var(–red);}
-.reg-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(–r);border:0.5px solid var(–line);}
-.reg-table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px;}
+.reg-table-wrap{overflow-x:hidden;-webkit-overflow-scrolling:touch;border-radius:var(–r);border:0.5px solid var(–line);}
+.reg-table{width:100%;border-collapse:collapse;font-size:11px;min-width:0;table-layout:fixed;}
 .reg-table th{background:var(–accent);color:#fff;font-weight:600;padding:9px 11px;text-align:left;white-space:nowrap;}
 .reg-table th.right{text-align:right;}
 .reg-table td{padding:8px 11px;border-bottom:0.5px solid var(–line);color:var(–text);vertical-align:middle;}
@@ -301,6 +301,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 input[type=file]{display:none;}
 textarea.json-area{width:100%;min-height:80px;font-family:monospace;font-size:12px;padding:10px;border:0.5px solid var(–line-2);border-radius:var(–r-sm);background:var(–bg-input);color:var(–text);resize:vertical;}
 textarea.json-area:focus{outline:none;border-color:var(–accent);}
+
+- { max-width:100%; box-sizing:border-box; }
+  html,body { overflow-x:hidden; max-width:100vw; }
+
 </style>
 
 </head>
@@ -318,7 +322,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.59</div>
+    <div class="login-version">v5.60</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -353,7 +357,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.59</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.60</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -392,7 +396,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.59</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.60</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">

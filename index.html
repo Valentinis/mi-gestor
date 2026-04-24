@@ -293,7 +293,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.31</div>
+    <div class="login-version">v5.32</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
@@ -584,6 +584,10 @@ function checkRedirectToken(){
 }
 function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }
 function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
+window.addEventListener('error', function(e){
+  var d=document.getElementById('login-status');
+  if(d) d.textContent='ERROR: '+e.message+' (línea '+e.lineno+')';
+});
 window.addEventListener('load',()=>{
   loadLocal(); loadCfg();
   if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }

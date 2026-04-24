@@ -5,302 +5,269 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MiGestor">
-<title>MiGestor — Gestor Fiscal</title>
+<meta name="theme-color" content="#0D0D1A">
+<title>MiGestor</title>
 <style>
-* { box-sizing:border-box; margin:0; padding:0; }
-:root {
-  --clay:#C4763A; --clay-light:#F5EBE0; --clay-dark:#7A4520;
-  --bg:#F7F5F2; --bg2:#FFFFFF; --bg3:#EFEDE9;
-  --text:#1A1A1A; --text2:#555; --text3:#888;
-  --border:rgba(0,0,0,0.09); --border2:rgba(0,0,0,0.16);
-  --green:#0F6E56; --green-bg:#EAF3DE; --green-border:#C0DD97;
-  --red:#A32D2D; --red-bg:#FCEBEB; --red-border:#F7C1C1;
-  --blue:#185FA5; --blue-bg:#E6F1FB; --blue-border:#B5D4F4;
-  --amber:#854F0B; --amber-bg:#FAEEDA; --amber-border:#FAC775;
-  --radius:16px; --radius-sm:10px;
-  --shadow:0 1px 4px rgba(0,0,0,0.08);
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --accent:#C4763A;--accent-light:#F5EBE0;--accent-dark:#7A4520;--accent-dim:rgba(196,118,58,0.15);
+  --bg:#F7F5F2;--bg-card:#FFFFFF;--bg-raised:#EFEDE9;--bg-input:#F2F0ED;
+  --text:#111111;--text-2:#555555;--text-3:#999999;
+  --line:rgba(0,0,0,0.09);--line-2:rgba(0,0,0,0.16);
+  --green:#0F6E56;--green-bg:#E6F4EC;--green-bd:#A8D8BE;
+  --red:#C0392B;--red-bg:#FDECEC;--red-bd:#F5BABA;
+  --blue:#1A5FA8;--blue-bg:#E8F1FC;--blue-bd:#A8C8F5;
+  --amber:#7A4500;--amber-bg:#FDF0DC;--amber-bd:#F5C878;
+  --r:14px;--r-sm:10px;--r-xs:7px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:#111110; --bg2:#1C1C1A; --bg3:#252522;
-    --text:#F0EDE8; --text2:#9A9690; --text3:#605D58;
-    --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
-    --clay-light:#2A1A0C; --clay-dark:#E8934A;
-    --green-bg:#0A1F17; --green-border:#1A4030; --green:#3DB88A;
-    --red-bg:#1F0A0A; --red-border:#4A1010; --red:#E87070;
-    --blue-bg:#0A1628; --blue-border:#1A3060; --blue:#5B9FE8;
-    --amber-bg:#1F1205; --amber-border:#4A2A05; --amber:#E8A855;
-    --shadow:0 1px 4px rgba(0,0,0,0.4);
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#111111;--bg-card:#1C1C1E;--bg-raised:#2C2C2E;--bg-input:#242426;
+    --text:#F2F2F7;--text-2:#AEAEB2;--text-3:#636366;
+    --line:rgba(255,255,255,0.08);--line-2:rgba(255,255,255,0.14);
+    --green:#30D158;--green-bg:rgba(48,209,88,0.12);--green-bd:rgba(48,209,88,0.25);
+    --red:#FF453A;--red-bg:rgba(255,69,58,0.12);--red-bd:rgba(255,69,58,0.25);
+    --blue:#0A84FF;--blue-bg:rgba(10,132,255,0.12);--blue-bd:rgba(10,132,255,0.25);
+    --amber:#FFD60A;--amber-bg:rgba(255,214,10,0.12);--amber-bd:rgba(255,214,10,0.25);
+    --accent-light:rgba(196,118,58,0.15);--accent-dim:rgba(196,118,58,0.10);
   }
 }
-body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); min-height:100vh; color:var(--text); -webkit-font-smoothing:antialiased; }
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
 
-/* ── LOGIN ── */
-#login-screen {
-min-height:100vh; display:flex; flex-direction:column;
-align-items:center; justify-content:center;
-padding:2rem; background:linear-gradient(160deg,#1A1A2E 0%,#16213E 50%,#0F3460 100%);
-}
-.login-logo-wrap { display:flex; flex-direction:column; align-items:center; gap:16px; margin-bottom:8px; }
-.login-logo-svg { filter:drop-shadow(0 8px 24px rgba(196,118,58,0.4)); }
-.login-app-name { font-size:28px; font-weight:700; color:#FFFFFF; letter-spacing:-0.5px; }
-.login-app-sub { font-size:13px; color:rgba(255,255,255,0.5); margin-top:2px; text-align:center; letter-spacing:.02em; }
-.login-version { font-size:10px; color:rgba(255,255,255,0.25); margin-top:4px; }
-.login-card {
-background:rgba(255,255,255,0.06);
-backdrop-filter:blur(20px);
--webkit-backdrop-filter:blur(20px);
-border:0.5px solid rgba(255,255,255,0.12);
-border-radius:20px;
-padding:2rem;
-width:100%; max-width:320px;
-text-align:center;
-margin-top:8px;
-}
-.login-card p { font-size:13px; color:rgba(255,255,255,0.55); margin-bottom:1.5rem; line-height:1.7; }
-.btn-google-new {
-display:flex; align-items:center; justify-content:center; gap:10px;
-background:#FFFFFF; border:none;
-border-radius:12px; padding:14px 20px;
-font-size:14px; font-weight:600; color:#1A1A1A;
-cursor:pointer; width:100%;
-box-shadow:0 4px 16px rgba(0,0,0,0.2);
-transition:transform .1s, box-shadow .1s;
-text-decoration:none;
-}
-.btn-google-new:active { transform:scale(0.97); box-shadow:0 2px 8px rgba(0,0,0,0.2); }
-.login-status { font-size:12px; color:rgba(255,255,255,0.4); margin-top:12px; min-height:18px; }
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;background:linear-gradient(160deg,#0D0D1A 0%,#111827 60%,#0F2040 100%);gap:2rem;}
+.login-logo-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.login-logo-svg{filter:drop-shadow(0 8px 24px rgba(196,118,58,0.35));}
+.login-app-name{font-size:30px;font-weight:700;color:#fff;letter-spacing:-0.5px;}
+.login-app-sub{font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:0.02em;}
+.login-version{font-size:10px;color:rgba(255,255,255,0.2);margin-top:2px;}
+.login-card{width:100%;max-width:340px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.13);border-radius:20px;padding:1.75rem;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);text-align:center;}
+.login-card p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:1.5rem;}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;color:#111;cursor:pointer;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.25);-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.btn-google:active{opacity:0.85;}
+.login-status{font-size:12px;color:rgba(255,255,255,0.35);margin-top:12px;min-height:16px;}
 
-/* ── PIN ── */
-#pin-screen {
-min-height:100vh; display:none; flex-direction:column;
-align-items:center; justify-content:center; gap:1.5rem; padding:2rem;
-background:linear-gradient(160deg,#1A1A2E 0%,#16213E 50%,#0F3460 100%);
-}
-.pin-user-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; }
-.avatar-img { width:60px; height:60px; border-radius:50%; border:2px solid rgba(196,118,58,0.6); }
-.avatar-name { font-size:16px; font-weight:600; color:#FFF; }
-.avatar-email { font-size:12px; color:rgba(255,255,255,0.4); }
-.pin-label { font-size:13px; color:rgba(255,255,255,0.5); letter-spacing:.05em; text-transform:uppercase; }
-.pin-card {
-background:rgba(255,255,255,0.06);
-border:0.5px solid rgba(255,255,255,0.12);
-border-radius:20px; padding:2rem;
-width:100%; max-width:300px;
-}
-.pin-dots { display:flex; gap:16px; justify-content:center; margin-bottom:2rem; }
-.pin-dot { width:14px; height:14px; border-radius:50%; border:2px solid rgba(255,255,255,0.25); transition:all .15s; }
-.pin-dot.filled { background:var(–clay); border-color:var(–clay); transform:scale(1.15); box-shadow:0 0 8px rgba(196,118,58,0.5); }
-.pin-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-.pin-btn { height:58px; background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.12); border-radius:12px; font-size:22px; font-weight:500; cursor:pointer; color:#FFF; -webkit-tap-highlight-color:transparent; transition:all .1s; }
-.pin-btn:active { background:rgba(255,255,255,0.18); transform:scale(0.94); }
-.pin-btn.del { font-size:16px; color:rgba(255,255,255,0.5); }
-.pin-btn.enter { background:var(–clay); border-color:var(–clay); font-size:14px; font-weight:700; }
-.pin-btn.enter:active { background:var(–clay-dark); }
-.pin-error { color:#FF6B6B; font-size:13px; text-align:center; margin-top:10px; min-height:18px; }
-.btn-out-white { background:transparent; border:0.5px solid rgba(255,255,255,0.2); border-radius:20px; padding:6px 16px; font-size:12px; color:rgba(255,255,255,0.5); cursor:pointer; }
+/* PIN */
+#pin-screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;padding:2rem 1.5rem;background:linear-gradient(160deg,#0D0D1A 0%,#111827 60%,#0F2040 100%);}
+.pin-user-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.avatar-img{width:60px;height:60px;border-radius:50%;border:2px solid rgba(196,118,58,0.5);}
+.avatar-name{font-size:17px;font-weight:600;color:#fff;}
+.avatar-email{font-size:12px;color:rgba(255,255,255,0.4);}
+.pin-label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;}
+.pin-card{width:100%;max-width:300px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:20px;padding:2rem;}
+.pin-dots{display:flex;gap:18px;justify-content:center;margin-bottom:2rem;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);transition:all .15s;}
+.pin-dot.filled{background:var(–accent);border-color:var(–accent);transform:scale(1.15);box-shadow:0 0 10px rgba(196,118,58,0.5);}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pin-btn{height:58px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.1);border-radius:12px;font-size:22px;font-weight:400;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .1s;}
+.pin-btn:active{background:rgba(255,255,255,0.2);}
+.pin-btn.del{font-size:17px;color:rgba(255,255,255,0.5);}
+.pin-btn.enter{background:var(–accent);border-color:var(–accent);font-size:13px;font-weight:700;color:#fff;}
+.pin-btn.enter:active{background:var(–accent-dark);}
+.pin-error{color:#FF6B6B;font-size:13px;text-align:center;margin-top:12px;min-height:18px;}
+.btn-ghost{background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:20px;padding:7px 18px;font-size:13px;color:rgba(255,255,255,0.45);cursor:pointer;}
 
-#main-screen { display:none; }
-.top-bar { background:var(–bg2); border-bottom:0.5px solid var(–border); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:var(–shadow); }
-.top-left { display:flex; align-items:center; gap:8px; }
-.top-title { font-size:15px; font-weight:700; color:var(–text); }
-.top-right { display:flex; align-items:center; gap:6px; }
-.q-badge { background:var(–clay); color:white; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; letter-spacing:.02em; }
-.status-row { display:flex; align-items:center; gap:4px; font-size:10px; color:var(–text3); }
-.dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-.dot-ok { background:#3DB88A; }
-.dot-err { background:#E87070; }
-.dot-sync { background:var(–amber); }
-.dot-off { background:var(–text3); }
-.btn-out { background:transparent; border:0.5px solid var(–border2); border-radius:20px; padding:5px 12px; font-size:12px; color:var(–text2); cursor:pointer; }
+/* MAIN */
+#main-screen{display:none;}
+.top-bar{background:var(–bg-card);border-bottom:0.5px solid var(–line);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.top-left{display:flex;align-items:center;gap:9px;}
+.top-title{font-size:16px;font-weight:700;color:var(–text);}
+.top-right{display:flex;align-items:center;gap:8px;}
+.q-badge{background:var(–accent-dim);color:var(–accent);font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;}
+.status-row{display:flex;align-items:center;gap:5px;font-size:11px;color:var(–text-3);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dot-ok{background:var(–green);}
+.dot-err{background:var(–red);}
+.dot-sync{background:var(–amber);}
+.dot-off{background:var(–text-3);}
+.btn-sm{background:var(–bg-raised);border:0.5px solid var(–line-2);border-radius:8px;padding:5px 11px;font-size:12px;color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 
-.tabs { display:flex; background:var(–bg2); border-bottom:0.5px solid var(–border); overflow-x:auto; -webkit-overflow-scrolling:touch; gap:0; }
-.tabs::-webkit-scrollbar { display:none; }
-.tab-btn { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 12px; font-size:11px; color:var(–text3); border:none; background:transparent; cursor:pointer; border-bottom:2.5px solid transparent; white-space:nowrap; font-weight:500; -webkit-tap-highlight-color:transparent; transition:color .15s; min-width:60px; }
-.tab-btn .tab-icon { font-size:16px; line-height:1; }
-.tab-btn.active { color:var(–clay); border-bottom-color:var(–clay); }
-.tab-pane { display:none; padding:16px; }
-.tab-pane.active { display:block; }
+/* TABS */
+.tabs{display:flex;background:var(–bg-card);border-bottom:0.5px solid var(–line);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;padding:12px 16px;font-size:13px;font-weight:500;color:var(–text-3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;-webkit-tap-highlight-color:transparent;transition:color .15s;}
+.tab-btn.active{color:var(–accent);border-bottom-color:var(–accent);}
+.tab-pane{display:none;padding:16px;}
+.tab-pane.active{display:block;}
 
-.section-label { font-size:11px; font-weight:700; color:var(–text3); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
-.q-selector { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-.q-pill { padding:6px 14px; font-size:13px; border:0.5px solid var(–border2); border-radius:20px; background:var(–bg3); color:var(–text2); cursor:pointer; -webkit-tap-highlight-color:transparent; }
-.q-pill.active { background:var(–clay); color:white; border-color:var(–clay); }
+.section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
+.q-selector{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.q-pill{padding:6px 14px;font-size:13px;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.q-pill.active{background:var(–accent);color:#fff;border-color:var(–accent);}
 
-.card { background:var(–bg2); border:0.5px solid var(–border); border-radius:var(–radius); padding:16px; margin-bottom:12px; }
-.tip-box { background:var(–clay-light); border-radius:var(–radius-sm); padding:12px; margin-bottom:12px; }
-.tip-box h4 { font-size:13px; font-weight:600; color:var(–clay-dark); margin-bottom:8px; }
-.tip-box ol { padding-left:18px; color:var(–clay-dark); font-size:13px; line-height:2.1; }
-.tip-box code { background:rgba(196,118,58,0.15); padding:1px 5px; border-radius:4px; font-size:11px; font-family:monospace; }
+/* CARDS */
+.card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:16px;margin-bottom:12px;}
+.tip-box{background:var(–accent-light);border-radius:var(–r-sm);padding:13px;margin-bottom:12px;}
+.tip-box h4{font-size:13px;font-weight:600;color:var(–accent-dark);margin-bottom:8px;}
+.tip-box ol{padding-left:18px;font-size:13px;color:var(–accent-dark);line-height:2.1;}
+.tip-box code{background:rgba(196,118,58,0.18);padding:1px 5px;border-radius:4px;font-size:11px;font-family:monospace;}
 
-.upload-zone { border:1.5px dashed var(–border2); border-radius:var(–radius); padding:2rem 1rem; text-align:center; cursor:pointer; transition:all .2s; background:var(–bg3); margin-bottom:12px; }
-.upload-zone:hover, .upload-zone.over { border-color:var(–clay); background:var(–clay-light); }
-.upload-icon { font-size:28px; margin-bottom:8px; }
-.upload-title { font-size:14px; font-weight:600; }
-.upload-sub { font-size:12px; color:var(–text2); margin-top:4px; }
+/* UPLOAD */
+.upload-zone{border:1.5px dashed var(–line-2);border-radius:var(–r);padding:2rem 1rem;text-align:center;cursor:pointer;background:var(–bg-raised);margin-bottom:12px;transition:border-color .2s,background .2s;-webkit-tap-highlight-color:transparent;}
+.upload-zone.over,.upload-zone:active{border-color:var(–accent);background:var(–accent-light);}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.upload-title{font-size:14px;font-weight:600;color:var(–text);}
+.upload-sub{font-size:12px;color:var(–text-2);margin-top:4px;}
 
-/* ANÁLISIS con descarte */
-.analysis-item { background:var(–bg2); border:0.5px solid var(–border); border-radius:var(–radius); padding:14px; margin-bottom:10px; }
-.analysis-hdr { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.analysis-filename { font-size:13px; font-weight:600; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.analysis-badge { font-size:11px; padding:3px 8px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
-.badge-analyzing { background:var(–amber-bg); color:var(–amber); }
-.badge-done { background:var(–green-bg); color:var(–green); }
-.badge-error { background:var(–red-bg); color:var(–red); }
+/* ANALYSIS */
+.analysis-item{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:14px;margin-bottom:10px;}
+.analysis-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.analysis-filename{font-size:13px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.analysis-badge{font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.badge-analyzing{background:var(–amber-bg);color:var(–amber);}
+.badge-done{background:var(–green-bg);color:var(–green);}
+.badge-error{background:var(–red-bg);color:var(–red);}
+.factura-review{border:0.5px solid var(–line);border-radius:var(–r-sm);margin-bottom:8px;overflow:hidden;}
+.factura-review.discarded{opacity:0.38;}
+.factura-review-hdr{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(–bg-raised);}
+.factura-review-hdr input[type=checkbox]{width:18px;height:18px;accent-color:var(–accent);flex-shrink:0;cursor:pointer;}
+.factura-review-title{font-size:13px;font-weight:600;flex:1;color:var(–text);}
+.factura-review-amount{font-size:13px;font-weight:600;color:var(–accent);}
+.factura-review-body{padding:10px 12px;}
+.factura-review-detail{font-size:12px;color:var(–text-2);margin-bottom:8px;}
+.just-row{display:flex;flex-direction:column;gap:4px;}
+.just-label{font-size:10px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.06em;}
+.just-select{font-size:13px;padding:8px 10px;border:0.5px solid var(–line-2);border-radius:var(–r-xs);background:var(–bg-input);color:var(–text);width:100%;}
+.just-select:focus{outline:none;border-color:var(–accent);}
+.just-input{font-size:13px;padding:8px 10px;border:0.5px solid var(–line-2);border-radius:var(–r-xs);background:var(–bg-input);color:var(–text);width:100%;margin-top:4px;}
+.just-input:focus{outline:none;border-color:var(–accent);}
 
-/* ITEM de factura con checkbox para descartar */
-.factura-review { border:0.5px solid var(–border); border-radius:var(–radius-sm); margin-bottom:8px; overflow:hidden; }
-.factura-review.discarded { opacity:0.45; }
-.factura-review-hdr { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(–bg3); }
-.factura-review-hdr input[type=checkbox] { width:18px; height:18px; accent-color:var(–clay); flex-shrink:0; cursor:pointer; }
-.factura-review-title { font-size:13px; font-weight:600; flex:1; }
-.factura-review-amount { font-size:13px; font-weight:600; color:var(–clay-dark); }
-.factura-review-body { padding:10px 12px; }
-.factura-review-detail { font-size:12px; color:var(–text2); margin-bottom:8px; }
+/* BUTTONS */
+.btn-primary{display:block;width:100%;background:var(–accent);color:#fff;border:none;border-radius:var(–r-sm);padding:13px 16px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.btn-primary:active{opacity:0.85;}
+.btn-sec{background:var(–bg-raised);color:var(–text);border:0.5px solid var(–line-2);border-radius:var(–r-sm);padding:9px 14px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.btn-save-analysis{display:block;width:100%;background:var(–accent);color:#fff;border:none;border-radius:var(–r-sm);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;}
+.btn-save-analysis:disabled{opacity:0.45;cursor:not-allowed;}
+.btn-danger-sm{background:transparent;color:var(–red);border:0.5px solid var(–line);border-radius:var(–r-xs);padding:4px 10px;font-size:12px;cursor:pointer;}
+.btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.feedback{font-size:12px;margin-top:8px;min-height:16px;}
+.feedback.ok{color:var(–green);}
+.feedback.err{color:var(–red);}
 
-/* JUSTIFICACIÓN */
-.just-row { display:flex; flex-direction:column; gap:4px; }
-.just-label { font-size:11px; font-weight:600; color:var(–text3); text-transform:uppercase; letter-spacing:.05em; }
-.just-select { font-size:12px; padding:6px 10px; border:0.5px solid var(–border2); border-radius:var(–radius-sm); background:var(–bg2); color:var(–text); width:100%; }
-.just-select:focus { outline:none; border-color:var(–clay); }
-.just-input { font-size:12px; padding:6px 10px; border:0.5px solid var(–border2); border-radius:var(–radius-sm); background:var(–bg2); color:var(–text); width:100%; margin-top:4px; }
-.just-input:focus { outline:none; border-color:var(–clay); }
+/* REG LIST */
+.reg-panel{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);overflow:hidden;margin-top:12px;}
+.reg-panel-hdr{padding:10px 16px;border-bottom:0.5px solid var(–line);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;}
+.reg-list{max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.reg-item{padding:11px 16px;border-bottom:0.5px solid var(–line);display:flex;align-items:flex-start;gap:10px;}
+.reg-item:last-child{border-bottom:none;}
+.reg-dot{width:20px;height:20px;border-radius:50%;background:var(–green-bg);color:var(–green);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:2px;}
+.reg-body{flex:1;min-width:0;}
+.reg-name{font-size:13px;font-weight:600;color:var(–text);}
+.reg-detail{font-size:12px;color:var(–text-2);margin-top:2px;}
+.reg-just{font-size:10px;color:var(–accent);background:var(–accent-dim);padding:2px 8px;border-radius:20px;display:inline-block;margin-top:4px;}
+.reg-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.chip{font-size:10px;padding:2px 8px;border-radius:20px;border:0.5px solid;}
+.chip-INT{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
+.chip-INTRA_S{background:var(–amber-bg);color:var(–amber);border-color:var(–amber-bd);}
+.chip-EXENTO{background:var(–bg-raised);color:var(–text-2);border-color:var(–line-2);}
+.chip-ALQUILER{background:var(–green-bg);color:var(–green);border-color:var(–green-bd);}
+.chip-PROF{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
+.chip-ing{background:var(–green-bg);color:var(–green);border-color:var(–green-bd);}
+.chip-amt{background:var(–bg-raised);color:var(–text);border-color:var(–line-2);font-weight:600;}
+.chip-ret{background:var(–amber-bg);color:var(–amber);border-color:var(–amber-bd);}
+.chip-drive{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
+.reg-del{background:none;border:none;cursor:pointer;color:var(–text-3);font-size:16px;padding:2px 4px;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
 
-.btn-save-analysis { background:var(–clay); color:white; border:none; border-radius:var(–radius-sm); padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; width:100%; margin-top:10px; }
-.btn-save-analysis:hover { background:var(–clay-dark); }
-.btn-save-analysis:disabled { opacity:0.5; cursor:not-allowed; }
+/* MODELOS */
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+@media(min-width:480px){.summary-grid{grid-template-columns:repeat(4,1fr);}}
+.sum-card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r-sm);padding:13px;}
+.sum-label{font-size:10px;color:var(–text-3);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+.sum-val{font-size:19px;font-weight:700;color:var(–text);}
+.sum-val.warn{color:var(–red);}
+.sum-val.good{color:var(–green);}
+.mod-card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);margin-bottom:10px;overflow:hidden;}
+.mod-hdr{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mod-left{display:flex;align-items:center;gap:10px;}
+.mod-code{font-size:20px;font-weight:700;color:var(–accent);min-width:44px;}
+.mod-name{font-size:14px;font-weight:500;color:var(–text);}
+.mod-res{font-size:15px;font-weight:700;}
+.mod-res.pagar{color:var(–red);}
+.mod-res.devolver{color:var(–green);}
+.mod-body{border-top:0.5px solid var(–line);padding:12px 16px;display:none;}
+.mod-body.open{display:block;}
+.cas-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(–line);font-size:13px;}
+.cas-row:last-child{border-bottom:none;}
+.cas-num{color:var(–text-3);min-width:44px;font-weight:600;font-size:12px;}
+.cas-desc{flex:1;padding:0 8px;color:var(–text);}
+.cas-base{color:var(–text-2);min-width:80px;text-align:right;font-size:12px;}
+.cas-cuota{font-weight:600;min-width:80px;text-align:right;color:var(–text);}
+.cas-total{background:var(–accent-dim);border-radius:var(–r-xs);padding-left:6px;}
+.cas-total .cas-desc{font-weight:600;}
 
-textarea.json-area { width:100%; min-height:80px; font-family:monospace; font-size:11px; padding:10px; border:0.5px solid var(–border2); border-radius:var(–radius-sm); background:var(–bg3); color:var(–text); resize:vertical; }
-textarea.json-area:focus { outline:none; border-color:var(–clay); }
-.btn-row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-.btn-primary { background:var(–clay); color:white; border:none; border-radius:var(–radius-sm); padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer; width:100%; margin-top:10px; -webkit-tap-highlight-color:transparent; }
-.btn-primary:active { background:var(–clay-dark); }
-.btn-sec { background:var(–bg3); color:var(–text); border:0.5px solid var(–border2); border-radius:var(–radius-sm); padding:8px 14px; font-size:13px; cursor:pointer; }
-.btn-danger-sm { background:transparent; color:var(–red); border:0.5px solid var(–border); border-radius:var(–radius-sm); padding:4px 10px; font-size:12px; cursor:pointer; }
-.feedback { font-size:12px; margin-top:8px; min-height:16px; }
-.feedback.ok { color:var(–green); }
-.feedback.err { color:var(–red); }
+/* VALIDAR */
+.val-card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);overflow:hidden;margin-bottom:12px;}
+.val-head{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:10px 16px;border-bottom:0.5px solid var(–line);font-size:10px;font-weight:700;color:var(–text-3);text-transform:uppercase;letter-spacing:0.05em;}
+.val-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:11px 16px;border-bottom:0.5px solid var(–line);font-size:13px;color:var(–text);}
+.val-row:last-child{border-bottom:none;}
+.val-ok{color:var(–green);font-weight:700;}
+.val-fail{color:var(–red);font-weight:700;}
+.val-result{margin-top:12px;padding:14px;border-radius:var(–r-sm);font-size:13px;display:none;line-height:1.6;}
+.val-result.ok{background:var(–green-bg);color:var(–green);border:0.5px solid var(–green-bd);}
+.val-result.fail{background:var(–red-bg);color:var(–red);border:0.5px solid var(–red-bd);}
 
-.reg-panel { background:var(–bg2); border:0.5px solid var(–border); border-radius:var(–radius); overflow:hidden; margin-top:12px; }
-.reg-panel-hdr { padding:10px 16px; border-bottom:0.5px solid var(–border); font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:space-between; }
-.reg-list { max-height:320px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-.reg-item { padding:10px 16px; border-bottom:0.5px solid var(–border); display:flex; align-items:flex-start; gap:10px; }
-.reg-item:last-child { border-bottom:none; }
-.reg-dot { width:20px; height:20px; border-radius:50%; background:var(–green-bg); color:var(–green); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; margin-top:2px; }
-.reg-body { flex:1; min-width:0; }
-.reg-name { font-size:13px; font-weight:600; }
-.reg-detail { font-size:12px; color:var(–text2); margin-top:2px; }
-.reg-just { font-size:11px; color:var(–clay-dark); background:var(–clay-light); padding:2px 8px; border-radius:20px; display:inline-block; margin-top:4px; }
-.reg-chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
-.chip { font-size:11px; padding:2px 8px; border-radius:20px; border:0.5px solid; }
-.chip-INT { background:var(–blue-bg); color:var(–blue); border-color:var(–blue-border); }
-.chip-INTRA_S { background:var(–amber-bg); color:var(–amber); border-color:var(–amber-border); }
-.chip-EXENTO { background:#F1EFE8; color:#5F5E5A; border-color:#D3D1C7; }
-.chip-ALQUILER { background:var(–green-bg); color:var(–green); border-color:var(–green-border); }
-.chip-PROF { background:var(–blue-bg); color:var(–blue); border-color:var(–blue-border); }
-.chip-ing { background:#E1F5EE; color:#0F6E56; border-color:#9FE1CB; }
-.chip-amt { background:var(–bg3); color:var(–text); border-color:var(–border2); font-weight:600; }
-.chip-ret { background:var(–amber-bg); color:var(–amber); border-color:var(–amber-border); }
-.chip-drive { background:var(–blue-bg); color:var(–blue); border-color:var(–blue-border); }
-.reg-del { background:none; border:none; cursor:pointer; color:var(–text3); font-size:16px; padding:2px 4px; flex-shrink:0; }
+/* DRIVE */
+.drive-file-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(–line);font-size:13px;}
+.drive-file-item:last-child{border-bottom:none;}
+.file-info{flex:1;min-width:0;}
+.file-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(–text);}
+.file-meta{font-size:11px;color:var(–text-3);margin-top:2px;}
+.file-open{background:var(–blue-bg);color:var(–blue);border:0.5px solid var(–blue-bd);border-radius:var(–r-xs);padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap;}
 
-.summary-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
-@media(min-width:500px){ .summary-grid { grid-template-columns:repeat(4,1fr); } }
-.sum-card { background:var(–bg2); border:0.5px solid var(–border); border-radius:var(–radius-sm); padding:12px; }
-.sum-label { font-size:11px; color:var(–text3); margin-bottom:4px; font-weight:600; }
-.sum-val { font-size:18px; font-weight:700; }
-.sum-val.warn { color:var(–red); }
-.sum-val.good { color:var(–green); }
+/* CONFIG */
+.config-row{display:flex;align-items:flex-start;justify-content:space-between;padding:13px 0;border-bottom:0.5px solid var(–line);gap:12px;}
+.config-row:last-child{border-bottom:none;}
+.config-label{font-size:13px;font-weight:500;color:var(–text);}
+.config-sub{font-size:11px;color:var(–text-3);margin-top:2px;line-height:1.5;}
+.config-input{font-size:13px;padding:7px 10px;border:0.5px solid var(–line-2);border-radius:var(–r-xs);background:var(–bg-input);color:var(–text);font-family:monospace;}
+.config-input:focus{outline:none;border-color:var(–accent);}
+.status-pill{font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+.pill-ok{background:var(–green-bg);color:var(–green);}
+.pill-off{background:var(–bg-raised);color:var(–text-3);}
 
-.mod-card { background:var(–bg2); border:0.5px solid var(–border); border-radius:var(–radius); margin-bottom:10px; overflow:hidden; }
-.mod-hdr { padding:14px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-.mod-left { display:flex; align-items:center; gap:10px; }
-.mod-code { font-size:20px; font-weight:700; color:var(–clay-dark); min-width:44px; }
-.mod-name { font-size:14px; font-weight:500; }
-.mod-res { font-size:15px; font-weight:700; }
-.mod-res.pagar { color:var(–red); }
-.mod-res.devolver { color:var(–green); }
-.mod-body { border-top:0.5px solid var(–border); padding:12px 16px; display:none; }
-.mod-body.open { display:block; }
-.cas-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:0.5px solid var(–border); font-size:13px; }
-.cas-row:last-child { border-bottom:none; }
-.cas-num { color:var(–text3); min-width:44px; font-weight:600; }
-.cas-desc { flex:1; padding:0 8px; }
-.cas-base { color:var(–text2); min-width:80px; text-align:right; font-size:12px; }
-.cas-cuota { font-weight:600; min-width:80px; text-align:right; }
-.cas-total { background:var(–clay-light); border-radius:var(–radius-sm); padding-left:6px; }
-.cas-total .cas-desc { font-weight:600; }
+/* REGISTROS */
+.view-toggle{display:flex;gap:6px;margin-bottom:12px;}
+.view-btn{padding:7px 16px;font-size:13px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.view-btn.active{background:var(–accent);color:#fff;border-color:var(–accent);}
+.totals-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px;}
+.total-box{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r-sm);padding:11px 12px;}
+.total-box-label{font-size:10px;color:var(–text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
+.total-box-val{font-size:15px;font-weight:700;color:var(–text);}
+.total-box-val.green{color:var(–green);}
+.total-box-val.blue{color:var(–blue);}
+.total-box-val.amber{color:var(–amber);}
+.total-box-val.red{color:var(–red);}
+.reg-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(–r);border:0.5px solid var(–line);}
+.reg-table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px;}
+.reg-table th{background:var(–accent);color:#fff;font-weight:600;padding:9px 11px;text-align:left;white-space:nowrap;}
+.reg-table th.right{text-align:right;}
+.reg-table td{padding:8px 11px;border-bottom:0.5px solid var(–line);color:var(–text);vertical-align:middle;}
+.reg-table tr:last-child td{border-bottom:none;}
+.reg-table tr:hover td{background:var(–bg-raised);}
+.reg-table .total-row td{background:var(–accent-dim);font-weight:600;color:var(–accent);border-top:1px solid var(–accent);}
+.reg-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.reg-table .date{white-space:nowrap;color:var(–text-3);font-size:11px;}
+.reg-table .proveedor{font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.reg-table .concepto{color:var(–text-2);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;}
+.op-badge{font-size:10px;padding:2px 7px;border-radius:20px;border:0.5px solid;white-space:nowrap;display:inline-block;}
+.op-INT{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
+.op-INTRA_S{background:var(–amber-bg);color:var(–amber);border-color:var(–amber-bd);}
+.op-EXENTO{background:var(–bg-raised);color:var(–text-2);border-color:var(–line-2);}
+.op-ALQUILER{background:var(–green-bg);color:var(–green);border-color:var(–green-bd);}
+.op-PROF{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
+.just-badge{font-size:10px;padding:2px 7px;border-radius:20px;background:var(–accent-dim);color:var(–accent);display:inline-block;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-.val-card { background:var(–bg2); border:0.5px solid var(–border); border-radius:var(–radius); overflow:hidden; margin-bottom:12px; }
-.val-head { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; padding:10px 16px; border-bottom:0.5px solid var(–border); font-size:11px; font-weight:700; color:var(–text3); text-transform:uppercase; }
-.val-row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; padding:10px 16px; border-bottom:0.5px solid var(–border); font-size:13px; }
-.val-row:last-child { border-bottom:none; }
-.val-ok { color:var(–green); font-weight:700; }
-.val-fail { color:var(–red); font-weight:700; }
-.val-result { margin-top:12px; padding:14px; border-radius:var(–radius-sm); font-size:13px; display:none; line-height:1.6; }
-.val-result.ok { background:var(–green-bg); color:var(–green); border:0.5px solid var(–green-border); }
-.val-result.fail { background:var(–red-bg); color:var(–red); border:0.5px solid var(–red-border); }
-
-.drive-file-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:0.5px solid var(–border); font-size:13px; }
-.drive-file-item:last-child { border-bottom:none; }
-.file-info { flex:1; min-width:0; }
-.file-name { font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.file-meta { font-size:11px; color:var(–text3); margin-top:2px; }
-.file-open { background:var(–blue-bg); color:var(–blue); border:0.5px solid var(–blue-border); border-radius:var(–radius-sm); padding:4px 10px; font-size:12px; cursor:pointer; white-space:nowrap; }
-
-.spin { width:16px; height:16px; border:2px solid var(–border2); border-top-color:var(–clay); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
-@keyframes spin { to { transform:rotate(360deg); } }
-
-.config-row { display:flex; align-items:flex-start; justify-content:space-between; padding:12px 0; border-bottom:0.5px solid var(–border); gap:12px; }
-.config-row:last-child { border-bottom:none; }
-.config-label { font-size:13px; font-weight:500; }
-.config-sub { font-size:11px; color:var(–text3); margin-top:2px; line-height:1.5; }
-.config-input { font-size:13px; padding:6px 10px; border:0.5px solid var(–border2); border-radius:var(–radius-sm); background:var(–bg3); color:var(–text); font-family:monospace; }
-.config-input:focus { outline:none; border-color:var(–clay); }
-.claude-status { font-size:11px; padding:3px 8px; border-radius:20px; white-space:nowrap; }
-.claude-ok { background:var(–green-bg); color:var(–green); }
-.claude-off { background:var(–bg3); color:var(–text3); }
-.sheets-status { font-size:11px; padding:3px 8px; border-radius:20px; white-space:nowrap; }
-.sheets-ok { background:var(–green-bg); color:var(–green); }
-.sheets-off { background:var(–bg3); color:var(–text3); }
-
-.empty { text-align:center; padding:2rem; color:var(–text3); font-size:14px; }
-.storage-bar { font-size:11px; color:var(–text3); text-align:right; padding:6px 0 0; display:flex; align-items:center; justify-content:flex-end; gap:5px; }
-.storage-dot { width:6px; height:6px; border-radius:50%; background:#639922; }
-input[type=file] { display:none; }
-
-/* REGISTROS TABLE */
-.reg-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:1rem; border-radius:var(–radius); border:0.5px solid var(–border); }
-.reg-table { width:100%; border-collapse:collapse; font-size:12px; min-width:700px; }
-.reg-table th { background:var(–clay); color:white; font-weight:600; padding:8px 10px; text-align:left; white-space:nowrap; position:sticky; top:0; }
-.reg-table th.right { text-align:right; }
-.reg-table td { padding:7px 10px; border-bottom:0.5px solid var(–border); vertical-align:middle; }
-.reg-table tr:last-child td { border-bottom:none; }
-.reg-table tr:hover td { background:var(–bg3); }
-.reg-table .total-row td { background:var(–clay-light); font-weight:600; color:var(–clay-dark); border-top:1px solid var(–clay); }
-.reg-table .num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
-.reg-table .date { white-space:nowrap; color:var(–text3); font-size:11px; }
-.reg-table .proveedor { font-weight:500; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.reg-table .concepto { color:var(–text2); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
-.op-badge { font-size:10px; padding:2px 6px; border-radius:20px; border:0.5px solid; white-space:nowrap; display:inline-block; }
-.op-INT { background:var(–blue-bg); color:var(–blue); border-color:var(–blue-border); }
-.op-INTRA_S { background:var(–amber-bg); color:var(–amber); border-color:var(–amber-border); }
-.op-EXENTO { background:#F1EFE8; color:#5F5E5A; border-color:#D3D1C7; }
-.op-ALQUILER { background:var(–green-bg); color:var(–green); border-color:var(–green-border); }
-.op-PROF { background:var(–blue-bg); color:var(–blue); border-color:var(–blue-border); }
-.just-badge { font-size:10px; padding:2px 6px; border-radius:20px; background:var(–clay-light); color:var(–clay-dark); display:inline-block; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.totals-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; margin-bottom:12px; }
-.total-box { background:var(–bg2); border:0.5px solid var(–border); border-radius:var(–radius-sm); padding:10px 12px; }
-.total-box-label { font-size:10px; color:var(–text3); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
-.total-box-val { font-size:16px; font-weight:700; }
-.total-box-val.red { color:var(–red); }
-.total-box-val.green { color:var(–green); }
-.total-box-val.blue { color:var(–blue); }
-.total-box-val.amber { color:var(–amber); }
-.view-toggle { display:flex; gap:6px; margin-bottom:12px; }
-.view-btn { padding:6px 14px; font-size:13px; border:0.5px solid var(–border2); border-radius:20px; background:var(–bg3); color:var(–text2); cursor:pointer; font-weight:500; }
-.view-btn.active { background:var(–clay); color:white; border-color:var(–clay); }
+/* MISC */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(–text-3);font-size:14px;}
+.storage-bar{font-size:11px;color:var(–text-3);padding:6px 0 0;display:flex;align-items:center;justify-content:flex-end;gap:5px;}
+.storage-dot{width:6px;height:6px;border-radius:50%;background:var(–green);}
+.spin{width:14px;height:14px;border:2px solid var(–line-2);border-top-color:var(–accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+input[type=file]{display:none;}
+textarea.json-area{width:100%;min-height:80px;font-family:monospace;font-size:12px;padding:10px;border:0.5px solid var(–line-2);border-radius:var(–r-sm);background:var(–bg-input);color:var(–text);resize:vertical;}
+textarea.json-area:focus{outline:none;border-color:var(–accent);}
 </style>
 
 </head>
@@ -310,19 +277,19 @@ input[type=file] { display:none; }
 
 <div id="login-screen">
   <div class="login-logo-wrap">
-    <svg class="login-logo-svg" width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#grad1)"/>
-      <path d="M14 52V30h5l7 14 7-14h5v22h-5V40l-5 10h-4l-5-10v12h-5z" fill="white"/>
-      <path d="M46 41v-3h12v10c-2 2.5-5.5 4-9 4-7 0-12-5-12-12s5-12 12-12c4 0 7.5 1.8 9.5 4.5l-3.5 2.5c-1.5-1.8-3.5-2.8-6-2.8-4.2 0-7.2 3.2-7.2 7.8s3 7.8 7.2 7.8c2.2 0 4.2-.8 5.5-2.2V41h-8.5z" fill="white"/>
-      <defs><linearGradient id="grad1" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#8B4513"/></linearGradient></defs>
+    <svg class="login-logo-svg" width="80" height="80" viewBox="0 0 80 80" fill="none">
+      <rect width="80" height="80" rx="20" fill="url(#lg)"/>
+      <path d="M13 52V29h5.5l7.5 15 7.5-15H39v23h-5V39l-5.5 11h-5L18 39v13h-5z" fill="white"/>
+      <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
+      <defs><linearGradient id="lg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.9</div>
+    <div class="login-version">v5.16</div>
   </div>
   <div class="login-card">
-    <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
-    <a id="btn-google" href="#" onclick="doLogin(event)" class="btn-google-new">
+    <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
+    <a href="#" onclick="doLogin(event)" class="btn-google">
       <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continuar con Google
     </a>
@@ -334,7 +301,7 @@ input[type=file] { display:none; }
 
 <div id="pin-screen">
   <div class="pin-user-wrap">
-    <img class="avatar-img" id="avatar-img" src="" alt="" onerror="this.style.display='none'" />
+    <img class="avatar-img" id="avatar-img" src="" alt="" onerror="this.style.display='none'"/>
     <div class="avatar-name" id="avatar-name">—</div>
     <div class="avatar-email" id="avatar-email">—</div>
   </div>
@@ -348,11 +315,11 @@ input[type=file] { display:none; }
       <button class="pin-btn" onclick="pp('1')">1</button><button class="pin-btn" onclick="pp('2')">2</button><button class="pin-btn" onclick="pp('3')">3</button>
       <button class="pin-btn" onclick="pp('4')">4</button><button class="pin-btn" onclick="pp('5')">5</button><button class="pin-btn" onclick="pp('6')">6</button>
       <button class="pin-btn" onclick="pp('7')">7</button><button class="pin-btn" onclick="pp('8')">8</button><button class="pin-btn" onclick="pp('9')">9</button>
-      <button class="pin-btn del" onclick="pd()">⌫</button><button class="pin-btn" onclick="pp('0')">0</button><button class="pin-btn enter" onclick="pe()">OK</button>
+      <button class="pin-btn del" onclick="pd()">&#x232B;</button><button class="pin-btn" onclick="pp('0')">0</button><button class="pin-btn enter" onclick="pe()">OK</button>
     </div>
     <div class="pin-error" id="pin-error"></div>
   </div>
-  <button class="btn-out-white" onclick="signOut()">Cambiar cuenta</button>
+  <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
 </div>
 
 <!-- MAIN -->
@@ -360,7 +327,12 @@ input[type=file] { display:none; }
 <div id="main-screen">
   <div class="top-bar">
     <div class="top-left">
-      <svg width="28" height="28" viewBox="0 0 80 80" fill="none" style="border-radius:8px;flex-shrink:0;"><rect width="80" height="80" rx="20" fill="url(#tg)"/><path d="M14 52V30h5l7 14 7-14h5v22h-5V40l-5 10h-4l-5-10v12h-5z" fill="white"/><path d="M46 41v-3h12v10c-2 2.5-5.5 4-9 4-7 0-12-5-12-12s5-12 12-12c4 0 7.5 1.8 9.5 4.5l-3.5 2.5c-1.5-1.8-3.5-2.8-6-2.8-4.2 0-7.2 3.2-7.2 7.8s3 7.8 7.2 7.8c2.2 0 4.2-.8 5.5-2.2V41h-8.5z" fill="white"/><defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#8B4513"/></linearGradient></defs></svg>
+      <svg width="28" height="28" viewBox="0 0 80 80" fill="none" style="border-radius:8px;flex-shrink:0;">
+        <rect width="80" height="80" rx="20" fill="url(#tg)"/>
+        <path d="M13 52V29h5.5l7.5 15 7.5-15H39v23h-5V39l-5.5 11h-5L18 39v13h-5z" fill="white"/>
+        <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
+        <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
+      </svg>
       <span class="top-title">MiGestor</span>
     </div>
     <div class="top-right">
@@ -370,22 +342,18 @@ input[type=file] { display:none; }
         <div class="dot dot-off" id="sheets-dot" style="margin-left:5px;"></div><span id="sheets-lbl">Sheets</span>
       </div>
       <span class="q-badge" id="qbadge">1T 2026</span>
-      <button class="btn-out" onclick="signOut()">Salir</button>
+      <button class="btn-sm" onclick="signOut()">Salir</button>
     </div>
   </div>
-
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('facturas',this)"><span class="tab-icon">📄</span>Facturas</button>
-    <button class="tab-btn" onclick="switchTab('registros',this)"><span class="tab-icon">📋</span>Registros</button>
-    <button class="tab-btn" onclick="switchTab('modelos',this)"><span class="tab-icon">🧮</span>Modelos</button>
-    <button class="tab-btn" onclick="switchTab('drive',this)"><span class="tab-icon">☁️</span>Drive</button>
-    <button class="tab-btn" onclick="switchTab('manual',this)"><span class="tab-icon">✏️</span>Manual</button>
-    <button class="tab-btn" onclick="switchTab('validar',this)"><span class="tab-icon">✅</span>Validar</button>
-    <button class="tab-btn" onclick="switchTab('config',this)"><span class="tab-icon">⚙️</span>Config</button>
+    <button class="tab-btn active" onclick="switchTab('facturas',this)">Facturas</button>
+    <button class="tab-btn" onclick="switchTab('registros',this)">Registros</button>
+    <button class="tab-btn" onclick="switchTab('manual',this)">Manual</button>
+    <button class="tab-btn" onclick="switchTab('modelos',this)">Modelos</button>
+    <button class="tab-btn" onclick="switchTab('drive',this)">Drive</button>
+    <button class="tab-btn" onclick="switchTab('validar',this)">Validar 1T</button>
+    <button class="tab-btn" onclick="switchTab('config',this)">Config</button>
   </div>
-
-  <!-- FACTURAS -->
-
   <div id="tab-facturas" class="tab-pane active">
     <div class="section-label">Trimestre activo</div>
     <div class="q-selector" id="qs-f">
@@ -394,32 +362,23 @@ input[type=file] { display:none; }
       <button class="q-pill" onclick="setQ('3T 2026',this,'qs-f')">3T 2026</button>
       <button class="q-pill" onclick="setQ('4T 2026',this,'qs-f')">4T 2026</button>
     </div>
-    <div id="claude-no-key" class="tip-box" style="display:none;">
-      <h4>Claude API no configurada</h4>
-      Ve a <strong>Config</strong> e introduce tu API key para activar el análisis automático.
-    </div>
+    <div id="claude-no-key" class="tip-box" style="display:none;"><h4>Claude API no configurada</h4>Ve a <strong>Config</strong> e introduce tu API key.</div>
     <div class="upload-zone" id="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
-      <div class="upload-icon">📄</div>
+      <div class="upload-icon">&#x1F4C4;</div>
       <div class="upload-title">Sube la foto o PDF de la factura</div>
       <div class="upload-sub">Claude la analiza automáticamente · JPG, PNG o PDF</div>
     </div>
-    <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)" />
+    <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <div id="analysis-list"></div>
     <div class="reg-panel" style="margin-top:16px;">
       <div class="reg-panel-hdr">
         <span>Registros — <span id="pq-f">1T 2026</span></span>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span id="rc-f" style="font-size:12px;color:var(--text3);">0</span>
-          <button class="btn-danger-sm" onclick="clearQ()">Borrar</button>
-        </div>
+        <div style="display:flex;gap:8px;align-items:center;"><span id="rc-f" style="font-size:12px;color:var(--text-3);">0</span><button class="btn-danger-sm" onclick="clearQ()">Borrar</button></div>
       </div>
       <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
     </div>
     <div class="storage-bar"><span class="storage-dot"></span><span id="si">Cargando...</span></div>
   </div>
-
-  <!-- REGISTROS -->
-
   <div id="tab-registros" class="tab-pane">
     <div class="section-label">Trimestre</div>
     <div class="q-selector" id="qs-r">
@@ -430,29 +389,14 @@ input[type=file] { display:none; }
       <button class="q-pill" onclick="setQReg('todos',this)">Todos</button>
     </div>
     <div class="view-toggle">
-      <button class="view-btn active" id="vbtn-gastos" onclick="setView('gastos',this)">Gastos recibidos</button>
-      <button class="view-btn" id="vbtn-ingresos" onclick="setView('ingresos',this)">Ingresos emitidos</button>
+      <button class="view-btn active" onclick="setView('gastos',this)">Gastos</button>
+      <button class="view-btn" onclick="setView('ingresos',this)">Ingresos</button>
     </div>
     <div class="totals-bar" id="reg-totals-bar"></div>
-    <div class="reg-table-wrap">
-      <table class="reg-table" id="reg-main-table">
-        <thead id="reg-thead"></thead>
-        <tbody id="reg-tbody"></tbody>
-      </table>
-    </div>
+    <div class="reg-table-wrap"><table class="reg-table"><thead id="reg-thead"></thead><tbody id="reg-tbody"></tbody></table></div>
   </div>
-
-  <!-- MANUAL -->
-
   <div id="tab-manual" class="tab-pane">
-    <div class="tip-box">
-      <h4>Importar JSON manualmente</h4>
-      <ol>
-        <li>Sube la factura al chat con Claude</li>
-        <li>Claude te devuelve un <code>JSON</code></li>
-        <li>Cópialo y pégalo aquí</li>
-      </ol>
-    </div>
+    <div class="tip-box"><h4>Importar JSON manualmente</h4><ol><li>Sube la factura al chat con Claude</li><li>Claude te devuelve un <code>JSON</code></li><li>Cópialo y pégalo aquí</li></ol></div>
     <div class="section-label">Trimestre</div>
     <div class="q-selector" id="qs-m">
       <button class="q-pill active" onclick="setQ('1T 2026',this,'qs-m')">1T 2026</button>
@@ -462,17 +406,11 @@ input[type=file] { display:none; }
     </div>
     <div class="card">
       <textarea class="json-area" id="json-in" placeholder='{"tipo":"gasto","proveedor_cliente":"..."}'></textarea>
-      <div class="btn-row">
-        <button class="btn-sec" onclick="clearJ()">Limpiar</button>
-        <button class="btn-sec" onclick="loadDemo()">Demo 1T</button>
-      </div>
+      <div class="btn-row"><button class="btn-sec" onclick="clearJ()">Limpiar</button><button class="btn-sec" onclick="loadDemo()">Demo 1T</button></div>
       <button class="btn-primary" onclick="importJ()">Guardar</button>
       <div class="feedback" id="imp-fb"></div>
     </div>
   </div>
-
-  <!-- MODELOS -->
-
   <div id="tab-modelos" class="tab-pane">
     <div class="summary-grid">
       <div class="sum-card"><div class="sum-label">303 IVA</div><div class="sum-val warn" id="s303">—</div></div>
@@ -480,67 +418,28 @@ input[type=file] { display:none; }
       <div class="sum-card"><div class="sum-label">115 Alquiler</div><div class="sum-val warn" id="s115">—</div></div>
       <div class="sum-card"><div class="sum-label">349 Intracom.</div><div class="sum-val" id="s349">—</div></div>
     </div>
-    <div class="mod-card">
-      <div class="mod-hdr" onclick="tog('b303')"><div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div><div class="mod-res pagar" id="r303">—</div></div>
-      <div class="mod-body" id="b303">
-        <div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div>
-        <div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div>
-        <div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div>
-        <div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div>
-        <div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div>
-        <div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div>
-        <div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div>
-      </div>
-    </div>
-    <div class="mod-card">
-      <div class="mod-hdr" onclick="tog('b130')"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div>
-      <div class="mod-body" id="b130">
-        <div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div>
-        <div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div>
-        <div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div>
-        <div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div>
-        <div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div>
-        <div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div>
-      </div>
-    </div>
-    <div class="mod-card">
-      <div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div>
-      <div class="mod-body" id="b115">
-        <div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div>
-        <div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div>
-      </div>
-    </div>
-    <div class="mod-card">
-      <div class="mod-hdr" onclick="tog('b349')"><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div>
-      <div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div>
-    </div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b303')"><div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div><div class="mod-res pagar" id="r303">—</div></div><div class="mod-body" id="b303"><div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div><div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div><div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div><div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div><div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div><div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div><div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b130')"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div><div class="mod-body" id="b130"><div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div><div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div><div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div><div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')"><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
     <button class="btn-primary" onclick="recalc()">Recalcular modelos</button>
     <button class="btn-sec" style="width:100%;margin-top:8px;" onclick="exportToSheets()">Exportar a Google Sheets</button>
     <div class="feedback" id="sheets-fb"></div>
   </div>
-
-  <!-- DRIVE -->
-
   <div id="tab-drive" class="tab-pane">
     <div class="section-label">Cuenta conectada</div>
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div>
-          <div style="font-size:14px;font-weight:600;" id="drive-user-name">—</div>
-          <div style="font-size:12px;color:var(--text2);" id="drive-user-email">—</div>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div><div style="font-size:14px;font-weight:600;color:var(--text);" id="drive-user-name">—</div><div style="font-size:12px;color:var(--text-2);" id="drive-user-email">—</div></div>
         <button class="btn-sec" onclick="syncDrive()">Sincronizar</button>
       </div>
-      <div style="font-size:12px;color:var(--text3);" id="drive-last-sync">Sin sincronizar aún</div>
+      <div style="font-size:11px;color:var(--text-3);" id="drive-last-sync">Sin sincronizar</div>
     </div>
     <div class="section-label">Archivos subidos</div>
     <div class="card"><div id="drive-files-list"><div class="empty">Sin archivos</div></div></div>
     <div class="section-label">Datos por trimestre</div>
-    <div class="card"><div id="drive-json-list"><div class="empty">Sin datos en Drive</div></div></div>
+    <div class="card"><div id="drive-json-list"><div class="empty">Sin datos</div></div></div>
   </div>
-
-  <!-- VALIDAR -->
-
   <div id="tab-validar" class="tab-pane">
     <div class="section-label">Comparación con 1T 2026 presentado</div>
     <div class="val-card">
@@ -553,39 +452,25 @@ input[type=file] { display:none; }
     <button class="btn-primary" onclick="validar()">Ejecutar validación</button>
     <div class="val-result" id="val-res"></div>
   </div>
-
-  <!-- CONFIG -->
-
   <div id="tab-config" class="tab-pane">
     <div class="section-label">Claude API</div>
     <div class="card">
-      <div class="config-row">
-        <div><div class="config-label">API Key de Claude</div><div class="config-sub">Guardada solo en tu navegador</div></div>
-        <span class="claude-status claude-off" id="claude-key-status">No configurada</span>
-      </div>
-      <input type="password" class="config-input" id="claude-key-input" placeholder="sk-ant-api03-..." style="width:100%;margin-top:10px;" oninput="updateClaudeKey(this.value)" />
+      <div class="config-row"><div><div class="config-label">API Key</div><div class="config-sub">Guardada solo en tu navegador</div></div><span class="status-pill pill-off" id="claude-key-status">No configurada</span></div>
+      <input type="password" class="config-input" id="claude-key-input" placeholder="sk-ant-api03-..." style="width:100%;margin-top:10px;" oninput="updateClaudeKey(this.value)"/>
       <div class="feedback" id="claude-key-fb"></div>
     </div>
     <div class="section-label">Datos del emisor</div>
     <div class="card">
-      <div class="config-row"><span class="config-label">Nombre</span><span style="font-size:13px;color:var(--text2);">Valentín López Pérez</span></div>
-      <div class="config-row"><span class="config-label">NIF</span><span style="font-size:13px;color:var(--text2);">48220739C</span></div>
-      <div class="config-row"><span class="config-label">Dirección</span><span style="font-size:13px;color:var(--text2);">Badajoz 95 LOC 1, 08005 Barcelona</span></div>
-      <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text2);">86.2 Ceramista</span></div>
+      <div class="config-row"><span class="config-label">Nombre</span><span style="font-size:13px;color:var(--text-2);">Valentín López Pérez</span></div>
+      <div class="config-row"><span class="config-label">NIF</span><span style="font-size:13px;color:var(--text-2);">48220739C</span></div>
+      <div class="config-row"><span class="config-label">Dirección</span><span style="font-size:13px;color:var(--text-2);">Badajoz 95 LOC 1, 08005 Barcelona</span></div>
+      <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text-2);">86.2 Ceramista</span></div>
     </div>
     <div class="section-label">Google Sheets</div>
-    <div class="card">
-      <div class="config-row">
-        <div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div>
-        <button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear hoja</button>
-      </div>
-    </div>
+    <div class="card"><div class="config-row"><div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div><button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear</button></div></div>
     <div class="section-label">PIN</div>
     <div class="card">
-      <div class="config-row">
-        <div><div class="config-label">Cambiar PIN</div><div class="config-sub">4 dígitos</div></div>
-        <input type="password" class="config-input" id="new-pin-input" placeholder="1234" maxlength="4" style="width:100px;" />
-      </div>
+      <div class="config-row"><div><div class="config-label">Cambiar PIN</div><div class="config-sub">4 dígitos</div></div><input type="password" class="config-input" id="new-pin-input" placeholder="1234" maxlength="4" style="width:90px;"/></div>
       <button class="btn-primary" onclick="changePin()">Guardar PIN</button>
       <div class="feedback" id="pin-fb"></div>
     </div>
@@ -593,6 +478,7 @@ input[type=file] { display:none; }
 </div>
 
 <script>
+
 const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com';
 const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
@@ -602,7 +488,7 @@ let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
 
 const JUST_OPTIONS=[
-  '','Material de taller (arcilla, esmaltes, herramientas)','Alquiler local de actividad','Suministros del local (luz, agua, gas)','Material fotográfico para documentar obra','Seguridad del local','Limpieza y mantenimiento del taller','Material de oficina y administración','Formación y desarrollo profesional','Marketing y promoción de la actividad','Equipamiento informático (uso profesional)','Servicio digital para la actividad','Otro (especificar)'
+  '','Material de taller (arcilla, esmaltes, herramientas)','Mobiliario y equipamiento del taller (mesas, sillas, lámparas, almacenamiento)','Alquiler local de actividad','Suministros del local (luz, agua, gas)','Material fotográfico para documentar obra','Seguridad del local','Limpieza y mantenimiento del taller','Material de oficina y administración','Formación y desarrollo profesional','Marketing y promoción de la actividad','Equipamiento informático (uso profesional)','Servicio digital para la actividad','Servicios profesionales externos (autónomo con retención 15%)','Otro (especificar)'
 ];
 
 // ── CFG ──
@@ -674,26 +560,66 @@ function updateDots(){ for(let i=0;i<4;i++) document.getElementById('d'+i).class
 function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.display='none'; document.getElementById('main-screen').style.display='block'; if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);} else{document.getElementById('claude-no-key').style.display='block';} updateSheetDisplay(); renderAll(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
 
 // ── CLAUDE API ──
-const SYSTEM_PROMPT=`Eres un asistente fiscal español experto en autónomos. Analiza esta factura y extrae los datos fiscales.
-Autónomo: Valentín López Pérez, ceramista, NIF 48220739C, estimación directa simplificada, Barcelona, IAE 86.2.
-REGLAS:
-- Endesa: SIEMPRE 2 facturas en 1 PDF. Base IVA electricidad = línea 'IVA normal 21% s/ XXX'. Ignora impuesto especial.
-- SumUp: IVA 0% exento. Genera 2 registros en array: ingreso (base=transacciones/1.21, pct_iva=21, cuota_iva=transacciones-base) y gasto comisión (operacion=EXENTO).
-- IA desde Irlanda (OpenAI, Anthropic): operacion=INTRA_S, pct_iva=0, cuota_iva=0.
-- Alquiler Alibau: base=900, pct_iva=21, cuota_iva=189, retencion_pct=19, retencion_importe=171, operacion=ALQUILER.
-- Amazon CN/GB con IVA declarado por Amazon ES: operacion=INT, IVA deducible.
-- Recibos sin IVA: cuota_iva=0.
-OPERACIONES: INT, INTRA_S, EXENTO, ALQUILER, PROF.
-Responde SOLO con JSON válido sin markdown:
-{"tipo":"gasto|ingreso","proveedor_cliente":"","nif":"","fecha":"YYYY-MM-DD","concepto":"","num_factura":"","trimestre":"1T 2026","operacion":"INT","base_iva":0,"pct_iva":21,"cuota_iva":0,"base_irpf":0,"retencion_pct":0,"retencion_importe":0,"ingresos_brutos":0,"notas":""}
-Si hay múltiples facturas devuelve array JSON.`;
+const SYSTEM_PROMPT=`Eres un experto en fiscalidad española para autónomos. Analiza facturas y extrae datos fiscales con máxima precisión.
+
+IDENTIDAD DEL AUTÓNOMO:
+- Nombre: Valentín López Pérez
+- NIF: 48220739C
+- Actividad: ceramista, talleres de cerámica
+- Barcelona, estimación directa simplificada, IAE 86.2
+
+REGLA CRÍTICA — TIPO GASTO vs INGRESO:
+- tipo="gasto": cuando Valentín López Pérez aparece como CLIENTE/CLIENT/DESTINATARIO/KÄUFER/BUYER — él está COMPRANDO o RECIBIENDO un servicio
+- tipo="ingreso": cuando Valentín López Pérez aparece como EMISOR/PROVEEDOR/SELLER/VENDEDOR — él está VENDIENDO
+- Si la factura la emite OTRA PERSONA o EMPRESA y Valentín es el cliente → SIEMPRE gasto
+- proveedor_cliente = quien EMITE la factura (el que cobra), NO Valentín
+
+REGLA CRÍTICA — RETENCIÓN IRPF:
+- Solo añadir retencion_pct y retencion_importe si aparece EXPLÍCITAMENTE en la factura (línea IRPF, retención, withholding)
+- Si no hay mención explícita de retención → retencion_pct=0, retencion_importe=0
+- Nunca inferir retención por el tipo de proveedor
+- operacion=PROF solo si hay retención 15% explícita en la factura
+
+REGLA CRÍTICA — BASE IMPONIBLE:
+- La factura puede estar en catalán, inglés, alemán, francés u otro idioma
+- Catalán: Base=base, IVA=IVA, IRPF=IRPF, Total=Total/TOTAL, Tasca=tarea/concepto
+- Inglés: Base=subtotal/net amount, VAT/Tax=IVA, Total=total
+- Alemán: Nettobetrag=base, MwSt=IVA, Gesamtbetrag=total
+- SIEMPRE extraer la base imponible (antes de IVA), nunca usar el total como base
+- Si hay descuento, la base es el importe después del descuento
+
+REGLAS ESPECÍFICAS POR PROVEEDOR:
+- Endesa: SIEMPRE 2 facturas en 1 PDF. Base IVA = línea "IVA normal 21% s/ XXX". Ignorar impuesto especial electricidad.
+- SumUp: tipo=ingreso. Genera array con 2 registros: [ingreso(base=transacciones/1.21, pct_iva=21, cuota_iva=transacciones-base), gasto comisión(operacion=EXENTO)]
+- OpenAI/Anthropic/servicios IA desde Irlanda: operacion=INTRA_S, pct_iva=0, cuota_iva=0
+- PROF aplica ÚNICAMENTE si: (1) el emisor es una persona física autónoma (nombre y apellidos, no empresa), Y (2) la factura tiene una línea IRPF/retención con importe explícito. Cerámica Collet, IKEA, Amazon y cualquier S.A., S.L., S.A.U., CB o empresa → NUNCA PROF, siempre INT
+- Patrícia Peix Roldán (NIF 47847236Z): tipo=gasto, operacion=PROF, retencion_pct=15
+- Alibau Gestio CB (alquiler): base=900, pct_iva=21, cuota_iva=189, retencion_pct=19, retencion_importe=171, operacion=ALQUILER
+- Amazon (CN/GB vendedores, IVA declarado por Amazon ES): operacion=INT, IVA deducible normal
+- Facturas sin IVA desglosado: cuota_iva=0, base_iva=importe total
+
+OPERACIONES:
+- INT: gasto/ingreso español con IVA (lo más común)
+- INTRA_S: servicio de empresa UE (inversión sujeto pasivo)
+- EXENTO: sin IVA (comisiones SumUp, algunos servicios)
+- ALQUILER: alquiler local con retención 19%
+- PROF: profesional español con retención 15% EXPLÍCITA en factura
+
+REGLA AMORTIZACIÓN:
+- Si un artículo individual supera 300€ de base imponible (maquinaria, mobiliario, equipamiento, ordenador, cámara, etc.) → notas="⚠️ Posible amortización: importe superior a 300€. Consultar si debe amortizarse en lugar de deducirse directamente."
+- Si son varios artículos en una misma factura, evalúa cada uno por separado
+- Gastos recurrentes (alquiler, suministros, servicios) → nunca amortizables
+
+Responde SOLO con JSON válido sin markdown ni texto adicional:
+{"tipo":"gasto|ingreso","proveedor_cliente":"nombre del emisor","nif":"NIF del emisor","fecha":"YYYY-MM-DD","concepto":"descripción del servicio/producto","num_factura":"número","trimestre":"XT 2026","operacion":"INT|INTRA_S|EXENTO|ALQUILER|PROF","base_iva":0.00,"pct_iva":21,"cuota_iva":0.00,"base_irpf":0.00,"retencion_pct":0,"retencion_importe":0.00,"ingresos_brutos":0.00,"notas":""}
+Si hay múltiples facturas en el documento devuelve array JSON.`;
 
 async function analyzeWithClaude(file){
   const base64=await fileToBase64(file);
   const isPDF=file.type==='application/pdf';
   const mt=isPDF?'application/pdf':(file.type||'image/jpeg');
-  const content=isPDF?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Extrae los datos fiscales.'}]:[{type:'image',source:{type:'base64',media_type:mt,data:base64}},{type:'text',text:'Extrae los datos fiscales.'}];
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
+  const content=isPDF?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales siguiendo exactamente las reglas del sistema.'}]:[{type:'image',source:{type:'base64',media_type:mt,data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales siguiendo exactamente las reglas del sistema.'}];
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
   const d=await resp.json();
   if(d.error) throw new Error(d.error.message);
   const raw=d.content.find(b=>b.type==='text')?.text||'{}';
@@ -727,6 +653,7 @@ async function handleClaudeFiles(files){
           </div>
           <div class="factura-review-body">
             <div class="factura-review-detail">${f.concepto||''} · ${f.operacion||'INT'} · ${f.tipo==='ingreso'?'Ingreso':'Gasto'}</div>
+            ${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:6px 10px;border-radius:var(--r-xs);margin-bottom:8px;">${f.notas}</div>`:''}
             <div class="just-row">
               <label class="just-label">Justificación deducción</label>
               <select class="just-select" id="${divId}_j${i}" onchange="toggleJustOther('${divId}_j${i}','${divId}_jo${i}')">
@@ -1027,6 +954,7 @@ function renderRegistros(){
 function resetSheet(){ sheetId=null; saveCfg(); document.getElementById('sheet-id-display').textContent='Sin crear'; document.getElementById('sheets-dot').className='dot dot-off'; alert('Hoja reseteada. La próxima exportación creará una nueva dentro de la carpeta MiGestor.'); }
 function updateSheetDisplay(){ const el=document.getElementById('sheet-id-display'); if(el) el.textContent=sheetId?'ID: '+sheetId.slice(0,20)+'...':'Sin crear'; }
 function loadDemo(){ const demo=[{tipo:'ingreso',proveedor_cliente:'SumUp enero 2026',nif:'IE9813461A',fecha:'2026-02-01',concepto:'Ventas tarjeta enero 2026',operacion:'INT',base_iva:790.08,pct_iva:21,cuota_iva:165.92,base_irpf:790.08,ingresos_brutos:956,retencion_pct:0,retencion_importe:0,justificacion:'Ingresos por ventas de ceramica y talleres'},{tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-02-01',concepto:'Comision TPV enero 2026',operacion:'EXENTO',base_iva:14.34,pct_iva:0,cuota_iva:0,base_irpf:14.34,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-01-01',concepto:'Alquiler local enero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-02-01',concepto:'Alquiler local febrero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-03-01',concepto:'Alquiler local marzo',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'OpenAI Ireland Limited',fecha:'2026-02-15',concepto:'Suscripcion OpenAI',operacion:'INTRA_S',base_iva:57.03,pct_iva:0,cuota_iva:0,base_irpf:57.03,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'}]; if(!data['1T 2026']) data['1T 2026']=[]; demo.forEach(f=>{f._quarter='1T 2026';f._id=Date.now()+Math.random();data['1T 2026'].push(f);}); saveLocal();Q='1T 2026'; document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); document.getElementById('qbadge').textContent='1T 2026'; renderAll(); }
+
 </script>
 
 </body>

@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.34</div>
+    <div class="login-version">v5.35</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.34</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.35</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -382,7 +382,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.34</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.35</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -872,7 +872,7 @@ function saveAnalysis(divId, count){
 function setDS(s,l){ document.getElementById('drive-dot').className='dot dot-'+s; document.getElementById('drive-lbl').textContent=l; }
 async function driveReq(url,opts={}){ const r=await fetch(url,{...opts,headers:{Authorization:'Bearer '+token,...(opts.headers||{})}}); if(!r.ok) throw new Error('Drive '+r.status); return r; }
 async function findOrCreate(name,parent){ const q=encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parent}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`); const j=await r.json(); if(j.files&&j.files.length) return j.files[0].id; const cr=await driveReq('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,mimeType:'application/vnd.google-apps.folder',parents:[parent]})}); return (await cr.json()).id; }
-async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); await loadFromDrive(); await loadDriveFiles(); setDS('ok','Drive OK'); }catch(e){setDS('err','Error Drive');} }
+async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); await loadDriveFiles(); await loadFromDrive(); setDS('ok','Drive OK'); }catch(e){setDS('err','Error Drive');} }
 async function loadDriveFiles(){
   if(!token||!facturasFId) return;
   try{

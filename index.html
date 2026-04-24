@@ -304,7 +304,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.38</div>
+    <div class="login-version">v5.39</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
@@ -565,7 +565,9 @@ function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1',
 // ── AUTH ──
 function doLogin(e){
   e.preventDefault();
-  const redirectUri='https://valentinis.github.io/mi-gestor/';
+  var redirectUri=window.location.origin+window.location.pathname;
+  if(redirectUri.slice(-1)==='/') redirectUri=redirectUri.slice(0,-1);
+  redirectUri=redirectUri+'/';
   const params=new URLSearchParams({
     client_id:CLIENT_ID,
     redirect_uri:redirectUri,
@@ -575,7 +577,7 @@ function doLogin(e){
     prompt:'select_account'
   });
   const url='https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
-  window.location.assign(url);
+  window.location.href=url;
 }
 function loginGoogle(){ doLogin({preventDefault:()=>{}}); }
 

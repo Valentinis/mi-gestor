@@ -87,9 +87,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 /* TABS */
 .tabs{display:flex;background:var(–bg-card);border-bottom:0.5px solid var(–line);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab-btn{flex-shrink:0;padding:12px 16px;font-size:13px;font-weight:500;color:var(–text-3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;-webkit-tap-highlight-color:transparent;transition:color .15s;}
-.tab-btn.active{color:var(–accent);border-bottom-color:var(–accent);}
-.tab-pane{display:none;padding:16px;}
+/* Bottom nav */
+.tab-bar-top{display:none;}
+.tab-pane{display:none;padding:12px 16px 100px;}
+.tab-pane.active{display:block;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(–bg-card);border-top:0.5px solid var(–line);display:flex;align-items:center;justify-content:space-around;padding:0 8px;z-index:200;padding-bottom:env(safe-area-inset-bottom);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:8px 4px;color:var(–text-3);transition:color .15s;}
+.nav-btn.active{color:var(–accent);}
+.nav-btn svg{width:22px;height:22px;}
+.nav-btn span{font-size:10px;font-weight:500;}
+.nav-add{width:52px;height:52px;border-radius:50%;background:var(–accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(196,118,58,0.5);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.nav-add svg{width:26px;height:26px;}
+/* Add invoice modal */
+#add-modal{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:var(–bg-card);border-radius:20px 20px 0 0;padding:20px 16px 40px;padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+#add-modal .add-sheet h3{font-size:17px;font-weight:700;margin:0 0 16px;text-align:center;}
+/* Facturas list compact */
+.fact-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(–line);}
+.fact-item:last-child{border-bottom:none;}
+.fact-color-bar{width:3px;height:36px;border-radius:2px;flex-shrink:0;}
+.fact-color-bar.ingreso{background:var(–green);}
+.fact-color-bar.gasto{background:var(–red);}
+.fact-main{flex:1;min-width:0;}
+.fact-name{font-size:13px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fact-sub{font-size:11px;color:var(–text-3);margin-top:1px;}
+.fact-right{text-align:right;flex-shrink:0;}
+.fact-amount{font-size:13px;font-weight:700;}
+.fact-amount.ingreso{color:var(–green);}
+.fact-amount.gasto{color:var(–red);}
+.fact-date{font-size:10px;color:var(–text-3);margin-top:1px;}
+/* Filter bar */
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-chip{flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
+.filter-chip.active{background:var(–accent);color:#fff;border-color:var(–accent);}
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
@@ -285,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.23</div>
+    <div class="login-version">v5.25</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -320,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.23</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.25</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -351,7 +382,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.23</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.25</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -364,44 +395,88 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </div>
   </div>
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('facturas',this)">Facturas</button>
-    <button class="tab-btn" onclick="switchTab('registros',this)">Registros</button>
-    <button class="tab-btn" onclick="switchTab('manual',this)">Manual</button>
-    <button class="tab-btn" onclick="switchTab('modelos',this)">Modelos</button>
-    <button class="tab-btn" onclick="switchTab('drive',this)">Drive</button>
-    <button class="tab-btn" onclick="switchTab('validar',this)">Validar 1T</button>
-    <button class="tab-btn" onclick="switchTab('config',this)">Config</button>
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-facturas" onclick="switchNav('facturas',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Facturas</span>
+    </button>
+    <button class="nav-btn" id="nav-registros" onclick="switchNav('registros',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Registros</span>
+    </button>
+    <button class="nav-add" onclick="openAddModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <button class="nav-btn" id="nav-modelos" onclick="switchNav('modelos',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Modelos</span>
+    </button>
+    <button class="nav-btn" id="nav-config" onclick="switchNav('config',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Config</span>
+    </button>
+  </nav>
+
+  <!-- ADD INVOICE MODAL -->
+
+  <div id="add-modal" onclick="closeAddModal(event)">
+    <div class="add-sheet">
+      <h3>Añadir factura</h3>
+      <div class="q-selector" id="qs-add" style="margin-bottom:16px;">
+        <button class="q-pill active" onclick="setQ('1T 2026',this,'qs-add')">1T 2026</button>
+        <button class="q-pill" onclick="setQ('2T 2026',this,'qs-add')">2T 2026</button>
+        <button class="q-pill" onclick="setQ('3T 2026',this,'qs-add')">3T 2026</button>
+        <button class="q-pill" onclick="setQ('4T 2026',this,'qs-add')">4T 2026</button>
+      </div>
+      <div id="claude-no-key-add" class="tip-box" style="display:none;">Ve a <strong>Config</strong> e introduce tu API key.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+        <div class="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)" style="margin-bottom:0;">
+          <div class="upload-icon">📁</div>
+          <div class="upload-title">Seleccionar</div>
+          <div class="upload-sub">Foto o PDF</div>
+        </div>
+        <div class="upload-zone" onclick="pasteFromClipboard()" style="margin-bottom:0;">
+          <div class="upload-icon">📋</div>
+          <div class="upload-title">Pegar</div>
+          <div class="upload-sub">Imagen o PDF</div>
+        </div>
+      </div>
+      <div id="paste-status" style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;min-height:16px;"></div>
+    </div>
+  </div>
   </div>
   <div id="tab-facturas" class="tab-pane active">
-    <div class="section-label">Trimestre activo</div>
-    <div class="q-selector" id="qs-f">
+    <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
+    <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
+    <div id="analysis-list"></div>
+    <!-- Trimestre selector -->
+    <div class="q-selector" id="qs-f" style="margin-bottom:12px;">
       <button class="q-pill active" onclick="setQ('1T 2026',this,'qs-f')">1T 2026</button>
       <button class="q-pill" onclick="setQ('2T 2026',this,'qs-f')">2T 2026</button>
       <button class="q-pill" onclick="setQ('3T 2026',this,'qs-f')">3T 2026</button>
       <button class="q-pill" onclick="setQ('4T 2026',this,'qs-f')">4T 2026</button>
     </div>
-    <div id="claude-no-key" class="tip-box" style="display:none;"><h4>Claude API no configurada</h4>Ve a <strong>Config</strong> e introduce tu API key.</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div class="upload-zone" id="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)" style="margin-bottom:0;">
-        <div class="upload-icon">📁</div>
-        <div class="upload-title">Seleccionar</div>
-        <div class="upload-sub">Foto o PDF</div>
-      </div>
-      <div class="upload-zone" onclick="pasteFromClipboard()" style="margin-bottom:0;">
-        <div class="upload-icon">📋</div>
-        <div class="upload-title">Pegar</div>
-        <div class="upload-sub">Imagen o PDF</div>
-      </div>
+    <!-- Filter bar -->
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
+      <button class="filter-chip" onclick="setFilter('ingreso',this)">Ingresos</button>
+      <button class="filter-chip" onclick="setFilter('gasto',this)">Gastos</button>
+      <button class="filter-chip" onclick="setFilter('mes',this)" id="filter-mes">Este mes</button>
     </div>
-    <div id="paste-status" style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;min-height:16px;"></div>
-    <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
-    <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
-    <div id="analysis-list"></div>
-    <div class="reg-panel" style="margin-top:16px;">
-      <div class="reg-panel-hdr">
-        <span>Registros — <span id="pq-f">1T 2026</span></span>
-        <div style="display:flex;gap:8px;align-items:center;"><span id="rc-f" style="font-size:12px;color:var(--text-3);">0</span><button class="btn-danger-sm" onclick="clearQ()">Borrar</button></div>
-      </div>
+    <!-- Search -->
+    <div style="position:relative;margin-bottom:12px;">
+      <input id="fact-search" type="search" placeholder="Buscar proveedor, cliente..." oninput="renderList()" style="width:100%;padding:9px 12px 9px 34px;background:var(--bg-raised);border:0.5px solid var(--line);border-radius:10px;font-size:13px;color:var(--text);box-sizing:border-box;">
+      <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <!-- Summary chips -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <span id="rc-f" style="font-size:12px;color:var(--text-3);">0 reg.</span>
+      <span id="fact-sum-ing" style="font-size:12px;color:var(--green);font-weight:600;"></span>
+      <span id="fact-sum-gas" style="font-size:12px;color:var(--red);font-weight:600;"></span>
+      <button class="btn-danger-sm" onclick="clearQ()" style="margin-left:auto;">Borrar trimestre</button>
+    </div>
+    <div class="reg-panel">
       <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
     </div>
     <div class="storage-bar"><span class="storage-dot"></span><span id="si">Cargando...</span></div>
@@ -771,6 +846,7 @@ function saveAnalysis(divId, count){
   if(saved===0){ alert('No hay facturas seleccionadas.'); return; }
   saveLocal(); renderAll();
   if(token) saveDataToDrive(Q).catch(()=>{});
+  closeAddModal();
   const btn=document.querySelector('#'+divId+' .btn-save-analysis');
   if(btn){btn.textContent='✓ '+saved+' guardada(s)';btn.disabled=true;}
 }
@@ -861,10 +937,63 @@ function clearQ(){ if(!confirm('Borrar todos los registros de '+Q+'?')) return; 
 function delR(id){ data[Q]=(data[Q]||[]).filter(f=>f._id!==id); saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); }
 
 // ── RENDER ──
-function switchTab(id,btn){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+id).classList.add('active'); if(id==='drive') renderDriveTab(); if(id==='registros') renderRegistros(); }
+function switchNav(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='drive') renderDriveTab();
+  if(id==='registros') renderRegistros();
+}
+function switchTab(id,btn){ switchNav(id,btn); }
+function openAddModal(){
+  if(!claudeKey.startsWith('sk-ant-')) document.getElementById('claude-no-key-add').style.display='block';
+  const cq=currentQuarter();
+  document.querySelectorAll('#qs-add .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===cq));
+  document.getElementById('add-modal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeAddModal(e){
+  if(!e||e.target===document.getElementById('add-modal')){ document.getElementById('add-modal').style.display='none'; document.body.style.overflow=''; }
+}
+let factFilter='todos';
+function setFilter(f,btn){ factFilter=f; document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderList(); }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('qbadge').textContent=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
 function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
-function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros en este trimestre</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item" onclick="openModal(${f._id})" style="cursor:pointer;"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text-3);font-size:11px;">${f.fecha||''}</span>${driveIcon(f)}</div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><span style="color:var(--text-3);font-size:18px;padding:4px;">›</span></div>`).join(''); }
+function renderList(){
+  let fs=getF(Q);
+  // Filter
+  const now=new Date(); const curMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  if(factFilter==='ingreso') fs=fs.filter(f=>f.tipo==='ingreso');
+  else if(factFilter==='gasto') fs=fs.filter(f=>f.tipo==='gasto');
+  else if(factFilter==='mes') fs=fs.filter(f=>(f.fecha||'').startsWith(curMonth));
+  // Search
+  const q=(document.getElementById('fact-search')||{}).value||'';
+  if(q) fs=fs.filter(f=>(f.proveedor_cliente||'').toLowerCase().includes(q.toLowerCase())||(f.concepto||'').toLowerCase().includes(q.toLowerCase()));
+  const list=document.getElementById('reg-list');
+  document.getElementById('rc-f').textContent=fs.length+' reg.';
+  // Summary
+  const totalIng=fs.filter(f=>f.tipo==='ingreso').reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+  const totalGas=fs.filter(f=>f.tipo==='gasto').reduce((a,f)=>a+(f.base_iva||0),0);
+  const si=document.getElementById('fact-sum-ing'); if(si&&totalIng>0) si.textContent='↑ '+fmt(totalIng);
+  const sg=document.getElementById('fact-sum-gas'); if(sg&&totalGas>0) sg.textContent='↓ '+fmt(totalGas);
+  if(!fs.length){list.innerHTML='<div class="empty">Sin registros</div>';return;}
+  list.innerHTML=[...fs].reverse().map(f=>{
+    const isIng=f.tipo==='ingreso';
+    const amount=isIng?(f.ingresos_brutos||f.base_iva||0):(f.base_iva||0);
+    return `<div class="fact-item" onclick="openModal(${f._id})" style="cursor:pointer;">
+      <div class="fact-color-bar ${f.tipo||'gasto'}"></div>
+      <div class="fact-main">
+        <div class="fact-name">${f.proveedor_cliente||'—'}</div>
+        <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}</div>
+      </div>
+      <div class="fact-right">
+        <div class="fact-amount ${f.tipo||'gasto'}">${isIng?'+':'−'}${fmt(amount)}</div>
+        <div class="fact-date">${f.fecha||''} ${driveIcon(f)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 // ── MODAL ──
 let modalFacturaId=null;
@@ -984,10 +1113,9 @@ async function handleReprocessFile(files){
 }
 function hasDriveBackup(f){
   if(f._driveLink) return true;
-  return driveFiles.some(df=>df.name&&(
-    (f.num_factura&&df.name.toLowerCase().includes(f.num_factura.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)))||
-    (f.fecha&&df.name.includes((f.fecha||'').slice(0,10)))
-  ));
+  if(!f.fecha) return false;
+  const datePrefix=(f.fecha||'').slice(0,10);
+  return driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
 }
 function driveIcon(f){ return hasDriveBackup(f)?'<span title="Copia en Drive" style="font-size:14px;color:var(--green);">☁️</span>':'<span title="Sin copia en Drive" style="font-size:14px;color:var(--text-3);opacity:.5;">☁️</span>'; }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }

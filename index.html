@@ -9,6 +9,15 @@
 <meta name="apple-mobile-web-app-title" content="MiGestor">
 <meta name="theme-color" content="#0D0D1A">
 <title>MiGestor</title>
+<script>
+(function(){
+  var h=location.hash;
+  if(h&&h.indexOf('access_token')!==-1){
+    localStorage.setItem('_mg',h);
+    location.hash='';
+  }
+})();
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -295,7 +304,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.37</div>
+    <div class="login-version">v5.38</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
@@ -603,17 +612,22 @@ window.addEventListener('load',()=>{
   var btn=document.getElementById('btn-google');
   if(btn) btn.addEventListener('click',function(e){ e.preventDefault(); doLogin(e); });
   const st=document.getElementById('login-status');
-  if(st) st.textContent='cargando...';
   try{ loadLocal(); }catch(e){ if(st) st.textContent='ERROR loadLocal: '+e.message; return; }
   try{ loadCfg(); }catch(e){ if(st) st.textContent='ERROR loadCfg: '+e.message; return; }
-  if(st) st.textContent='hash:'+window.location.hash.substring(0,50)||'(vacío)';
+  // Check hash saved by head script before Safari clears it
+  var saved=localStorage.getItem('_mg');
+  if(saved&&saved.indexOf('access_token')!==-1){
+    localStorage.removeItem('_mg');
+    var m=saved.match(/access_token=([^&]+)/);
+    if(m){ if(st) st.textContent='token ok, verificando...'; handleToken(m[1]).then(()=>showPin()).catch(e=>{ if(st) st.textContent='error:'+e.message; }); return; }
+  }
   if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }
   try{
     const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
     if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
-  if(st) st.textContent='listo - sin sesión';
+  if(st) st.textContent='JS OK';
 });
 
 // ── PIN ──

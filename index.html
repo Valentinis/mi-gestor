@@ -293,7 +293,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.21b</div>
+    <div class="login-version">v5.22</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -521,7 +521,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 <script>
 
 const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com';
-console.log('MiGestor v5.21b loaded');
+console.log('MiGestor v5.22 loaded');
 const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
 
@@ -593,6 +593,17 @@ window.addEventListener('load',()=>{
     if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
+  // Global paste listener
+  document.addEventListener('paste',(e)=>{
+    const active=document.querySelector('.tab-btn.active');
+    if(!active||active.textContent.trim()!=='Facturas') return;
+    if(!claudeKey.startsWith('sk-ant-')) return;
+    const items=[...(e.clipboardData?.items||[])];
+    const pdfItem=items.find(i=>i.type==='application/pdf');
+    if(pdfItem){ const file=pdfItem.getAsFile(); if(file){handleClaudeFiles([file]);return;} }
+    const imgItem=items.find(i=>i.type.startsWith('image/'));
+    if(imgItem){ const file=imgItem.getAsFile(); if(file) handleClaudeFiles([file]); }
+  });
 });
 
 // ── PIN ──
@@ -718,17 +729,7 @@ function handlePasteEvent(e){
   if(imgItem){ const file=imgItem.getAsFile(); if(file){status.textContent='';handleClaudeFiles([file]);return;} }
   status.textContent='No se detectó imagen ni PDF en el portapapeles.';
 }
-// Global paste listener when on Facturas tab
-document.addEventListener('paste',(e)=>{
-  const active=document.querySelector('.tab-btn.active');
-  if(!active||active.textContent.trim()!=='Facturas') return;
-  if(!claudeKey.startsWith('sk-ant-')) return;
-  const items=[...(e.clipboardData?.items||[])];
-  const pdfItem=items.find(i=>i.type==='application/pdf');
-  if(pdfItem){ const file=pdfItem.getAsFile(); if(file){handleClaudeFiles([file]);return;} }
-  const imgItem=items.find(i=>i.type.startsWith('image/'));
-  if(imgItem){ const file=imgItem.getAsFile(); if(file) handleClaudeFiles([file]); }
-});
+// Global paste listener moved to load event
 
 async function handleClaudeFiles(files){
   const list=document.getElementById('analysis-list');

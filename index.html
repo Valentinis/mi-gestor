@@ -285,7 +285,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.22</div>
+    <div class="login-version">v5.23</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -320,7 +320,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.22</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.23</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.22</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.23</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -864,7 +864,7 @@ function delR(id){ data[Q]=(data[Q]||[]).filter(f=>f._id!==id); saveLocal();rend
 function switchTab(id,btn){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+id).classList.add('active'); if(id==='drive') renderDriveTab(); if(id==='registros') renderRegistros(); }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('qbadge').textContent=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
 function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
-function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros en este trimestre</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item" onclick="openModal(${f._id})" style="cursor:pointer;"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text-3);font-size:11px;">${f.fecha||''}</span></div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><span style="color:var(--text-3);font-size:18px;padding:4px;">›</span></div>`).join(''); }
+function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros en este trimestre</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item" onclick="openModal(${f._id})" style="cursor:pointer;"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text-3);font-size:11px;">${f.fecha||''}</span>${driveIcon(f)}</div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><span style="color:var(--text-3);font-size:18px;padding:4px;">›</span></div>`).join(''); }
 
 // ── MODAL ──
 let modalFacturaId=null;
@@ -894,14 +894,42 @@ function openModal(id){
   ];
   document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:0;">${rows.filter(([k,v])=>v&&v!=='—'&&v!=='0,00 €').map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line);font-size:13px;gap:12px;"><span style="color:var(--text-3);font-weight:500;flex-shrink:0;">${k}</span><span style="color:var(--text);text-align:right;">${v}</span></div>`).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
   // Show Drive button if file link exists
-  const driveFile=driveFiles.find(df=>df.name&&df.name.includes((f.fecha||'').slice(0,10)));
+  const driveFile=driveFiles.find(df=>df.name&&(
+    (f.num_factura&&df.name.toLowerCase().includes(f.num_factura.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)))||
+    (f.fecha&&df.name.includes((f.fecha||'').slice(0,10)))
+  )) || (f._driveLink?{link:f._driveLink}:null);
   const driveBtn=document.getElementById('modal-drive-btn');
-  driveBtn.style.display=driveFile?'flex':'none';
-  driveBtn._link=driveFile?driveFile.link:'';
+  if(driveFile){ driveBtn.style.display='flex'; driveBtn._link=driveFile.link; driveBtn.textContent='📂 Ver en Drive'; }
+  else{ driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='☁️ Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); }
   document.getElementById('factura-modal').style.display='block';
   document.body.style.overflow='hidden';
 }
 function closeModal(){ document.getElementById('factura-modal').style.display='none'; document.body.style.overflow=''; modalFacturaId=null; }
+function uploadFromModal(){
+  if(!modalFacturaId) return;
+  document.getElementById('file-reprocess').onchange=async function(e){
+    const file=e.target.files[0]; if(!file) return;
+    if(token&&facturasFId){
+      const all=Object.values(data).flat();
+      const f=all.find(x=>x._id===modalFacturaId);
+      const fecha=(f&&f.fecha||'').slice(0,10);
+      const prov=((f&&f.proveedor_cliente)||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
+      const numf=((f&&f.num_factura)||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
+      const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
+      const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
+      const q=(f&&f._quarter)||Q;
+      const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q).catch(()=>null);
+      if(created&&f){ f._driveLink=created.webViewLink; saveLocal(); }
+      const driveBtn=document.getElementById('modal-drive-btn');
+      driveBtn.textContent='📂 Ver en Drive'; driveBtn._link=created&&created.webViewLink;
+      driveBtn.onclick=()=>openDriveFile();
+    }
+    // Reset for future reprocess use
+    document.getElementById('file-reprocess').onchange=e2=>handleReprocessFile(e2.target.files);
+    document.getElementById('file-reprocess').value='';
+  };
+  document.getElementById('file-reprocess').click();
+}
 function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
 function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar este registro?')) return; const q=Object.keys(data).find(q=>data[q].find(f=>f._id===modalFacturaId)); if(q){ data[q]=data[q].filter(f=>f._id!==modalFacturaId); saveLocal(); renderAll(); if(token) saveDataToDrive(q).catch(()=>{}); } closeModal(); }
 async function reprocessFromModal(){
@@ -954,6 +982,14 @@ async function handleReprocessFile(files){
   }
   document.getElementById('file-reprocess').value='';
 }
+function hasDriveBackup(f){
+  if(f._driveLink) return true;
+  return driveFiles.some(df=>df.name&&(
+    (f.num_factura&&df.name.toLowerCase().includes(f.num_factura.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)))||
+    (f.fecha&&df.name.includes((f.fecha||'').slice(0,10)))
+  ));
+}
+function driveIcon(f){ return hasDriveBackup(f)?'<span title="Copia en Drive" style="font-size:14px;color:var(--green);">☁️</span>':'<span title="Sin copia en Drive" style="font-size:14px;color:var(--text-3);opacity:.5;">☁️</span>'; }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──
@@ -1040,7 +1076,7 @@ function renderRegistros(){
       items.forEach(f=>{
         const base=f.base_iva||0, iva=f.cuota_iva||0, irpf=f.base_irpf||f.base_iva||0, ret=f.retencion_importe||0;
         gBase+=base; gIva+=iva; gIrpf+=irpf; gRet+=ret;
-        rows+=`<tr>
+        rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
           <td class="date">${f.fecha||'—'}</td>
           <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
           <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
@@ -1048,12 +1084,12 @@ function renderRegistros(){
           <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
           <td class="num">${fmtEur(base)}</td>
           <td class="num">${f.pct_iva||0}%</td>
-          <td class="num" style="color:${iva>0?'var(--green)':'var(--text3)'}">${fmtEur(iva)}</td>
+          <td class="num" style="color:${iva>0?'var(--green)':'var(--text-3)'}">${fmtEur(iva)}</td>
           <td class="num">${fmtEur(irpf)}</td>
           <td class="num">${f.retencion_pct||0}%</td>
-          <td class="num" style="color:${ret>0?'var(--amber)':'var(--text3)'}">${fmtEur(ret)}</td>
+          <td class="num" style="color:${ret>0?'var(--amber)':'var(--text-3)'}">${fmtEur(ret)}</td>
           <td>${f.justificacion?`<span class="just-badge" title="${f.justificacion}">${f.justificacion}</span>`:''}</td>
-          <td><button class="reg-del" onclick="delR(${f._id})">✕</button></td>
+          <td style="text-align:center;">${driveIcon(f)}<button class="reg-del" onclick="event.stopPropagation();delR(${f._id})" style="margin-left:4px;">✕</button></td>
         </tr>`;
       });
     });
@@ -1085,7 +1121,7 @@ function renderRegistros(){
     facts.forEach(f=>{
       const bruto=f.ingresos_brutos||f.base_iva||0, base=f.base_irpf||0, iva=f.cuota_iva||0, ret=f.retencion_importe||0;
       gBruto+=bruto; gBase+=base; gIva+=iva; gRet+=ret;
-      rows+=`<tr>
+      rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
         <td class="date">${f.fecha||'—'}</td>
         <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
         <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
@@ -1096,8 +1132,8 @@ function renderRegistros(){
         <td class="num">${f.pct_iva||0}%</td>
         <td class="num" style="color:var(--amber)">${fmtEur(iva)}</td>
         <td class="num">${f.retencion_pct||0}%</td>
-        <td class="num" style="color:${ret>0?'var(--red)':'var(--text3)'}">${fmtEur(ret)}</td>
-        <td><button class="reg-del" onclick="delR(${f._id})">✕</button></td>
+        <td class="num" style="color:${ret>0?'var(--red)':'var(--text-3)'}">${fmtEur(ret)}</td>
+        <td style="text-align:center;">${driveIcon(f)}<button class="reg-del" onclick="event.stopPropagation();delR(${f._id})" style="margin-left:4px;">✕</button></td>
       </tr>`;
     });
     rows+=`<tr class="total-row">

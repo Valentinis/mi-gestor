@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.32</div>
+    <div class="login-version">v5.33</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.32</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.33</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -382,7 +382,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.32</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.33</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -614,7 +614,7 @@ function changePin(){ const np=document.getElementById('new-pin-input').value.tr
 // ── DATA ──
 function loadLocal(){ try{ data=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){ data={}; } migrar(); }
 function saveLocal(){ localStorage.setItem(LS,JSON.stringify(data)); updateSI(); }
-function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros'; }
+function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros · '+Q; }
 function getF(q){ if(!data[q]) data[q]=[]; return data[q]; }
 function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1','migestor_v2','migestor_v3'].forEach(k=>{ try{ const o=JSON.parse(localStorage.getItem(k)||'{}'); Object.entries(o).forEach(([q,fs])=>{ if(!data[q]) data[q]=[]; (fs||[]).forEach(f=>{ if(!data[q].find(x=>x._id===f._id)) data[q].push(f); }); }); }catch(e){} }); }
 
@@ -676,7 +676,7 @@ function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.di
   const cq=currentQuarter();
   ['qs-f','qs-m','qs-r'].forEach(id=>{ document.querySelectorAll('#'+id+' .q-pill').forEach(b=>{ b.classList.toggle('active', b.textContent.trim()===cq); }); });
   document.getElementById('qbadge').textContent=cq;
-  renderAll(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
+  renderAll(); updateSI(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
 
 // ── CLAUDE API ──
 const SYSTEM_PROMPT=`Eres un experto en fiscalidad española para autónomos. Analiza facturas y extrae datos fiscales con máxima precisión.
@@ -889,15 +889,34 @@ async function loadDriveFiles(){
   }catch(e){ console.error('loadDriveFiles error:',e); }
 }
 async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); } else { const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
-async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace(/_/g,' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal();
-  // Auto-select current quarter after loading
+async function loadFromDrive(){
+  if(!token||!dataFId) return;
+  try{
+    const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`);
+    const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`);
+    const j=await r.json();
+    if(j.files&&j.files.length){
+      for(const f of j.files){
+        const qn=f.name.replace('.json','').replace(/_/g,' ');
+        try{
+          const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`);
+          const recs=await fr.json();
+          if(!data[qn]) data[qn]=[];
+          recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);});
+        }catch(e){ console.warn('Error loading',f.name,e); }
+      }
+    }
+  }catch(e){ console.error('loadFromDrive error:',e); }
+  // Always update UI regardless of errors
+  saveLocal();
   const cq2=currentQuarter();
   Q=cq2; regQ=cq2;
   ['qs-f','qs-m','qs-r'].forEach(id=>{ document.querySelectorAll('#'+id+' .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===cq2)); });
   const qb=document.getElementById('qbadge'); if(qb) qb.textContent=cq2;
   renderAll(); renderDriveTab();
   const el=document.getElementById('drive-last-sync'); if(el) el.textContent='Última sync: '+new Date().toLocaleTimeString('es');
-  const si2=document.getElementById('si'); if(si2) si2.textContent=Object.values(data).reduce((a,b)=>a+(b||[]).length,0)+' registros'; }
+  updateSI();
+}
 async function uploadFileToDrive(file,q){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); renderDriveTab(); return created; }
 async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
 function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }

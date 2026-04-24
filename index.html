@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.35</div>
+    <div class="login-version">v5.37</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.35</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.37</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -363,8 +363,16 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <button onclick="closeModal()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-3);display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     <div style="padding:16px;" id="modal-body"></div>
+    <!-- Edit justification -->
+    <div id="modal-just-section" style="padding:0 16px 12px;display:none;">
+      <div style="font-size:11px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Justificación</div>
+      <select id="modal-just-select" class="just-select" onchange="toggleModalJustOther(this)"></select>
+      <input id="modal-just-other" type="text" placeholder="Especifica el motivo..." style="display:none;margin-top:6px;width:100%;padding:8px 10px;background:var(--bg-input);border:0.5px solid var(--line-2);border-radius:var(--r-xs);font-size:13px;color:var(--text);box-sizing:border-box;">
+      <button onclick="saveJustification()" style="margin-top:8px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:9px;font-size:13px;font-weight:600;cursor:pointer;">Guardar justificación</button>
+    </div>
     <div style="padding:12px 16px;border-top:0.5px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
-      <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">📂 Ver en Drive</button>
+      <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">📂 Drive</button>
+      <button onclick="toggleJustEdit()" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;" id="modal-just-btn">✏️ Justificación</button>
       <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Reprocesar</button>
       <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Eliminar</button>
     </div>
@@ -382,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.35</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.37</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -1152,6 +1160,17 @@ function openModal(id){
   const driveBtn=document.getElementById('modal-drive-btn');
   if(driveFile){ driveBtn.style.display='flex'; driveBtn._link=driveFile.link; driveBtn.textContent='📂 Ver en Drive'; }
   else{ driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='☁️ Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); }
+  // Populate justification select
+  const justSec=document.getElementById('modal-just-section');
+  justSec.style.display='none';
+  document.getElementById('modal-just-btn').textContent='✏️ Justificación';
+  const justSel=document.getElementById('modal-just-select');
+  justSel.innerHTML=JUST_OPTIONS.map(o=>`<option value="${o}" ${o===(f.justificacion||'')?'selected':''}>${o===''?'— Seleccionar justificación —':o}</option>`).join('');
+  const justOther=document.getElementById('modal-just-other');
+  justOther.style.display='none';
+  if(f.justificacion&&!JUST_OPTIONS.includes(f.justificacion)){
+    justSel.value='Otro (especificar)'; justOther.style.display='block'; justOther.value=f.justificacion;
+  }
   document.getElementById('factura-modal').style.display='block';
   document.body.style.overflow='hidden';
 }
@@ -1180,6 +1199,35 @@ function uploadFromModal(){
     document.getElementById('file-reprocess').value='';
   };
   document.getElementById('file-reprocess').click();
+}
+function toggleJustEdit(){
+  const sec=document.getElementById('modal-just-section');
+  const showing=sec.style.display!=='none';
+  sec.style.display=showing?'none':'block';
+  document.getElementById('modal-just-btn').textContent=showing?'✏️ Justificación':'✏️ Cerrar';
+}
+function toggleModalJustOther(sel){
+  const other=document.getElementById('modal-just-other');
+  other.style.display=sel.value==='Otro (especificar)'?'block':'none';
+}
+function saveJustification(){
+  if(!modalFacturaId) return;
+  const sel=document.getElementById('modal-just-select');
+  const other=document.getElementById('modal-just-other');
+  const just=sel.value==='Otro (especificar)'?(other.value||sel.value):sel.value;
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===modalFacturaId);
+  if(f){
+    f.justificacion=just;
+    saveLocal(); renderAll();
+    const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===modalFacturaId));
+    if(token&&q) saveDataToDrive(q).catch(()=>{});
+    // Update modal title area to reflect change
+    document.getElementById('modal-just-btn').textContent='✏️ Justificación';
+    document.getElementById('modal-just-section').style.display='none';
+    // Re-open modal to refresh body
+    openModal(modalFacturaId);
+  }
 }
 function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
 function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar este registro?')) return; const q=Object.keys(data).find(q=>data[q].find(f=>f._id===modalFacturaId)); if(q){ data[q]=data[q].filter(f=>f._id!==modalFacturaId); saveLocal(); renderAll(); if(token) saveDataToDrive(q).catch(()=>{}); } closeModal(); }
@@ -1238,6 +1286,10 @@ function hasDriveBackup(f){
   if(!f.fecha) return false;
   const datePrefix=(f.fecha||'').slice(0,10);
   const found=driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
+  if(!found&&driveFiles.length>0&&f.fecha){
+    // Debug: show first mismatch
+    console.log('No match for',datePrefix,'in',driveFiles.slice(0,2).map(d=>d.name));
+  }
   return found;
 }
 function driveIcon(f){ return hasDriveBackup(f)?'<span title="Copia en Drive" style="font-size:14px;color:var(--green);">☁️</span>':'<span title="Sin copia en Drive" style="font-size:14px;color:var(--text-3);opacity:.5;">☁️</span>'; }

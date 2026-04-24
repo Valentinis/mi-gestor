@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.46</div>
+    <div class="login-version">v5.50</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.46</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.50</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -390,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.46</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.50</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -1148,8 +1148,100 @@ async function exportToSheets(){
 // ── IMPORT MANUAL ──
 function importJ(){ const raw=document.getElementById('json-in').value.trim(),fb=document.getElementById('imp-fb'); if(!raw){fb.textContent='Pega un JSON primero.';fb.className='feedback err';return;} try{ const clean=raw.replace(/```json|```/g,'').trim(); let parsed=JSON.parse(clean); const items=Array.isArray(parsed)?parsed:[parsed]; if(!data[Q]) data[Q]=[]; items.forEach(f=>{f._quarter=Q;f._id=Date.now()+Math.random();data[Q].push(f);}); saveLocal();renderAll(); document.getElementById('json-in').value=''; fb.textContent='✓ '+items.length+' registro(s) guardado(s)';fb.className='feedback ok'; if(token) saveDataToDrive(Q).catch(()=>{}); setTimeout(()=>fb.textContent='',3000); }catch(e){fb.textContent='JSON inválido: '+e.message;fb.className='feedback err';} }
 function clearJ(){ document.getElementById('json-in').value=''; document.getElementById('imp-fb').textContent=''; }
-function clearQ(){ if(!confirm('Borrar todos los registros de '+Q+'?')) return; data[Q]=[]; saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); }
-function delR(id){ data[Q]=(data[Q]||[]).filter(f=>f._id!==id); saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); }
+function clearQ(){
+  showResetModal();
+}
+function showResetModal(){
+  // Build months available in current quarter
+  const months=[];
+  const [t,y]=Q.split(' ');
+  const qNum=parseInt(t[0]);
+  const startM=(qNum-1)*3+1;
+  for(let m=startM;m<startM+3;m++){
+    const label=new Date(parseInt(y),m-1,1).toLocaleString('es',{month:'long',year:'numeric'});
+    months.push({value:`${y}-${String(m).padStart(2,'0')}`,label:label});
+  }
+  const modal=document.createElement('div');
+  modal.id='reset-modal';
+  modal.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  modal.innerHTML=`
+    <div style="background:var(--bg-card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:24px 20px 40px;border-top:0.5px solid var(--line);" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h3 style="margin:0;font-size:17px;">🗑 Borrar registros</h3>
+        <button onclick="document.getElementById('reset-modal').remove()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-3);">✕</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-3);margin:0 0 16px;">Selecciona qué quieres borrar. Los archivos en Drive también se eliminarán.</p>
+      <!-- Reset trimestre -->
+      <div style="background:var(--red-bg);border:0.5px solid var(--red-bd);border-radius:12px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:4px;">Trimestre completo — ${Q}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">${(data[Q]||[]).length} registros · se borrarán también los archivos en Drive</div>
+        <button onclick="confirmReset('quarter','${Q}')" style="background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Borrar todo el trimestre ${Q}</button>
+      </div>
+      <!-- Reset por mes -->
+      <div style="font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px;">O borrar por mes</div>
+      ${months.map(m=>{
+        const count=(data[Q]||[]).filter(f=>(f.fecha||'').startsWith(m.value)).length;
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--line);">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">${m.label}</div>
+            <div style="font-size:11px;color:var(--text-3);">${count} registro(s)</div>
+          </div>
+          ${count>0?`<button onclick="confirmReset('month','${m.value}')" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Borrar</button>`:'<span style="font-size:12px;color:var(--text-3);">Vacío</span>'}
+        </div>`;
+      }).join('')}
+    </div>`;
+  modal.addEventListener('click',e=>{ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+async function confirmReset(type, value){
+  const label=type==='quarter'?`el trimestre ${value}`:`el mes ${value}`;
+  if(!confirm(`⚠️ ¿Borrar todos los registros de ${label}?\n\nEsto también eliminará los archivos en Drive. Esta acción no se puede deshacer.`)) return;
+  // Collect drive links before deleting
+  let toDelete=[];
+  if(type==='quarter'){
+    toDelete=(data[value]||[]).map(f=>f._driveLink).filter(Boolean);
+    data[value]=[];
+    if(token) saveDataToDrive(value).catch(()=>{});
+  } else {
+    toDelete=(data[Q]||[]).filter(f=>(f.fecha||'').startsWith(value)).map(f=>f._driveLink).filter(Boolean);
+    data[Q]=(data[Q]||[]).filter(f=>!(f.fecha||'').startsWith(value));
+    if(token) saveDataToDrive(Q).catch(()=>{});
+  }
+  saveLocal(); renderAll();
+  document.getElementById('reset-modal').remove();
+  // Delete Drive files (only if no other records use them)
+  const unique=[...new Set(toDelete)];
+  for(const link of unique){ await deleteDriveFileIfOrphan(link); }
+  if(unique.length>0) renderDriveTab();
+}
+async function deleteDriveFileIfOrphan(driveLink){
+  if(!driveLink||!token) return;
+  const stillUsed=Object.values(data).flat().some(f=>f._driveLink===driveLink);
+  if(stillUsed) return;
+  const df=driveFiles.find(f=>f.link===driveLink);
+  if(!df||!df.id) return;
+  try{ await driveReq('https://www.googleapis.com/drive/v3/files/'+df.id,{method:'DELETE'}); driveFiles=driveFiles.filter(f=>f.id!==df.id); }catch(e){}
+}
+function delR(id){
+  const f=(data[Q]||[]).find(x=>x._id===id);
+  const driveLink=f&&f._driveLink||null;
+  data[Q]=(data[Q]||[]).filter(x=>x._id!==id);
+  saveLocal(); renderAll();
+  if(token){ saveDataToDrive(Q).catch(()=>{}); if(driveLink) deleteDriveFileIfOrphan(driveLink); }
+}
+function deleteFromModal(){
+  if(!modalFacturaId) return;
+  if(!confirm('¿Eliminar este registro?')) return;
+  const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id===modalFacturaId));
+  if(q){
+    const f=data[q].find(x=>x._id===modalFacturaId);
+    const driveLink=f&&f._driveLink||null;
+    data[q]=data[q].filter(x=>x._id!==modalFacturaId);
+    saveLocal(); renderAll();
+    if(token){ saveDataToDrive(q).catch(()=>{}); if(driveLink) deleteDriveFileIfOrphan(driveLink); }
+  }
+  closeModal();
+}
 
 // ── RENDER ──
 function switchNav(id,btn){
@@ -1401,12 +1493,73 @@ function saveJustification(){
   }
 }
 function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
-function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar este registro?')) return; const q=Object.keys(data).find(q=>data[q].find(f=>f._id===modalFacturaId)); if(q){ data[q]=data[q].filter(f=>f._id!==modalFacturaId); saveLocal(); renderAll(); if(token) saveDataToDrive(q).catch(()=>{}); } closeModal(); }
+
 async function reprocessFromModal(){
   if(!modalFacturaId) return;
   if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config.'); return; }
-  // Always open file picker directly — no need to find original in Drive
-  document.getElementById('file-reprocess').click();
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===modalFacturaId);
+  // Check if there's a Drive file for this record
+  const hasDrive=f&&(f._driveLink||(f.fecha&&driveFiles.some(df=>df.name&&df.name.startsWith((f.fecha||'').slice(0,10)))));
+  if(hasDrive){
+    // Show mini sheet with two options
+    showReprocessOptions(f);
+  } else {
+    // No Drive file — just open file picker
+    document.getElementById('file-reprocess').click();
+  }
+}
+function showReprocessOptions(f){
+  // Create inline options inside the modal footer
+  const btn=document.getElementById('modal-reprocess-btn');
+  const footer=btn.parentElement;
+  // Replace buttons with options
+  footer.innerHTML=`
+    <div style="width:100%;">
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;text-align:center;">¿Qué quieres reprocesar?</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="reprocessFromDrive()" style="flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:12px;font-weight:600;cursor:pointer;">☁️ Usar archivo de Drive</button>
+        <button onclick="document.getElementById('file-reprocess').click()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:12px;font-weight:600;cursor:pointer;">📁 Subir nuevo archivo</button>
+        <button onclick="restoreModalButtons()" style="background:var(--bg-raised);color:var(--text-3);border:0.5px solid var(--line);border-radius:var(--r-sm);padding:10px;font-size:12px;cursor:pointer;">✕</button>
+      </div>
+    </div>`;
+}
+function restoreModalButtons(){
+  const footer=document.getElementById('modal-reprocess-btn')?.parentElement||document.querySelector('#factura-modal .modal-footer');
+  if(footer) footer.innerHTML=`
+    <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">📂 Drive</button>
+    <button onclick="toggleJustEdit()" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;" id="modal-just-btn">✏️ Justificación</button>
+    <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Reprocesar</button>
+    <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Eliminar</button>`;
+  // Re-open modal to restore state
+  if(modalFacturaId) openModal(modalFacturaId);
+}
+async function reprocessFromDrive(){
+  if(!modalFacturaId) return;
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===modalFacturaId);
+  if(!f){ restoreModalButtons(); return; }
+  // Find Drive file
+  let driveFile=null;
+  if(f._driveLink){ driveFile={link:f._driveLink,id:null}; }
+  if(!driveFile&&f.fecha){
+    driveFile=driveFiles.find(df=>df.name&&df.name.startsWith((f.fecha||'').slice(0,10))&&df.id);
+  }
+  if(!driveFile||!driveFile.id){ alert('No se encontró el archivo en Drive. Usa "Subir nuevo archivo".'); restoreModalButtons(); return; }
+  // Fetch file from Drive
+  const btn=document.querySelector('#factura-modal button[onclick*="reprocessFromDrive"]')||document.querySelector('#factura-modal .add-sheet');
+  const footer=document.querySelector('#factura-modal div[style*="gap:8px"]');
+  if(footer) footer.innerHTML='<div style="text-align:center;color:var(--text-3);font-size:13px;padding:8px;">⏳ Descargando de Drive...</div>';
+  try{
+    const r=await driveReq(`https://www.googleapis.com/drive/v3/files/${driveFile.id}?alt=media`);
+    const blob=await r.blob();
+    const fileName=driveFiles.find(df=>df.id===driveFile.id)?.name||'factura.pdf';
+    const file=new File([blob],fileName,{type:blob.type||'application/pdf'});
+    await handleReprocessFile([file]);
+  }catch(e){
+    alert('Error descargando de Drive: '+e.message);
+    restoreModalButtons();
+  }
 }
 async function handleReprocessFile(files){
   if(!files||!files.length||!modalFacturaId) return;
@@ -1604,7 +1757,7 @@ function renderRegistros(){
   if(regView==='gastos'){
     thead.innerHTML=`<tr>
       <th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>Nº Factura</th>
-      <th>Op.</th><th class="right">Base</th><th class="right">% IVA</th>
+      <th>Op.</th><th class="right" style="color:var(--red);font-weight:700;">Total</th><th class="right">Base</th><th class="right">% IVA</th>
       <th class="right">IVA</th><th class="right">Base IRPF</th>
       <th class="right">% Ret.</th><th class="right">Retención</th>
       <th>Justificación</th><th></th>
@@ -1628,6 +1781,7 @@ function renderRegistros(){
       rows+=`<tr><td colspan="13" style="background:${groupColors[op]};color:${groupText[op]};font-weight:600;font-size:11px;padding:5px 10px;letter-spacing:.03em;">${groupLabels[op]} · ${items.length} registro(s)</td></tr>`;
       items.forEach(f=>{
         const base=f.base_iva||0, iva=f.cuota_iva||0, irpf=f.base_irpf||f.base_iva||0, ret=f.retencion_importe||0;
+        const total=base+iva;
         gBase+=base; gIva+=iva; gIrpf+=irpf; gRet+=ret;
         rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
           <td class="date">${f.fecha||'—'}</td>
@@ -1635,6 +1789,7 @@ function renderRegistros(){
           <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
           <td class="date">${f.num_factura||'—'}</td>
           <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
+          <td class="num" style="font-weight:700;color:var(--red);">${fmtEur(total)}</td>
           <td class="num">${fmtEur(base)}</td>
           <td class="num">${f.pct_iva||0}%</td>
           <td class="num" style="color:${iva>0?'var(--green)':'var(--text-3)'}">${fmtEur(iva)}</td>
@@ -1650,6 +1805,7 @@ function renderRegistros(){
     // Fila total
     rows+=`<tr class="total-row">
       <td colspan="5">TOTAL</td>
+      <td class="num" style="font-weight:700;color:var(--red);">${fmtEur(gBase+gIva)}</td>
       <td class="num">${fmtEur(gBase)}</td><td></td>
       <td class="num">${fmtEur(gIva)}</td>
       <td class="num">${fmtEur(gIrpf)}</td><td></td>

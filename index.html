@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.38</div>
+    <div class="login-version">v5.39</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.38</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.39</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -390,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.38</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.39</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -458,11 +458,19 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
     <div id="analysis-list"></div>
     <!-- Trimestre selector -->
-    <div class="q-selector" id="qs-f" style="margin-bottom:12px;">
-      <button class="q-pill active" onclick="setQ('1T 2026',this,'qs-f')">1T 2026</button>
-      <button class="q-pill" onclick="setQ('2T 2026',this,'qs-f')">2T 2026</button>
-      <button class="q-pill" onclick="setQ('3T 2026',this,'qs-f')">3T 2026</button>
-      <button class="q-pill" onclick="setQ('4T 2026',this,'qs-f')">4T 2026</button>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+      <select id="year-f" onchange="updateYearQ('f')" style="padding:6px 10px;font-size:13px;font-weight:600;border:0.5px solid var(--line);border-radius:10px;background:var(--bg-raised);color:var(--text);cursor:pointer;">
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026" selected>2026</option>
+        <option value="2027">2027</option>
+      </select>
+      <div class="q-selector" id="qs-f" style="flex:1;margin-bottom:0;">
+        <button class="q-pill" onclick="setQY(1,this,'f')">1T</button>
+        <button class="q-pill" onclick="setQY(2,this,'f')">2T</button>
+        <button class="q-pill" onclick="setQY(3,this,'f')">3T</button>
+        <button class="q-pill" onclick="setQY(4,this,'f')">4T</button>
+      </div>
     </div>
     <!-- Filter bar -->
     <div class="filter-bar" id="filter-bar">
@@ -513,11 +521,20 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
   <div id="tab-manual" class="tab-pane">
     <div class="tip-box"><h4>Importar JSON manualmente</h4><ol><li>Sube la factura al chat con Claude</li><li>Claude te devuelve un <code>JSON</code></li><li>Cópialo y pégalo aquí</li></ol></div>
     <div class="section-label">Trimestre</div>
-    <div class="q-selector" id="qs-m">
-      <button class="q-pill active" onclick="setQ('1T 2026',this,'qs-m')">1T 2026</button>
-      <button class="q-pill" onclick="setQ('2T 2026',this,'qs-m')">2T 2026</button>
-      <button class="q-pill" onclick="setQ('3T 2026',this,'qs-m')">3T 2026</button>
-      <button class="q-pill" onclick="setQ('4T 2026',this,'qs-m')">4T 2026</button>
+    <!-- Year + Quarter selector for modelos -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+      <select id="year-m" onchange="updateYearQ('m')" style="padding:6px 10px;font-size:13px;font-weight:600;border:0.5px solid var(--line);border-radius:10px;background:var(--bg-raised);color:var(--text);cursor:pointer;">
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026" selected>2026</option>
+        <option value="2027">2027</option>
+      </select>
+      <div class="q-selector" id="qs-m" style="flex:1;margin-bottom:0;">
+        <button class="q-pill" onclick="setQY(1,this,'m')">1T</button>
+        <button class="q-pill" onclick="setQY(2,this,'m')">2T</button>
+        <button class="q-pill" onclick="setQY(3,this,'m')">3T</button>
+        <button class="q-pill" onclick="setQY(4,this,'m')">4T</button>
+      </div>
     </div>
     <div class="card">
       <textarea class="json-area" id="json-in" placeholder='{"tipo":"gasto","proveedor_cliente":"..."}'></textarea>
@@ -532,12 +549,31 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <div class="sum-card"><div class="sum-label">130 IRPF</div><div class="sum-val warn" id="s130">—</div></div>
       <div class="sum-card"><div class="sum-label">115 Alquiler</div><div class="sum-val warn" id="s115">—</div></div>
       <div class="sum-card"><div class="sum-label">349 Intracom.</div><div class="sum-val" id="s349">—</div></div>
+      <div class="sum-card"><div class="sum-label">111 Ret.Prof.</div><div class="sum-val warn" id="s111">—</div></div>
     </div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b303')"><div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div><div class="mod-res pagar" id="r303">—</div></div><div class="mod-body" id="b303"><div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div><div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div><div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div><div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div><div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div><div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div><div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b130')"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div><div class="mod-body" id="b130"><div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div><div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div><div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div><div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')"><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
-    <button class="btn-primary" onclick="recalc()">Recalcular modelos</button>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b111')"><div class="mod-left"><span class="mod-code">111</span><span class="mod-name">Retenciones profesionales</span></div><div class="mod-res pagar" id="r111">—</div></div><div class="mod-body" id="b111"><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Nº perceptores</span><span class="cas-base"></span><span class="cas-cuota" id="m111-n">—</span></div><div class="cas-row"><span class="cas-num">04</span><span class="cas-desc">Base retenciones PROF</span><span class="cas-base"></span><span class="cas-cuota" id="m111-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">06</span><span class="cas-desc">Retenciones 15%</span><span class="cas-base"></span><span class="cas-cuota" id="m111-c">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')""><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
+    <button class="btn-primary" onclick="recalc()" style="width:100%;margin-bottom:8px;">Recalcular modelos</button>
+    <div class="mod-card" style="margin-top:12px;">
+      <div class="mod-hdr" onclick="tog('b-anual')">
+        <div class="mod-left"><span class="mod-code" style="font-size:11px;background:var(--text-3);">AÑO</span><span class="mod-name">Resumen anual estimado</span></div>
+        <span style="font-size:12px;color:var(--text-3);">▾</span>
+      </div>
+      <div class="mod-body" id="b-anual" style="display:block;">
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;">Suma de todos los trimestres cargados</div>
+        <div class="cas-row"><span class="cas-num">303</span><span class="cas-desc">IVA total</span><span class="cas-base"></span><span class="cas-cuota" id="a303">—</span></div>
+        <div class="cas-row"><span class="cas-num">130</span><span class="cas-desc">IRPF pagos fraccionados</span><span class="cas-base"></span><span class="cas-cuota" id="a130">—</span></div>
+        <div class="cas-row"><span class="cas-num">115</span><span class="cas-desc">Retenciones alquiler</span><span class="cas-base"></span><span class="cas-cuota" id="a115">—</span></div>
+        <div class="cas-row"><span class="cas-num">111</span><span class="cas-desc">Retenciones profesionales</span><span class="cas-base"></span><span class="cas-cuota" id="a111">—</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">∑</span><span class="cas-desc">Total a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="a-total">—</span></div>
+        <div style="border-top:0.5px solid var(--line);margin:8px 0;"></div>
+        <div class="cas-row"><span class="cas-num">100</span><span class="cas-desc">Rendimiento neto anual</span><span class="cas-base"></span><span class="cas-cuota" id="a100-net">—</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">100</span><span class="cas-desc">IRPF anual estimado (20%)</span><span class="cas-base"></span><span class="cas-cuota" id="a100">—</span></div>
+      </div>
+    </div>
     <button class="btn-sec" style="width:100%;margin-top:8px;" onclick="exportToSheets()">Exportar a Google Sheets</button>
     <div class="feedback" id="sheets-fb"></div>
   </div>
@@ -1062,6 +1098,22 @@ function groupNames(names){
   return Object.fromEntries(Object.entries(groups).sort(([a],[b])=>a.localeCompare(b)));
 }
 function setFilter(f,btn){ factFilter=f; document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderList(); }
+// ── YEAR + QUARTER ──
+function setQY(t,btn,ns){
+  const year=document.getElementById('year-'+ns)?.value||'2026';
+  const q=t+'T '+year;
+  setQ(q,btn,ns==='f'?'qs-f':'qs-m');
+  if(ns==='r') setQReg(q,btn);
+}
+function updateYearQ(ns){
+  const year=document.getElementById('year-'+ns)?.value||'2026';
+  const active=document.querySelector('#qs-'+ns+' .q-pill.active');
+  if(active){
+    const t=active.textContent.trim().replace(/T.*/,'');
+    const q=t+'T '+year;
+    setQ(q,active,ns==='f'?'qs-f':'qs-m');
+  }
+}
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('qbadge').textContent=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
 function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
 function renderList(){
@@ -1298,7 +1350,72 @@ function driveIcon(f){ return hasDriveBackup(f)
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──
-function recalc(){ const fs=getF(Q); let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0; let intra={}; for(const f of fs){ if(f.tipo==='ingreso'){ing+=f.base_irpf||0;if(f.operacion==='INT'||f.operacion==='PROF'){c07b+=f.base_iva||0;c07q+=f.cuota_iva||0;}ret+=f.retencion_importe||0;} else{gas+=f.base_irpf||f.base_iva||0;if(f.operacion==='INTRA_S'){c10b+=f.base_iva||0;c10q+=(f.base_iva||0)*0.21;c36b+=f.base_iva||0;c36q+=(f.base_iva||0)*0.21;const p=f.proveedor_cliente||'UE';intra[p]=(intra[p]||0)+(f.base_iva||0);}else if(f.operacion==='ALQUILER'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;ab+=f.base_irpf||f.base_iva||0;ac+=f.retencion_importe||0;}else if(f.operacion==='INT'||f.operacion==='PROF'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;}}} const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gas,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0); tx('c07b',fmt(c07b));tx('c07q',fmt(c07q));tx('c10b',fmt(c10b));tx('c10q',fmt(c10q));tx('c27',fmt(c27));tx('c28b',fmt(c28b));tx('c28q',fmt(c28q));tx('c36b',fmt(c36b));tx('c36q',fmt(c36q));tx('c45',fmt(c45));tx('c46',fmt(c46));tx('r303',fmt(c46));tx('s303',fmt(c46));document.getElementById('r303').className='mod-res '+(c46>=0?'pagar':'devolver');document.getElementById('s303').className='sum-val '+(c46>0?'warn':'good');tx('m130-i',fmt(ing));tx('m130-g',fmt(gas));tx('m130-n',fmt(net));tx('m130-20',fmt(v20));tx('m130-r',fmt(ret));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));document.getElementById('s130').className='sum-val '+(res>0?'warn':'good');tx('m115-b',fmt(ab));tx('m115-c',fmt(ac));tx('r115',fmt(ac));tx('s115',fmt(ac));document.getElementById('s115').className='sum-val '+(ac>0?'warn':'good');const ops=Object.entries(intra);document.getElementById('ops349').innerHTML=ops.length?ops.map(([k,v])=>`<div class="cas-row"><span class="cas-num">I</span><span class="cas-desc">${k}</span><span class="cas-cuota">${fmt(v)}</span></div>`).join(''):'<div class="empty">Sin operaciones</div>';tx('r349',ops.length?fmt(it):'—');tx('s349',ops.length?fmt(it):'—');svSync(c46,res,ac,it); }
+function recalc(){
+  const fs=getF(Q);
+  let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0,profB=0,profR=0,profN=0;
+  let intra={};
+  for(const f of fs){
+    if(f.tipo==='ingreso'){
+      ing+=f.base_irpf||0;
+      if(f.operacion==='INT'||f.operacion==='PROF'){c07b+=f.base_iva||0;c07q+=f.cuota_iva||0;}
+      ret+=f.retencion_importe||0;
+    } else {
+      gas+=f.base_irpf||f.base_iva||0;
+      if(f.operacion==='INTRA_S'){c10b+=f.base_iva||0;c10q+=(f.base_iva||0)*0.21;c36b+=f.base_iva||0;c36q+=(f.base_iva||0)*0.21;const p=f.proveedor_cliente||'UE';intra[p]=(intra[p]||0)+(f.base_iva||0);}
+      else if(f.operacion==='ALQUILER'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;ab+=f.base_irpf||f.base_iva||0;ac+=f.retencion_importe||0;}
+      else if(f.operacion==='INT'||f.operacion==='PROF'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;}
+      if(f.operacion==='PROF'&&f.retencion_importe>0){profN++;profB+=f.base_irpf||f.base_iva||0;profR+=f.retencion_importe||0;}
+    }
+  }
+  const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gas,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0);
+  tx('c07b',fmt(c07b));tx('c07q',fmt(c07q));tx('c10b',fmt(c10b));tx('c10q',fmt(c10q));tx('c27',fmt(c27));tx('c28b',fmt(c28b));tx('c28q',fmt(c28q));tx('c36b',fmt(c36b));tx('c36q',fmt(c36q));tx('c45',fmt(c45));tx('c46',fmt(c46));tx('r303',fmt(c46));tx('s303',fmt(c46));
+  document.getElementById('r303').className='mod-res '+(c46>=0?'pagar':'devolver');
+  document.getElementById('s303').className='sum-val '+(c46>0?'warn':'good');
+  tx('m130-i',fmt(ing));tx('m130-g',fmt(gas));tx('m130-n',fmt(net));tx('m130-20',fmt(v20));tx('m130-r',fmt(ret));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));
+  document.getElementById('s130').className='sum-val '+(res>0?'warn':'good');
+  tx('m115-b',fmt(ab));tx('m115-c',fmt(ac));tx('r115',fmt(ac));tx('s115',fmt(ac));
+  document.getElementById('s115').className='sum-val '+(ac>0?'warn':'good');
+  // Modelo 111
+  tx('m111-n',profN||'—');tx('m111-b',fmt(profB));tx('m111-c',fmt(profR));tx('r111',fmt(profR));tx('s111',fmt(profR));
+  const ops=Object.entries(intra);
+  document.getElementById('ops349').innerHTML=ops.length?ops.map(([k,v])=>`<div class="cas-row"><span class="cas-num">I</span><span class="cas-desc">${k}</span><span class="cas-cuota">${fmt(v)}</span></div>`).join(''):'<div class="empty">Sin operaciones</div>';
+  tx('r349',ops.length?fmt(it):'—');tx('s349',ops.length?fmt(it):'—');
+  svSync(c46,res,ac,it);
+  // Annual summary
+  calcAnual();
+}
+function calcAnual(){
+  const year=document.getElementById('year-m')?.value||new Date().getFullYear().toString();
+  const qs=['1T','2T','3T','4T'].map(t=>t+' '+year);
+  let tot303=0,tot130=0,tot115=0,tot111=0,totIng=0,totGas=0,totRet=0;
+  qs.forEach(q=>{
+    const fs=getF(q);
+    fs.forEach(f=>{
+      if(f.tipo==='ingreso'){
+        totIng+=f.base_irpf||0; totRet+=f.retencion_importe||0;
+        if(f.operacion==='INT'||f.operacion==='PROF'){tot303+=(f.cuota_iva||0);}
+      } else {
+        totGas+=f.base_irpf||f.base_iva||0;
+        const deduct=f.cuota_iva||0;
+        if(f.operacion==='INT'||f.operacion==='PROF'||f.operacion==='INTRA_S') tot303-=deduct;
+        if(f.operacion==='ALQUILER'){tot303-=deduct; tot115+=f.retencion_importe||0;}
+        if(f.operacion==='PROF') tot111+=f.retencion_importe||0;
+      }
+    });
+  });
+  const net=totIng-totGas;
+  const v20=Math.max(0,net*.2);
+  const irpf=Math.max(0,v20-totRet);
+  qs.forEach(q=>{
+    const fs=getF(q);
+    let ing=0,gas=0,ret=0;
+    fs.forEach(f=>{ if(f.tipo==='ingreso'){ing+=f.base_irpf||0;ret+=f.retencion_importe||0;} else{gas+=f.base_irpf||f.base_iva||0;} });
+    const n=ing-gas; tot130+=Math.max(0,Math.max(0,n*.2)-ret);
+  });
+  tx('a303',fmt(tot303)); tx('a130',fmt(tot130)); tx('a115',fmt(tot115)); tx('a111',fmt(tot111));
+  const total=tot303+tot130+tot115+tot111;
+  tx('a-total',fmt(total)); tx('a100-net',fmt(net)); tx('a100',fmt(v20));
+}
 function svSync(r303,r130,r115,r349){ const tg={303:528.87,130:129.48,115:513,349:57.03},ac={303:r303,130:r130,115:r115,349:r349}; for(const k of Object.keys(tg)){ const v=ac[k]||0,t=tg[k],d=v-t,ve=document.getElementById('v'+k),de=document.getElementById('dv'+k); if(ve) ve.textContent=v>0?fmtN(v):'—'; if(de&&v>0){de.textContent=(d>=0?'+':'')+d.toFixed(2).replace('.',',')+'€';de.className=Math.abs(d)<0.02?'val-ok':'val-fail';} } }
 function validar(){ recalc(); const fs=getF('1T 2026'); if(!fs.length){showV(false,'No hay registros del 1T 2026.');return;} const tg={303:528.87,130:129.48,115:513,349:57.03},get=id=>parseFloat((document.getElementById('v'+id).textContent||'0').replace(',','.'))||0,ac={303:get(303),130:get(130),115:get(115),349:get(349)},wrong=Object.keys(tg).filter(k=>ac[k]>0&&Math.abs(ac[k]-tg[k])>=0.02),miss=Object.keys(tg).filter(k=>!ac[k]); if(!wrong.length&&!miss.length) showV(true,'✓ Todos los modelos cuadran con el 1T 2026 presentado.'); else{let m='';if(miss.length) m+='Sin datos: '+miss.map(k=>'Mod.'+k).join(', ')+'. ';if(wrong.length) m+='Diferencias: '+wrong.map(k=>'Mod.'+k).join(', ')+'.';showV(false,m);} }
 function showV(ok,msg){ const e=document.getElementById('val-res'); e.style.display='block'; e.className='val-result '+(ok?'ok':'fail'); e.textContent=msg; }

@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MiGestor">
@@ -89,44 +89,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .tabs::-webkit-scrollbar{display:none;}
 /* Bottom nav */
 .tab-bar-top{display:none;}
-.tab-pane{display:none;padding:12px 16px 100px;}
+.tab-pane{display:none;padding:12px 16px calc(90px + env(safe-area-inset-bottom));}
 .tab-pane.active{display:block;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--bg-card);border-top:0.5px solid var(--line);display:flex;align-items:center;justify-content:space-around;padding:0 8px;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(0,0,0,0.15);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:8px 4px;color:var(--text-3);transition:color .15s;}
-.nav-btn.active{color:var(--accent);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(–bg-card);border-top:0.5px solid var(–line);display:flex;align-items:center;justify-content:space-around;padding:8px 8px 0;padding-bottom:max(env(safe-area-inset-bottom),8px);z-index:200;box-shadow:0 -4px 20px rgba(0,0,0,0.15);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:8px 4px;color:var(–text-3);transition:color .15s;}
+.nav-btn.active{color:var(–accent);}
 .nav-btn svg{width:22px;height:22px;}
 .nav-btn span{font-size:10px;font-weight:500;}
-.nav-add{width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(196,118,58,0.5);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.nav-add{width:52px;height:52px;border-radius:50%;background:var(–accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(196,118,58,0.5);-webkit-tap-highlight-color:transparent;flex-shrink:0;}
 .nav-add svg{width:26px;height:26px;}
 /* Add invoice modal */
 #add-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
-#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--bg-card);border-radius:20px 20px 0 0;padding:20px 16px 32px;max-height:85vh;overflow-y:auto;}
+#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:var(–bg-card);border-radius:20px 20px 0 0;padding:20px 16px 32px;max-height:85vh;overflow-y:auto;}
 #add-modal .add-sheet h3{font-size:17px;font-weight:700;margin:0 0 16px;text-align:center;}
 /* Facturas list compact */
-.fact-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--line);}
+.fact-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(–line);}
 .fact-item:last-child{border-bottom:none;}
 .fact-color-bar{width:3px;height:36px;border-radius:2px;flex-shrink:0;}
-.fact-color-bar.ingreso{background:var(--green);}
-.fact-color-bar.gasto{background:var(--red);}
+.fact-color-bar.ingreso{background:var(–green);}
+.fact-color-bar.gasto{background:var(–red);}
 .fact-main{flex:1;min-width:0;}
-.fact-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fact-sub{font-size:11px;color:var(--text-3);margin-top:1px;}
+.fact-name{font-size:13px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fact-sub{font-size:11px;color:var(–text-3);margin-top:1px;}
 .fact-right{text-align:right;flex-shrink:0;}
 .fact-amount{font-size:13px;font-weight:700;}
-.fact-amount.ingreso{color:var(--green);}
-.fact-amount.gasto{color:var(--red);}
-.fact-date{font-size:10px;color:var(--text-3);margin-top:1px;}
+.fact-amount.ingreso{color:var(–green);}
+.fact-amount.gasto{color:var(–red);}
+.fact-date{font-size:10px;color:var(–text-3);margin-top:1px;}
 /* Filter bar */
 .filter-bar{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-chip{flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(--line-2);border-radius:20px;background:var(--bg-raised);color:var(--text-2);cursor:pointer;}
-.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.filter-chip{flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
+.filter-chip.active{background:var(–accent);color:#fff;border-color:var(–accent);}
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
-.q-selector{display:flex;gap:0;margin-bottom:16px;background:var(--bg-raised);border-radius:12px;padding:3px;border:0.5px solid var(--line);}
-.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(--text-3);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;}
-.q-pill.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(196,118,58,0.35);}
+.q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;border:0.5px solid var(–line);}
+.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-3);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;}
+.q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 8px rgba(196,118,58,0.35);}
 
 /* CARDS */
 .card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:16px;margin-bottom:12px;}
@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.50</div>
+    <div class="login-version">v5.51</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.50</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.51</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -390,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.50</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.51</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -427,6 +427,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
   </nav>
 
   <!-- ADD INVOICE MODAL -->
+
   <div id="add-modal" onclick="closeAddModal(event)">
     <div class="add-sheet" onclick="event.stopPropagation()">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -946,25 +947,7 @@ async function handleClaudeFiles(files){
       div._items=items;
       // Store items on div element
       window['_analysis_'+divId]=items;
-      // Upload file to Drive
-      if(token&&facturasFId){
-        const f0=items[0]||{};
-        const fecha=(f0.fecha||'').slice(0,10);
-        const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
-        const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
-        const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
-        const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
-        uploadFileToDrive(new File([file],newName,{type:file.type}),Q).then(created=>{
-          if(created&&created.webViewLink){
-            // Store drive link on ALL records from this analysis
-            items.forEach(rec=>{
-              const saved=Object.values(data).flat().find(x=>x._id===rec._id);
-              if(saved) saved._driveLink=created.webViewLink;
-            });
-            saveLocal();
-          }
-        }).catch(()=>{});
-      }
+      window['_file_'+divId]=file; // Save file for upload after user saves
     }catch(e){
       div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-error">Error</span></div><div style="font-size:12px;color:var(--red);padding:8px;">${e.message}</div>`;
     }
@@ -1011,6 +994,29 @@ function saveAnalysis(divId, count){
   if(saved===0){ alert('No hay facturas seleccionadas.'); return; }
   saveLocal(); renderAll();
   if(token) saveDataToDrive(Q).catch(()=>{});
+  // Upload file to Drive NOW (after records are saved) and store link
+  const savedFile=window['_file_'+divId];
+  const savedItems=window['_analysis_'+divId];
+  if(token&&facturasFId&&savedFile&&savedItems){
+    const f0=savedItems[0]||{};
+    const fecha=(f0.fecha||'').slice(0,10);
+    const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
+    const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
+    const ext=savedFile.name.includes('.')?'.'+savedFile.name.split('.').pop().toLowerCase():'.jpg';
+    const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
+    uploadFileToDrive(new File([savedFile],newName,{type:savedFile.type}),Q).then(created=>{
+      if(created&&created.webViewLink){
+        // Store link on all saved records
+        savedItems.forEach(rec=>{
+          const inData=Object.values(data).flat().find(x=>x._id===rec._id);
+          if(inData){ inData._driveLink=created.webViewLink; }
+        });
+        saveLocal();
+        saveDataToDrive(Q).catch(()=>{});
+      }
+    }).catch(()=>{});
+    delete window['_file_'+divId];
+  }
   const btn=document.querySelector('#'+divId+' .btn-save-analysis');
   if(btn){btn.textContent='✓ '+saved+' guardada(s)';btn.disabled=true;}
   setTimeout(()=>closeAddModal(),1200);

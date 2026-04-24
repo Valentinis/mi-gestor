@@ -285,7 +285,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.19</div>
+    <div class="login-version">v5.21</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -320,7 +320,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.19</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.21</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.19</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.21</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -917,6 +917,27 @@ async function handleReprocessFile(files){
     items.forEach(f=>{ f._quarter=q; f._id=Date.now()+Math.random(); data[q].push(f); });
     saveLocal(); renderAll();
     if(token) saveDataToDrive(q).catch(()=>{});
+    // Upload file to Drive
+    if(token&&facturasFId){
+      const f0=items[0]||{};
+      const fecha=(f0.fecha||'').slice(0,10);
+      const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
+      const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
+      const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
+      const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
+      uploadFileToDrive(new File([file],newName,{type:file.type}),q).catch(()=>{});
+    }
+    // Force registros and modelos to show the right quarter
+    regQ=q; Q=q;
+    document.querySelectorAll('#qs-r .q-pill').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach(b=>b.classList.remove('active'));
+    const qLabel=q;
+    document.querySelectorAll('#qs-r .q-pill').forEach(b=>{ if(b.textContent.trim()===qLabel) b.classList.add('active'); });
+    document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach(b=>{ if(b.textContent.trim()===qLabel) b.classList.add('active'); });
+    document.getElementById('qbadge').textContent=qLabel;
+    renderAll();
+    // Reset button before closing
+    btn.textContent='✓ Listo'; btn.disabled=false;
     closeModal();
     setTimeout(()=>openModal(items[0]._id),300);
   }catch(e){

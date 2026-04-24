@@ -295,7 +295,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.36</div>
+    <div class="login-version">v5.37</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
@@ -579,14 +579,17 @@ async function handleToken(access_token){
 }
 
 function checkRedirectToken(){
+  const st=document.getElementById('login-status');
   const hash=window.location.hash.substring(1);
-  if(!hash) return;
+  if(st) st.textContent='hash:'+hash.substring(0,60);
+  if(!hash){ if(st) st.textContent='hash vacío'; return; }
   const params=new URLSearchParams(hash);
   const access_token=params.get('access_token');
+  if(st) st.textContent='token:'+(access_token?access_token.substring(0,20)+'...':'NO');
   if(access_token){
     history.replaceState(null,'',window.location.pathname);
     loadLocal(); loadCfg();
-    handleToken(access_token).then(()=>{ showPin(); });
+    handleToken(access_token).then(()=>{ showPin(); }).catch(e=>{ if(st) st.textContent='handleToken error:'+e.message; });
   }
 }
 function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }

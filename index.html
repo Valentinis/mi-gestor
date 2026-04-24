@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.39</div>
+    <div class="login-version">v5.40</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.39</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.40</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -390,7 +390,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.39</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.40</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -563,15 +563,28 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <span style="font-size:12px;color:var(--text-3);">▾</span>
       </div>
       <div class="mod-body" id="b-anual" style="display:block;">
-        <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;">Suma de todos los trimestres cargados</div>
-        <div class="cas-row"><span class="cas-num">303</span><span class="cas-desc">IVA total</span><span class="cas-base"></span><span class="cas-cuota" id="a303">—</span></div>
-        <div class="cas-row"><span class="cas-num">130</span><span class="cas-desc">IRPF pagos fraccionados</span><span class="cas-base"></span><span class="cas-cuota" id="a130">—</span></div>
-        <div class="cas-row"><span class="cas-num">115</span><span class="cas-desc">Retenciones alquiler</span><span class="cas-base"></span><span class="cas-cuota" id="a115">—</span></div>
-        <div class="cas-row"><span class="cas-num">111</span><span class="cas-desc">Retenciones profesionales</span><span class="cas-base"></span><span class="cas-cuota" id="a111">—</span></div>
-        <div class="cas-row cas-total"><span class="cas-num">∑</span><span class="cas-desc">Total a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="a-total">—</span></div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;">Suma de todos los trimestres cargados del año seleccionado</div>
+        <!-- Modelos resumen anuales -->
+        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;padding:6px 0 4px;">Resúmenes anuales obligatorios</div>
+        <div class="cas-row"><span class="cas-num">390</span><span class="cas-desc">Resumen anual IVA (= suma 303)</span><span class="cas-base"></span><span class="cas-cuota" id="a390">—</span></div>
+        <div class="cas-row"><span class="cas-num">190</span><span class="cas-desc">Resumen retenciones PROF (= suma 111)</span><span class="cas-base"></span><span class="cas-cuota" id="a190">—</span></div>
+        <div class="cas-row"><span class="cas-num">180</span><span class="cas-desc">Resumen retenciones alquiler (= suma 115)</span><span class="cas-base"></span><span class="cas-cuota" id="a180">—</span></div>
+        <div class="cas-row" style="background:var(--amber-bg);"><span class="cas-num" style="color:var(--amber);">347</span><span class="cas-desc" style="color:var(--amber);">Operaciones +3.005€ — consultar gestor</span><span class="cas-base"></span><span class="cas-cuota" id="a347" style="color:var(--amber);">—</span></div>
+        <!-- Pagos fraccionados acumulados -->
         <div style="border-top:0.5px solid var(--line);margin:8px 0;"></div>
-        <div class="cas-row"><span class="cas-num">100</span><span class="cas-desc">Rendimiento neto anual</span><span class="cas-base"></span><span class="cas-cuota" id="a100-net">—</span></div>
-        <div class="cas-row cas-total"><span class="cas-num">100</span><span class="cas-desc">IRPF anual estimado (20%)</span><span class="cas-base"></span><span class="cas-cuota" id="a100">—</span></div>
+        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;padding:4px 0;">Pagos fraccionados (130 acumulado)</div>
+        <div class="cas-row"><span class="cas-num">130</span><span class="cas-desc">Total pagado en trimestres</span><span class="cas-base"></span><span class="cas-cuota" id="a130">—</span></div>
+        <!-- IRPF anual -->
+        <div style="border-top:0.5px solid var(--line);margin:8px 0;"></div>
+        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;padding:4px 0;">Mod. 100 — IRPF anual estimado</div>
+        <div class="cas-row"><span class="cas-num">100</span><span class="cas-desc">Ingresos brutos</span><span class="cas-base"></span><span class="cas-cuota" id="a100-ing">—</span></div>
+        <div class="cas-row"><span class="cas-num">100</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="a100-gas">—</span></div>
+        <div class="cas-row"><span class="cas-num">100</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="a100-net">—</span></div>
+        <div class="cas-row"><span class="cas-num">100</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="a100-ret">—</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">100</span><span class="cas-desc">Cuota diferencial estimada</span><span class="cas-base"></span><span class="cas-cuota" id="a100">—</span></div>
+        <!-- Total anual -->
+        <div style="border-top:1px solid var(--accent);margin:8px 0;"></div>
+        <div class="cas-row cas-total" style="background:var(--accent-dim);"><span class="cas-num">∑</span><span class="cas-desc">Total a ingresar (excl. 100)</span><span class="cas-base"></span><span class="cas-cuota" id="a-total">—</span></div>
       </div>
     </div>
     <button class="btn-sec" style="width:100%;margin-top:8px;" onclick="exportToSheets()">Exportar a Google Sheets</button>
@@ -1387,34 +1400,46 @@ function recalc(){
 function calcAnual(){
   const year=document.getElementById('year-m')?.value||new Date().getFullYear().toString();
   const qs=['1T','2T','3T','4T'].map(t=>t+' '+year);
-  let tot303=0,tot130=0,tot115=0,tot111=0,totIng=0,totGas=0,totRet=0;
+  let tot390=0,tot190=0,tot180=0,tot130=0,tot111=0,tot115=0;
+  let totIng=0,totGas=0,totRet=0;
+  let a347providers={};
   qs.forEach(q=>{
     const fs=getF(q);
+    let qIng=0,qGas=0,qRet=0,qIVA=0;
     fs.forEach(f=>{
       if(f.tipo==='ingreso'){
-        totIng+=f.base_irpf||0; totRet+=f.retencion_importe||0;
-        if(f.operacion==='INT'||f.operacion==='PROF'){tot303+=(f.cuota_iva||0);}
+        qIng+=f.base_irpf||0; qRet+=f.retencion_importe||0;
+        if(f.operacion==='INT'||f.operacion==='PROF') qIVA+=(f.cuota_iva||0);
+        // 347: track clients with >3005€
+        const p=f.proveedor_cliente||''; if(p) a347providers[p]=(a347providers[p]||0)+(f.ingresos_brutos||f.base_iva||0);
       } else {
-        totGas+=f.base_irpf||f.base_iva||0;
-        const deduct=f.cuota_iva||0;
-        if(f.operacion==='INT'||f.operacion==='PROF'||f.operacion==='INTRA_S') tot303-=deduct;
-        if(f.operacion==='ALQUILER'){tot303-=deduct; tot115+=f.retencion_importe||0;}
-        if(f.operacion==='PROF') tot111+=f.retencion_importe||0;
+        qGas+=f.base_irpf||f.base_iva||0;
+        const iva=f.cuota_iva||0;
+        if(f.operacion==='INT'||f.operacion==='PROF') qIVA-=iva;
+        if(f.operacion==='INTRA_S') qIVA-=iva;
+        if(f.operacion==='ALQUILER'){ qIVA-=iva; tot180+=f.retencion_importe||0; tot115+=f.retencion_importe||0; }
+        if(f.operacion==='PROF') tot190+=f.retencion_importe||0;
+        // 347: track providers with >3005€
+        const p=f.proveedor_cliente||''; if(p) a347providers[p]=(a347providers[p]||0)+(f.base_iva||0);
       }
     });
+    tot390+=qIVA;
+    const n=qIng-qGas; tot130+=Math.max(0,Math.max(0,n*.2)-qRet);
+    totIng+=qIng; totGas+=qGas; totRet+=qRet;
   });
+  tot111=tot190;
   const net=totIng-totGas;
   const v20=Math.max(0,net*.2);
-  const irpf=Math.max(0,v20-totRet);
-  qs.forEach(q=>{
-    const fs=getF(q);
-    let ing=0,gas=0,ret=0;
-    fs.forEach(f=>{ if(f.tipo==='ingreso'){ing+=f.base_irpf||0;ret+=f.retencion_importe||0;} else{gas+=f.base_irpf||f.base_iva||0;} });
-    const n=ing-gas; tot130+=Math.max(0,Math.max(0,n*.2)-ret);
-  });
-  tx('a303',fmt(tot303)); tx('a130',fmt(tot130)); tx('a115',fmt(tot115)); tx('a111',fmt(tot111));
-  const total=tot303+tot130+tot115+tot111;
-  tx('a-total',fmt(total)); tx('a100-net',fmt(net)); tx('a100',fmt(v20));
+  const irpfDif=Math.max(0,v20-totRet-tot130);
+  const providers347=Object.entries(a347providers).filter(([,v])=>v>=3005.01).length;
+
+  tx('a390',fmt(tot390)); tx('a190',fmt(tot190)); tx('a180',fmt(tot180));
+  tx('a347',providers347>0?providers347+' proveedor(es)':'Sin obligación');
+  tx('a130',fmt(tot130)); tx('a111',fmt(tot111)); tx('a115',fmt(tot115));
+  tx('a100-ing',fmt(totIng)); tx('a100-gas',fmt(totGas)); tx('a100-net',fmt(net));
+  tx('a100-ret',fmt(totRet)); tx('a100',fmt(irpfDif));
+  const total=tot390+tot190+tot180+tot130;
+  tx('a-total',fmt(total));
 }
 function svSync(r303,r130,r115,r349){ const tg={303:528.87,130:129.48,115:513,349:57.03},ac={303:r303,130:r130,115:r115,349:r349}; for(const k of Object.keys(tg)){ const v=ac[k]||0,t=tg[k],d=v-t,ve=document.getElementById('v'+k),de=document.getElementById('dv'+k); if(ve) ve.textContent=v>0?fmtN(v):'—'; if(de&&v>0){de.textContent=(d>=0?'+':'')+d.toFixed(2).replace('.',',')+'€';de.className=Math.abs(d)<0.02?'val-ok':'val-fail';} } }
 function validar(){ recalc(); const fs=getF('1T 2026'); if(!fs.length){showV(false,'No hay registros del 1T 2026.');return;} const tg={303:528.87,130:129.48,115:513,349:57.03},get=id=>parseFloat((document.getElementById('v'+id).textContent||'0').replace(',','.'))||0,ac={303:get(303),130:get(130),115:get(115),349:get(349)},wrong=Object.keys(tg).filter(k=>ac[k]>0&&Math.abs(ac[k]-tg[k])>=0.02),miss=Object.keys(tg).filter(k=>!ac[k]); if(!wrong.length&&!miss.length) showV(true,'✓ Todos los modelos cuadran con el 1T 2026 presentado.'); else{let m='';if(miss.length) m+='Sin datos: '+miss.map(k=>'Mod.'+k).join(', ')+'. ';if(wrong.length) m+='Diferencias: '+wrong.map(k=>'Mod.'+k).join(', ')+'.';showV(false,m);} }

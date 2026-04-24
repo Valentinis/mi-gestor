@@ -91,7 +91,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .tab-bar-top{display:none;}
 .tab-pane{display:none;padding:12px 16px 100px;}
 .tab-pane.active{display:block;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(–bg-card);border-top:0.5px solid var(–line);display:flex;align-items:center;justify-content:space-around;padding:0 8px;z-index:200;padding-bottom:env(safe-area-inset-bottom);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(–bg-card);border-top:0.5px solid var(–line);display:flex;align-items:center;justify-content:space-around;padding:0 8px;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(0,0,0,0.15);}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:8px 4px;color:var(–text-3);transition:color .15s;}
 .nav-btn.active{color:var(–accent);}
 .nav-btn svg{width:22px;height:22px;}
@@ -316,7 +316,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.28</div>
+    <div class="login-version">v5.30</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.28</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.30</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -382,7 +382,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.28</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.30</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -566,6 +566,8 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <div class="config-row"><span class="config-label">Nombre</span><span style="font-size:13px;color:var(--text-2);">Valentín López Pérez</span></div>
       <div class="config-row"><span class="config-label">NIF</span><span style="font-size:13px;color:var(--text-2);">48220739C</span></div>
       <div class="config-row"><span class="config-label">Dirección</span><span style="font-size:13px;color:var(--text-2);">Badajoz 95 LOC 1, 08005 Barcelona</span></div>
+      <div class="config-row"><span class="config-label">Email</span><span style="font-size:13px;color:var(--text-2);">valentinnlopez@gmail.com</span></div>
+      <div class="config-row"><span class="config-label">Teléfono</span><span style="font-size:13px;color:var(--text-2);">686 544 922</span></div>
       <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text-2);">86.2 Ceramista</span></div>
     </div>
     <div class="section-label">Google Sheets</div>
@@ -582,8 +584,8 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 <script>
 
 const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com';
-const SCOPES='https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
-const SCOPE_VERSION='v2'; // bump when scopes change to force re-auth
+const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+const SCOPE_VERSION='v3';
 if(localStorage.getItem('_scope_v')!==SCOPE_VERSION){ localStorage.removeItem('migestor_auth'); localStorage.setItem('_scope_v',SCOPE_VERSION); }
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
 
@@ -607,7 +609,7 @@ function changePin(){ const np=document.getElementById('new-pin-input').value.tr
 // ── DATA ──
 function loadLocal(){ try{ data=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){ data={}; } migrar(); }
 function saveLocal(){ localStorage.setItem(LS,JSON.stringify(data)); updateSI(); }
-function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros · '+(token?'Drive conectado':'sin Drive'); }
+function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros'; }
 function getF(q){ if(!data[q]) data[q]=[]; return data[q]; }
 function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1','migestor_v2','migestor_v3'].forEach(k=>{ try{ const o=JSON.parse(localStorage.getItem(k)||'{}'); Object.entries(o).forEach(([q,fs])=>{ if(!data[q]) data[q]=[]; (fs||[]).forEach(f=>{ if(!data[q].find(x=>x._id===f._id)) data[q].push(f); }); }); }catch(e){} }); }
 
@@ -877,12 +879,12 @@ async function loadDriveFiles(){
       const jf=await rf.json();
       (jf.files||[]).forEach(f=>{ if(!driveFiles.find(x=>x.id===f.id)) driveFiles.push({id:f.id,name:f.name,quarter:folder.name,link:f.webViewLink,ts:f.createdTime}); });
     }
-    console.log('Drive files loaded:',driveFiles.length, driveFiles.map(f=>f.name));
-    renderAll(); renderDriveTab();
+    console.log('Drive files loaded:',driveFiles.length, driveFiles.slice(0,3).map(f=>f.name));
+    renderList(); renderDriveTab();
   }catch(e){ console.error('loadDriveFiles error:',e); }
 }
 async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); } else { const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
-async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace('_',' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal(); renderAll(); renderDriveTab(); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); }
+async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace('_',' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal(); renderAll(); renderDriveTab(); const el=document.getElementById('drive-last-sync'); if(el) el.textContent='Última sync: '+new Date().toLocaleTimeString('es'); const si=document.getElementById('si'); if(si) si.textContent=Object.values(data).reduce((a,b)=>a+(b||[]).length,0)+' registros'; }
 async function uploadFileToDrive(file,q){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); renderDriveTab(); return created; }
 async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
 function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
@@ -1140,7 +1142,8 @@ function hasDriveBackup(f){
   if(f._driveLink) return true;
   if(!f.fecha) return false;
   const datePrefix=(f.fecha||'').slice(0,10);
-  return driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
+  const found=driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
+  return found;
 }
 function driveIcon(f){ return hasDriveBackup(f)?'<span title="Copia en Drive" style="font-size:14px;color:var(--green);">☁️</span>':'<span title="Sin copia en Drive" style="font-size:14px;color:var(--text-3);opacity:.5;">☁️</span>'; }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }

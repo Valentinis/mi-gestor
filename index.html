@@ -10,19 +10,20 @@
 <meta name="theme-color" content="#0D0D1A">
 <title>MiGestor</title>
 <script>
-// Detectar token OAuth ANTES de que cargue nada - evita flash de login
+// Capturar token OAuth inmediatamente - PRIMERA línea que ejecuta el navegador
 (function(){
   try{
-    const h=window.location.hash.substring(1);
+    const h=window.location.hash;
     if(h&&h.includes('access_token')){
-      const p=new URLSearchParams(h);
+      const p=new URLSearchParams(h.substring(1));
       const t=p.get('access_token');
       if(t){
-        sessionStorage.setItem('_oauth_token',t);
-        history.replaceState(null,'',window.location.pathname);
+        localStorage.setItem('_oauth_pending',t);
+        localStorage.setItem('_oauth_ts',Date.now().toString());
+        // NO limpiar el hash todavía - lo hace el JS principal
       }
     }
-  }catch(e){}
+  }catch(e){ localStorage.setItem('_oauth_err',e.message); }
 })();
 </script>
 <style>
@@ -309,7 +310,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.24</div>
+    <div class="login-version">v5.25</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -595,16 +596,22 @@ function checkRedirectToken(){
   if(access_token){
     history.replaceState(null,'',window.location.pathname);
     loadLocal(); loadCfg();
-    handleToken(access_token).then(()=>{ showPin(); });
+    handleToken(access_token);
   }
 }
 function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }
 function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
 window.addEventListener('load',()=>{
   loadLocal(); loadCfg();
-  // Check token stored before page load (from OAuth redirect)
-  const earlyToken=sessionStorage.getItem('_oauth_token');
-  if(earlyToken){ sessionStorage.removeItem('_oauth_token'); handleToken(earlyToken); return; }
+  // Check pending OAuth token (stored in head script before page load)
+  const pendingToken=localStorage.getItem('_oauth_pending');
+  const pendingTs=parseInt(localStorage.getItem('_oauth_ts')||'0');
+  if(pendingToken&&(Date.now()-pendingTs)<60000){
+    localStorage.removeItem('_oauth_pending');
+    localStorage.removeItem('_oauth_ts');
+    history.replaceState(null,'',window.location.pathname);
+    handleToken(pendingToken); return;
+  }
   // Fallback: check hash directly
   if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }
   try{
@@ -612,6 +619,12 @@ window.addEventListener('load',()=>{
     if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
+  // Debug info
+  const dbg=[];
+  dbg.push('hash:'+window.location.hash.substring(0,30));
+  dbg.push('pending:'+!!localStorage.getItem('_oauth_pending'));
+  dbg.push('err:'+localStorage.getItem('_oauth_err'));
+  document.getElementById('login-status').textContent=dbg.filter(d=>!d.endsWith('null')&&!d.endsWith('false')&&!d.endsWith(':')).join(' | ')||'Listo';
   // Global paste listener
   document.addEventListener('paste',(e)=>{
     const active=document.querySelector('.tab-btn.active');

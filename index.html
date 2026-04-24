@@ -279,7 +279,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 </style>
 
 </head>
-<body>
+<body onload="checkAuth()">
 
 <!-- LOGIN -->
 
@@ -293,7 +293,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.27</div>
+    <div class="login-version">v5.28</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -592,9 +592,17 @@ function checkRedirectToken(){
 function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }
 function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
 
-window.addEventListener('load',()=>{
-  // Check if returning from OAuth redirect
-  if(window.location.hash&&window.location.hash.indexOf('access_token')!==-1){ checkRedirectToken(); return; }
+function checkAuth(){
+  // Check if returning from Google OAuth — read hash FIRST before anything else
+  var hash=window.location.hash;
+  if(hash&&hash.indexOf('access_token')!==-1){
+    var m=hash.match(/access_token=([^&]+)/);
+    if(m){
+      history.replaceState(null,'',window.location.pathname);
+      verifyGoogleToken(m[1]);
+      return;
+    }
+  }
   loadLocal(); loadCfg();
   try{
     const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
@@ -612,7 +620,7 @@ window.addEventListener('load',()=>{
     const imgItem=items.find(i=>i.type.startsWith('image/'));
     if(imgItem){ const file=imgItem.getAsFile(); if(file) handleClaudeFiles([file]); }
   });
-});
+}
 
 // ── PIN ──
 function pp(d){ if(pin.length>=4)return; pin+=d; updateDots(); }

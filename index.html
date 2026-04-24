@@ -293,7 +293,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.32</div>
+    <div class="login-version">v5.33</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
@@ -589,13 +589,18 @@ window.addEventListener('error', function(e){
   if(d) d.textContent='ERROR: '+e.message+' (línea '+e.lineno+')';
 });
 window.addEventListener('load',()=>{
-  loadLocal(); loadCfg();
+  const st=document.getElementById('login-status');
+  if(st) st.textContent='cargando...';
+  try{ loadLocal(); }catch(e){ if(st) st.textContent='ERROR loadLocal: '+e.message; return; }
+  try{ loadCfg(); }catch(e){ if(st) st.textContent='ERROR loadCfg: '+e.message; return; }
+  if(st) st.textContent='hash:'+window.location.hash.substring(0,50)||'(vacío)';
   if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }
   try{
     const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
     if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
+  if(st) st.textContent='listo - sin sesión';
 });
 
 // ── PIN ──

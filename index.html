@@ -285,7 +285,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.16</div>
+    <div class="login-version">v5.17</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -320,6 +320,23 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
+</div>
+
+<!-- MODAL DETALLE FACTURA -->
+
+<div id="factura-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);overflow-y:auto;padding:1rem;">
+  <div style="background:var(--bg-card);border-radius:20px;max-width:480px;margin:2rem auto;padding:0;overflow:hidden;border:0.5px solid var(--line);">
+    <div style="padding:16px;border-bottom:0.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:15px;font-weight:700;color:var(--text);" id="modal-title">Detalle factura</span>
+      <button onclick="closeModal()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-3);display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div style="padding:16px;" id="modal-body"></div>
+    <div style="padding:12px 16px;border-top:0.5px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
+      <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">📂 Ver en Drive</button>
+      <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Reprocesar</button>
+      <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Eliminar</button>
+    </div>
+  </div>
 </div>
 
 <!-- MAIN -->
@@ -792,7 +809,58 @@ function delR(id){ data[Q]=(data[Q]||[]).filter(f=>f._id!==id); saveLocal();rend
 function switchTab(id,btn){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+id).classList.add('active'); if(id==='drive') renderDriveTab(); if(id==='registros') renderRegistros(); }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('qbadge').textContent=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
 function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
-function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros en este trimestre</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text3);font-size:11px;">${f.fecha||''}</span></div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><button class="reg-del" onclick="delR(${f._id})">✕</button></div>`).join(''); }
+function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros en este trimestre</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item" onclick="openModal(${f._id})" style="cursor:pointer;"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text-3);font-size:11px;">${f.fecha||''}</span></div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><span style="color:var(--text-3);font-size:18px;padding:4px;">›</span></div>`).join(''); }
+
+// ── MODAL ──
+let modalFacturaId=null;
+function openModal(id){
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===id);
+  if(!f) return;
+  modalFacturaId=id;
+  document.getElementById('modal-title').textContent=(f.proveedor_cliente||'—')+' · '+(f.fecha||'—');
+  const rows=[
+    ['Tipo', f.tipo==='ingreso'?'💚 Ingreso':'🔴 Gasto'],
+    ['Fecha', f.fecha||'—'],
+    ['Trimestre', f._quarter||f.trimestre||'—'],
+    ['Concepto', f.concepto||'—'],
+    ['Nº Factura', f.num_factura||'—'],
+    ['NIF', f.nif||'—'],
+    ['Operación', f.operacion||'—'],
+    ['Base IVA', fmt(f.base_iva)],
+    ['% IVA', (f.pct_iva||0)+'%'],
+    ['Cuota IVA', fmt(f.cuota_iva)],
+    ['Base IRPF', fmt(f.base_irpf)],
+    ['% Retención', (f.retencion_pct||0)+'%'],
+    ['Retención', fmt(f.retencion_importe)],
+    ['Ingresos brutos', f.ingresos_brutos?fmt(f.ingresos_brutos):'—'],
+    ['Justificación', f.justificacion||'—'],
+    ['Notas', f.notas||'—'],
+  ];
+  document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:0;">${rows.filter(([k,v])=>v&&v!=='—'&&v!=='0,00 €').map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line);font-size:13px;gap:12px;"><span style="color:var(--text-3);font-weight:500;flex-shrink:0;">${k}</span><span style="color:var(--text);text-align:right;">${v}</span></div>`).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
+  // Show Drive button if file link exists
+  const driveFile=driveFiles.find(df=>df.name&&df.name.includes((f.fecha||'').slice(0,10)));
+  const driveBtn=document.getElementById('modal-drive-btn');
+  driveBtn.style.display=driveFile?'flex':'none';
+  driveBtn._link=driveFile?driveFile.link:'';
+  document.getElementById('factura-modal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeModal(){ document.getElementById('factura-modal').style.display='none'; document.body.style.overflow=''; modalFacturaId=null; }
+function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
+function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar este registro?')) return; const q=Object.keys(data).find(q=>data[q].find(f=>f._id===modalFacturaId)); if(q){ data[q]=data[q].filter(f=>f._id!==modalFacturaId); saveLocal(); renderAll(); if(token) saveDataToDrive(q).catch(()=>{}); } closeModal(); }
+async function reprocessFromModal(){
+  if(!modalFacturaId) return;
+  if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config.'); return; }
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===modalFacturaId);
+  if(!f){ alert('No se puede reprocesar — archivo original no disponible. Sube la factura de nuevo desde la pestaña Facturas.'); return; }
+  // Find Drive file to reprocess
+  const driveFile=driveFiles.find(df=>df.name&&f.fecha&&df.name.includes((f.fecha||'').slice(0,10)));
+  if(!driveFile){ closeModal(); alert('No se encontró el archivo original en Drive. Sube la factura de nuevo desde la pestaña Facturas para reprocesarla.'); return; }
+  closeModal();
+  alert('Función de reprocesar: sube la factura original de nuevo desde la pestaña Facturas. El resultado se añadirá como nuevo registro y podrás eliminar el anterior.');
+}
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──

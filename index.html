@@ -7,286 +7,920 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MiGestor">
-<meta name="theme-color" content="#0D0D1A">
+<meta name="theme-color" content="#1A1A2E">
 <title>MiGestor</title>
-<script>
-(function(){
-  var h=location.hash;
-  if(h&&h.indexOf('access_token')!==-1){
-    localStorage.setItem('_mg',h);
-    location.hash='';
-  }
-})();
-</script>
+<script>(function(){var h=location.hash;if(h&&h.indexOf('access_token')!==-1){var m=h.match(/access_token=([^&]+)/);if(m){localStorage.setItem('_mg',m[1]);localStorage.setItem('_mg_ts',Date.now());}}})();</script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --accent:#C4763A;--accent-light:#F5EBE0;--accent-dark:#7A4520;--accent-dim:rgba(196,118,58,0.15);
-  --bg:#F7F5F2;--bg-card:#FFFFFF;--bg-raised:#EFEDE9;--bg-input:#F2F0ED;
-  --text:#111111;--text-2:#555555;--text-3:#999999;
-  --line:rgba(0,0,0,0.09);--line-2:rgba(0,0,0,0.16);
-  --green:#0F6E56;--green-bg:#E6F4EC;--green-bd:#A8D8BE;
-  --red:#C0392B;--red-bg:#FDECEC;--red-bd:#F5BABA;
-  --blue:#1A5FA8;--blue-bg:#E8F1FC;--blue-bd:#A8C8F5;
-  --amber:#7A4500;--amber-bg:#FDF0DC;--amber-bd:#F5C878;
-  --r:14px;--r-sm:10px;--r-xs:7px;
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+/* \u2500\u2500 TOKENS: claro + oscuro \u2500\u2500 */
+:root {
+–accent:#C4763A;
+–accent-light:#F5EBE0;
+–accent-dark:#7A4520;
+–accent-dim:rgba(196,118,58,0.15);
+
+–bg:         #F7F5F2;
+–bg-card:    #FFFFFF;
+–bg-raised:  #EFEDE9;
+–bg-input:   #F2F0ED;
+
+–text:       #111111;
+–text-2:     #555555;
+–text-3:     #999999;
+
+–line:       rgba(0,0,0,0.09);
+–line-2:     rgba(0,0,0,0.16);
+
+–green:      #0F6E56;
+–green-bg:   #E6F4EC;
+–green-bd:   #A8D8BE;
+
+–red:        #C0392B;
+–red-bg:     #FDECEC;
+–red-bd:     #F5BABA;
+
+–blue:       #1A5FA8;
+–blue-bg:    #E8F1FC;
+–blue-bd:    #A8C8F5;
+
+–amber:      #7A4500;
+–amber-bg:   #FDF0DC;
+–amber-bd:   #F5C878;
+
+–r:          14px;
+–r-sm:       10px;
+–r-xs:       7px;
 }
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg:#111111;--bg-card:#1C1C1E;--bg-raised:#2C2C2E;--bg-input:#242426;
-    --text:#F2F2F7;--text-2:#AEAEB2;--text-3:#636366;
-    --line:rgba(255,255,255,0.08);--line-2:rgba(255,255,255,0.14);
-    --green:#30D158;--green-bg:rgba(48,209,88,0.12);--green-bd:rgba(48,209,88,0.25);
-    --red:#FF453A;--red-bg:rgba(255,69,58,0.12);--red-bd:rgba(255,69,58,0.25);
-    --blue:#0A84FF;--blue-bg:rgba(10,132,255,0.12);--blue-bd:rgba(10,132,255,0.25);
-    --amber:#FFD60A;--amber-bg:rgba(255,214,10,0.12);--amber-bd:rgba(255,214,10,0.25);
-    --accent-light:rgba(196,118,58,0.15);--accent-dim:rgba(196,118,58,0.10);
-  }
+
+@media (prefers-color-scheme: dark) {
+:root {
+–bg:         #111111;
+–bg-card:    #1C1C1E;
+–bg-raised:  #2C2C2E;
+–bg-input:   #242426;
+
+```
+--text:       #F2F2F7;
+--text-2:     #AEAEB2;
+--text-3:     #636366;
+
+--line:       rgba(255,255,255,0.08);
+--line-2:     rgba(255,255,255,0.14);
+
+--green:      #30D158;
+--green-bg:   rgba(48,209,88,0.12);
+--green-bd:   rgba(48,209,88,0.25);
+
+--red:        #FF453A;
+--red-bg:     rgba(255,69,58,0.12);
+--red-bd:     rgba(255,69,58,0.25);
+
+--blue:       #0A84FF;
+--blue-bg:    rgba(10,132,255,0.12);
+--blue-bd:    rgba(10,132,255,0.25);
+
+--amber:      #FFD60A;
+--amber-bg:   rgba(255,214,10,0.12);
+--amber-bd:   rgba(255,214,10,0.25);
+
+--accent-light: rgba(196,118,58,0.15);
+--accent-dim:   rgba(196,118,58,0.10);
+```
+
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
+}
 
-/* LOGIN */
-#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;background:linear-gradient(160deg,#0D0D1A 0%,#111827 60%,#0F2040 100%);gap:2rem;}
-.login-logo-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;}
-.login-logo-svg{filter:drop-shadow(0 8px 24px rgba(196,118,58,0.35));}
-.login-app-name{font-size:30px;font-weight:700;color:#fff;letter-spacing:-0.5px;}
-.login-app-sub{font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:0.02em;}
-.login-version{font-size:10px;color:rgba(255,255,255,0.2);margin-top:2px;}
-.login-card{width:100%;max-width:340px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.13);border-radius:20px;padding:1.75rem;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);text-align:center;}
-.login-card p{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:1.5rem;}
-.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 20px;background:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;color:#111;cursor:pointer;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,0.25);-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
-.btn-google:active{opacity:0.85;}
-.login-status{font-size:12px;color:rgba(255,255,255,0.35);margin-top:12px;min-height:16px;}
-.btn-google-new{display:flex;align-items:center;justify-content:center;gap:10px;background:#FFFFFF;border:none;border-radius:12px;padding:14px 20px;font-size:14px;font-weight:600;color:#1A1A1A;cursor:pointer;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.2);transition:transform .1s,box-shadow .1s;text-decoration:none;}
-.btn-google-new:active{transform:scale(0.97);box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+body {
+font-family: -apple-system, BlinkMacSystemFont, ‘SF Pro Text’, ‘Segoe UI’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+-webkit-font-smoothing: antialiased;
+-webkit-text-size-adjust: 100%;
+}
 
-/* PIN */
-#pin-screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;padding:2rem 1.5rem;background:linear-gradient(160deg,#0D0D1A 0%,#111827 60%,#0F2040 100%);}
-.pin-user-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
-.avatar-img{width:60px;height:60px;border-radius:50%;border:2px solid rgba(196,118,58,0.5);}
-.avatar-name{font-size:17px;font-weight:600;color:#fff;}
-.avatar-email{font-size:12px;color:rgba(255,255,255,0.4);}
-.pin-label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;}
-.pin-card{width:100%;max-width:300px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:20px;padding:2rem;}
-.pin-dots{display:flex;gap:18px;justify-content:center;margin-bottom:2rem;}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);transition:all .15s;}
-.pin-dot.filled{background:var(–accent);border-color:var(–accent);transform:scale(1.15);box-shadow:0 0 10px rgba(196,118,58,0.5);}
-.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.pin-btn{height:58px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.1);border-radius:12px;font-size:22px;font-weight:400;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .1s;}
-.pin-btn:active{background:rgba(255,255,255,0.2);}
-.pin-btn.del{font-size:17px;color:rgba(255,255,255,0.5);}
-.pin-btn.enter{background:var(–accent);border-color:var(–accent);font-size:13px;font-weight:700;color:#fff;}
-.pin-btn.enter:active{background:var(–accent-dark);}
-.pin-error{color:#FF6B6B;font-size:13px;text-align:center;margin-top:12px;min-height:18px;}
-.btn-ghost{background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:20px;padding:7px 18px;font-size:13px;color:rgba(255,255,255,0.45);cursor:pointer;}
+/* \u2500\u2500 LOGIN \u2500\u2500 */
+#login-screen {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 2rem 1.5rem;
+background: linear-gradient(160deg, #0D0D1A 0%, #111827 60%, #0F2040 100%);
+gap: 2rem;
+}
+.login-logo-wrap {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 12px;
+}
+.login-logo-svg {
+filter: drop-shadow(0 8px 24px rgba(196,118,58,0.35));
+}
+.login-app-name {
+font-size: 30px;
+font-weight: 700;
+color: #fff;
+letter-spacing: -0.5px;
+}
+.login-app-sub {
+font-size: 13px;
+color: rgba(255,255,255,0.45);
+letter-spacing: 0.02em;
+}
+.login-version {
+font-size: 10px;
+color: rgba(255,255,255,0.2);
+margin-top: 2px;
+}
+.login-card {
+width: 100%;
+max-width: 340px;
+background: rgba(255,255,255,0.07);
+border: 0.5px solid rgba(255,255,255,0.13);
+border-radius: 20px;
+padding: 1.75rem;
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+text-align: center;
+}
+.login-card p {
+font-size: 13px;
+color: rgba(255,255,255,0.5);
+line-height: 1.7;
+margin-bottom: 1.5rem;
+}
+.btn-google {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+width: 100%;
+padding: 14px 20px;
+background: #fff;
+border: none;
+border-radius: 12px;
+font-size: 15px;
+font-weight: 600;
+color: #111;
+cursor: pointer;
+text-decoration: none;
+box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+transition: opacity .15s;
+-webkit-tap-highlight-color: transparent;
+}
+.btn-google:active { opacity: 0.85; }
+.login-status {
+font-size: 12px;
+color: rgba(255,255,255,0.35);
+margin-top: 12px;
+min-height: 16px;
+}
 
-/* MAIN */
-#main-screen{display:none;}
-.top-bar{background:var(–bg-card);border-bottom:0.5px solid var(–line);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.top-left{display:flex;align-items:center;gap:9px;}
-.top-title{font-size:16px;font-weight:700;color:var(–text);}
-.top-right{display:flex;align-items:center;gap:8px;}
-.q-badge{background:var(–accent-dim);color:var(–accent);font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;}
-.status-row{display:flex;align-items:center;gap:5px;font-size:11px;color:var(–text-3);}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.dot-ok{background:var(–green);}
-.dot-err{background:var(–red);}
-.dot-sync{background:var(–amber);}
-.dot-off{background:var(–text-3);}
-.btn-sm{background:var(–bg-raised);border:0.5px solid var(–line-2);border-radius:8px;padding:5px 11px;font-size:12px;color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+/* \u2500\u2500 PIN \u2500\u2500 */
+#pin-screen {
+min-height: 100vh;
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 1.5rem;
+padding: 2rem 1.5rem;
+background: linear-gradient(160deg, #0D0D1A 0%, #111827 60%, #0F2040 100%);
+}
+.pin-user-wrap {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 8px;
+}
+.avatar-img {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+border: 2px solid rgba(196,118,58,0.5);
+}
+.avatar-name { font-size: 17px; font-weight: 600; color: #fff; }
+.avatar-email { font-size: 12px; color: rgba(255,255,255,0.4); }
+.pin-label {
+font-size: 11px;
+font-weight: 600;
+color: rgba(255,255,255,0.4);
+text-transform: uppercase;
+letter-spacing: 0.08em;
+}
+.pin-card {
+width: 100%;
+max-width: 300px;
+background: rgba(255,255,255,0.06);
+border: 0.5px solid rgba(255,255,255,0.12);
+border-radius: 20px;
+padding: 2rem;
+}
+.pin-dots {
+display: flex;
+gap: 18px;
+justify-content: center;
+margin-bottom: 2rem;
+}
+.pin-dot {
+width: 14px;
+height: 14px;
+border-radius: 50%;
+border: 2px solid rgba(255,255,255,0.2);
+transition: all .15s;
+}
+.pin-dot.filled {
+background: var(–accent);
+border-color: var(–accent);
+transform: scale(1.15);
+box-shadow: 0 0 10px rgba(196,118,58,0.5);
+}
+.pin-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 10px;
+}
+.pin-btn {
+height: 58px;
+background: rgba(255,255,255,0.08);
+border: 0.5px solid rgba(255,255,255,0.1);
+border-radius: 12px;
+font-size: 22px;
+font-weight: 400;
+color: #fff;
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+transition: background .1s;
+}
+.pin-btn:active { background: rgba(255,255,255,0.2); }
+.pin-btn.del { font-size: 17px; color: rgba(255,255,255,0.5); }
+.pin-btn.enter {
+background: var(–accent);
+border-color: var(–accent);
+font-size: 13px;
+font-weight: 700;
+color: #fff;
+}
+.pin-btn.enter:active { background: var(–accent-dark); }
+.pin-error {
+color: #FF6B6B;
+font-size: 13px;
+text-align: center;
+margin-top: 12px;
+min-height: 18px;
+}
+.btn-ghost {
+background: transparent;
+border: 0.5px solid rgba(255,255,255,0.2);
+border-radius: 20px;
+padding: 7px 18px;
+font-size: 13px;
+color: rgba(255,255,255,0.45);
+cursor: pointer;
+}
 
-/* TABS */
-.tabs{display:flex;background:var(–bg-card);border-bottom:0.5px solid var(–line);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.tabs::-webkit-scrollbar{display:none;}
-.tab-btn{flex-shrink:0;padding:12px 16px;font-size:13px;font-weight:500;color:var(–text-3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;-webkit-tap-highlight-color:transparent;transition:color .15s;}
-.tab-btn.active{color:var(–accent);border-bottom-color:var(–accent);}
-.tab-pane{display:none;padding:16px;}
-.tab-pane.active{display:block;}
+/* \u2500\u2500 MAIN SHELL \u2500\u2500 */
+#main-screen { display: none; }
 
-.section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
-.q-selector{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.q-pill{padding:6px 14px;font-size:13px;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.q-pill.active{background:var(–accent);color:#fff;border-color:var(–accent);}
+.top-bar {
+background: var(–bg-card);
+border-bottom: 0.5px solid var(–line);
+padding: 10px 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: sticky;
+top: 0;
+z-index: 100;
+}
+.top-left { display: flex; align-items: center; gap: 9px; }
+.top-title { font-size: 16px; font-weight: 700; color: var(–text); }
+.top-right { display: flex; align-items: center; gap: 8px; }
+.q-badge {
+background: var(–accent-dim);
+color: var(–accent);
+font-size: 12px;
+font-weight: 600;
+padding: 4px 10px;
+border-radius: 20px;
+}
+.status-row {
+display: flex;
+align-items: center;
+gap: 5px;
+font-size: 11px;
+color: var(–text-3);
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dot-ok  { background: var(–green); }
+.dot-err { background: var(–red); }
+.dot-sync { background: var(–amber); }
+.dot-off { background: var(–text-3); }
+.btn-sm {
+background: var(–bg-raised);
+border: 0.5px solid var(–line-2);
+border-radius: 8px;
+padding: 5px 11px;
+font-size: 12px;
+color: var(–text-2);
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+}
 
-/* CARDS */
-.card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:16px;margin-bottom:12px;}
-.tip-box{background:var(–accent-light);border-radius:var(–r-sm);padding:13px;margin-bottom:12px;}
-.tip-box h4{font-size:13px;font-weight:600;color:var(–accent-dark);margin-bottom:8px;}
-.tip-box ol{padding-left:18px;font-size:13px;color:var(–accent-dark);line-height:2.1;}
-.tip-box code{background:rgba(196,118,58,0.18);padding:1px 5px;border-radius:4px;font-size:11px;font-family:monospace;}
+/* \u2500\u2500 TABS \u2500\u2500 */
+.tabs {
+display: flex;
+background: var(–bg-card);
+border-bottom: 0.5px solid var(–line);
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+flex-shrink: 0;
+padding: 12px 16px;
+font-size: 13px;
+font-weight: 500;
+color: var(–text-3);
+border: none;
+background: transparent;
+cursor: pointer;
+border-bottom: 2px solid transparent;
+-webkit-tap-highlight-color: transparent;
+transition: color .15s;
+}
+.tab-btn.active {
+color: var(–accent);
+border-bottom-color: var(–accent);
+}
 
-/* UPLOAD */
-.upload-zone{border:1.5px dashed var(–line-2);border-radius:var(–r);padding:2rem 1rem;text-align:center;cursor:pointer;background:var(–bg-raised);margin-bottom:12px;transition:border-color .2s,background .2s;-webkit-tap-highlight-color:transparent;}
-.upload-zone.over,.upload-zone:active{border-color:var(–accent);background:var(–accent-light);}
-.upload-actions{margin-bottom:12px;}
-.upload-btn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.upload-action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 8px;background:var(–bg-raised);border:0.5px solid var(–line-2);border-radius:var(–r);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s;}
-.upload-action-btn:active{background:var(–accent-light);border-color:var(–accent);}
-.upload-drop-target{border:1.5px dashed var(–line-2);}
-.upload-drop-target.over{border-color:var(–accent);background:var(–accent-light);}
-.upload-action-label{font-size:13px;font-weight:600;color:var(–text);}
-.upload-action-sub{font-size:10px;color:var(–text-3);}
-.upload-icon{font-size:28px;margin-bottom:8px;}
-.upload-title{font-size:14px;font-weight:600;color:var(–text);}
-.upload-sub{font-size:12px;color:var(–text-2);margin-top:4px;}
+/* \u2500\u2500 CONTENT \u2500\u2500 */
+.tab-pane { display: none; padding: 16px; }
+.tab-pane.active { display: block; }
 
-/* ANALYSIS */
-.analysis-item{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:14px;margin-bottom:10px;}
-.analysis-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.analysis-filename{font-size:13px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.analysis-badge{font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
-.badge-analyzing{background:var(–amber-bg);color:var(–amber);}
-.badge-done{background:var(–green-bg);color:var(–green);}
-.badge-error{background:var(–red-bg);color:var(–red);}
-.factura-review{border:0.5px solid var(–line);border-radius:var(–r-sm);margin-bottom:8px;overflow:hidden;}
-.factura-review.discarded{opacity:0.38;}
-.factura-review-hdr{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(–bg-raised);}
-.factura-review-hdr input[type=checkbox]{width:18px;height:18px;accent-color:var(–accent);flex-shrink:0;cursor:pointer;}
-.factura-review-title{font-size:13px;font-weight:600;flex:1;color:var(–text);}
-.factura-review-amount{font-size:13px;font-weight:600;color:var(–accent);}
-.factura-review-body{padding:10px 12px;}
-.factura-review-detail{font-size:12px;color:var(–text-2);margin-bottom:8px;}
-.just-row{display:flex;flex-direction:column;gap:4px;}
-.just-label{font-size:10px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.06em;}
-.just-select{font-size:13px;padding:8px 10px;border:0.5px solid var(–line-2);border-radius:var(–r-xs);background:var(–bg-input);color:var(–text);width:100%;}
-.just-select:focus{outline:none;border-color:var(–accent);}
-.just-input{font-size:13px;padding:8px 10px;border:0.5px solid var(–line-2);border-radius:var(–r-xs);background:var(–bg-input);color:var(–text);width:100%;margin-top:4px;}
-.just-input:focus{outline:none;border-color:var(–accent);}
+.section-label {
+font-size: 11px;
+font-weight: 600;
+color: var(–text-3);
+text-transform: uppercase;
+letter-spacing: 0.07em;
+margin-bottom: 8px;
+}
 
-/* BUTTONS */
-.btn-primary{display:block;width:100%;background:var(–accent);color:#fff;border:none;border-radius:var(–r-sm);padding:13px 16px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
-.btn-primary:active{opacity:0.85;}
-.btn-sec{background:var(–bg-raised);color:var(–text);border:0.5px solid var(–line-2);border-radius:var(–r-sm);padding:9px 14px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.btn-save-analysis{display:block;width:100%;background:var(–accent);color:#fff;border:none;border-radius:var(–r-sm);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;}
-.btn-save-analysis:disabled{opacity:0.45;cursor:not-allowed;}
-.btn-danger-sm{background:transparent;color:var(–red);border:0.5px solid var(–line);border-radius:var(–r-xs);padding:4px 10px;font-size:12px;cursor:pointer;}
-.btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
-.feedback{font-size:12px;margin-top:8px;min-height:16px;}
-.feedback.ok{color:var(–green);}
-.feedback.err{color:var(–red);}
+.q-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.q-pill {
+padding: 6px 14px;
+font-size: 13px;
+border: 0.5px solid var(–line-2);
+border-radius: 20px;
+background: var(–bg-raised);
+color: var(–text-2);
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+}
+.q-pill.active { background: var(–accent); color: #fff; border-color: var(–accent); }
 
-/* REG LIST */
-.reg-panel{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);overflow:hidden;margin-top:12px;}
-.reg-panel-hdr{padding:10px 16px;border-bottom:0.5px solid var(–line);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;}
-.reg-list{max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.reg-item{padding:11px 16px;border-bottom:0.5px solid var(–line);display:flex;align-items:flex-start;gap:10px;}
-.reg-item:last-child{border-bottom:none;}
-.reg-dot{width:20px;height:20px;border-radius:50%;background:var(–green-bg);color:var(–green);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:2px;}
-.reg-body{flex:1;min-width:0;}
-.reg-name{font-size:13px;font-weight:600;color:var(–text);}
-.reg-detail{font-size:12px;color:var(–text-2);margin-top:2px;}
-.reg-just{font-size:10px;color:var(–accent);background:var(–accent-dim);padding:2px 8px;border-radius:20px;display:inline-block;margin-top:4px;}
-.reg-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
-.chip{font-size:10px;padding:2px 8px;border-radius:20px;border:0.5px solid;}
-.chip-INT{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
-.chip-INTRA_S{background:var(–amber-bg);color:var(–amber);border-color:var(–amber-bd);}
-.chip-EXENTO{background:var(–bg-raised);color:var(–text-2);border-color:var(–line-2);}
-.chip-ALQUILER{background:var(–green-bg);color:var(–green);border-color:var(–green-bd);}
-.chip-PROF{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
-.chip-ing{background:var(–green-bg);color:var(–green);border-color:var(–green-bd);}
-.chip-amt{background:var(–bg-raised);color:var(–text);border-color:var(–line-2);font-weight:600;}
-.chip-ret{background:var(–amber-bg);color:var(–amber);border-color:var(–amber-bd);}
-.chip-drive{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
-.reg-del{background:none;border:none;cursor:pointer;color:var(–text-3);font-size:16px;padding:2px 4px;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+/* \u2500\u2500 CARDS \u2500\u2500 */
+.card {
+background: var(–bg-card);
+border: 0.5px solid var(–line);
+border-radius: var(–r);
+padding: 16px;
+margin-bottom: 12px;
+}
+.tip-box {
+background: var(–accent-light);
+border-radius: var(–r-sm);
+padding: 13px;
+margin-bottom: 12px;
+}
+.tip-box h4 { font-size: 13px; font-weight: 600; color: var(–accent-dark); margin-bottom: 8px; }
+.tip-box ol { padding-left: 18px; font-size: 13px; color: var(–accent-dark); line-height: 2.1; }
+.tip-box code {
+background: rgba(196,118,58,0.18);
+padding: 1px 5px;
+border-radius: 4px;
+font-size: 11px;
+font-family: monospace;
+}
 
-/* MODELOS */
-.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
-@media(min-width:480px){.summary-grid{grid-template-columns:repeat(4,1fr);}}
-.sum-card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r-sm);padding:13px;}
-.sum-label{font-size:10px;color:var(–text-3);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
-.sum-val{font-size:19px;font-weight:700;color:var(–text);}
-.sum-val.warn{color:var(–red);}
-.sum-val.good{color:var(–green);}
-.mod-card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);margin-bottom:10px;overflow:hidden;}
-.mod-hdr{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.mod-left{display:flex;align-items:center;gap:10px;}
-.mod-code{font-size:20px;font-weight:700;color:var(–accent);min-width:44px;}
-.mod-name{font-size:14px;font-weight:500;color:var(–text);}
-.mod-res{font-size:15px;font-weight:700;}
-.mod-res.pagar{color:var(–red);}
-.mod-res.devolver{color:var(–green);}
-.mod-body{border-top:0.5px solid var(–line);padding:12px 16px;display:none;}
-.mod-body.open{display:block;}
-.cas-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(–line);font-size:13px;}
-.cas-row:last-child{border-bottom:none;}
-.cas-num{color:var(–text-3);min-width:44px;font-weight:600;font-size:12px;}
-.cas-desc{flex:1;padding:0 8px;color:var(–text);}
-.cas-base{color:var(–text-2);min-width:80px;text-align:right;font-size:12px;}
-.cas-cuota{font-weight:600;min-width:80px;text-align:right;color:var(–text);}
-.cas-total{background:var(–accent-dim);border-radius:var(–r-xs);padding-left:6px;}
-.cas-total .cas-desc{font-weight:600;}
+/* \u2500\u2500 UPLOAD ZONE \u2500\u2500 */
+.upload-zone {
+border: 1.5px dashed var(–line-2);
+border-radius: var(–r);
+padding: 2rem 1rem;
+text-align: center;
+cursor: pointer;
+background: var(–bg-raised);
+margin-bottom: 12px;
+transition: border-color .2s, background .2s;
+-webkit-tap-highlight-color: transparent;
+}
+.upload-zone.over,
+.upload-zone:active { border-color: var(–accent); background: var(–accent-light); }
+.upload-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-title { font-size: 14px; font-weight: 600; color: var(–text); }
+.upload-sub { font-size: 12px; color: var(–text-2); margin-top: 4px; }
 
-/* VALIDAR */
-.val-card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);overflow:hidden;margin-bottom:12px;}
-.val-head{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:10px 16px;border-bottom:0.5px solid var(–line);font-size:10px;font-weight:700;color:var(–text-3);text-transform:uppercase;letter-spacing:0.05em;}
-.val-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:11px 16px;border-bottom:0.5px solid var(–line);font-size:13px;color:var(–text);}
-.val-row:last-child{border-bottom:none;}
-.val-ok{color:var(–green);font-weight:700;}
-.val-fail{color:var(–red);font-weight:700;}
-.val-result{margin-top:12px;padding:14px;border-radius:var(–r-sm);font-size:13px;display:none;line-height:1.6;}
-.val-result.ok{background:var(–green-bg);color:var(–green);border:0.5px solid var(–green-bd);}
-.val-result.fail{background:var(–red-bg);color:var(–red);border:0.5px solid var(–red-bd);}
+/* \u2500\u2500 ANALYSIS \u2500\u2500 */
+.analysis-item {
+background: var(–bg-card);
+border: 0.5px solid var(–line);
+border-radius: var(–r);
+padding: 14px;
+margin-bottom: 10px;
+}
+.analysis-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.analysis-filename {
+font-size: 13px;
+font-weight: 600;
+flex: 1;
+min-width: 0;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+.analysis-badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.badge-analyzing { background: var(–amber-bg); color: var(–amber); }
+.badge-done      { background: var(–green-bg); color: var(–green); }
+.badge-error     { background: var(–red-bg);   color: var(–red); }
 
-/* DRIVE */
-.drive-file-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(–line);font-size:13px;}
-.drive-file-item:last-child{border-bottom:none;}
-.file-info{flex:1;min-width:0;}
-.file-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(–text);}
-.file-meta{font-size:11px;color:var(–text-3);margin-top:2px;}
-.file-open{background:var(–blue-bg);color:var(–blue);border:0.5px solid var(–blue-bd);border-radius:var(–r-xs);padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap;}
+.factura-review {
+border: 0.5px solid var(–line);
+border-radius: var(–r-sm);
+margin-bottom: 8px;
+overflow: hidden;
+}
+.factura-review.discarded { opacity: 0.38; }
+.factura-review-hdr {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 10px 12px;
+background: var(–bg-raised);
+}
+.factura-review-hdr input[type=checkbox] {
+width: 18px; height: 18px;
+accent-color: var(–accent);
+flex-shrink: 0;
+cursor: pointer;
+}
+.factura-review-title { font-size: 13px; font-weight: 600; flex: 1; color: var(–text); }
+.factura-review-amount { font-size: 13px; font-weight: 600; color: var(–accent); }
+.factura-review-body { padding: 10px 12px; }
+.factura-review-detail { font-size: 12px; color: var(–text-2); margin-bottom: 8px; }
 
-/* CONFIG */
-.config-row{display:flex;align-items:flex-start;justify-content:space-between;padding:13px 0;border-bottom:0.5px solid var(–line);gap:12px;}
-.config-row:last-child{border-bottom:none;}
-.config-label{font-size:13px;font-weight:500;color:var(–text);}
-.config-sub{font-size:11px;color:var(–text-3);margin-top:2px;line-height:1.5;}
-.config-input{font-size:13px;padding:7px 10px;border:0.5px solid var(–line-2);border-radius:var(–r-xs);background:var(–bg-input);color:var(–text);font-family:monospace;}
-.config-input:focus{outline:none;border-color:var(–accent);}
-.status-pill{font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap;}
-.pill-ok{background:var(–green-bg);color:var(–green);}
-.pill-off{background:var(–bg-raised);color:var(–text-3);}
+.just-row { display: flex; flex-direction: column; gap: 4px; }
+.just-label { font-size: 10px; font-weight: 600; color: var(–text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.just-select {
+font-size: 13px;
+padding: 8px 10px;
+border: 0.5px solid var(–line-2);
+border-radius: var(–r-xs);
+background: var(–bg-input);
+color: var(–text);
+width: 100%;
+appearance: auto;
+}
+.just-select:focus { outline: none; border-color: var(–accent); }
+.just-input {
+font-size: 13px;
+padding: 8px 10px;
+border: 0.5px solid var(–line-2);
+border-radius: var(–r-xs);
+background: var(–bg-input);
+color: var(–text);
+width: 100%;
+margin-top: 4px;
+}
+.just-input:focus { outline: none; border-color: var(–accent); }
 
-/* REGISTROS */
-.view-toggle{display:flex;gap:6px;margin-bottom:12px;}
-.view-btn{padding:7px 16px;font-size:13px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.view-btn.active{background:var(–accent);color:#fff;border-color:var(–accent);}
-.totals-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px;}
-.total-box{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r-sm);padding:11px 12px;}
-.total-box-label{font-size:10px;color:var(–text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
-.total-box-val{font-size:15px;font-weight:700;color:var(–text);}
-.total-box-val.green{color:var(–green);}
-.total-box-val.blue{color:var(–blue);}
-.total-box-val.amber{color:var(–amber);}
-.total-box-val.red{color:var(–red);}
-.reg-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(–r);border:0.5px solid var(–line);}
-.reg-table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px;}
-.reg-table th{background:var(–accent);color:#fff;font-weight:600;padding:9px 11px;text-align:left;white-space:nowrap;}
-.reg-table th.right{text-align:right;}
-.reg-table td{padding:8px 11px;border-bottom:0.5px solid var(–line);color:var(–text);vertical-align:middle;}
-.reg-table tr:last-child td{border-bottom:none;}
-.reg-table tr:hover td{background:var(–bg-raised);}
-.reg-table .total-row td{background:var(–accent-dim);font-weight:600;color:var(–accent);border-top:1px solid var(–accent);}
-.reg-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
-.reg-table .date{white-space:nowrap;color:var(–text-3);font-size:11px;}
-.reg-table .proveedor{font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.reg-table .concepto{color:var(–text-2);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;}
-.op-badge{font-size:10px;padding:2px 7px;border-radius:20px;border:0.5px solid;white-space:nowrap;display:inline-block;}
-.op-INT{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
-.op-INTRA_S{background:var(–amber-bg);color:var(–amber);border-color:var(–amber-bd);}
-.op-EXENTO{background:var(–bg-raised);color:var(–text-2);border-color:var(–line-2);}
-.op-ALQUILER{background:var(–green-bg);color:var(–green);border-color:var(–green-bd);}
-.op-PROF{background:var(–blue-bg);color:var(–blue);border-color:var(–blue-bd);}
-.just-badge{font-size:10px;padding:2px 7px;border-radius:20px;background:var(–accent-dim);color:var(–accent);display:inline-block;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* \u2500\u2500 BUTTONS \u2500\u2500 */
+.btn-primary {
+display: block;
+width: 100%;
+background: var(–accent);
+color: #fff;
+border: none;
+border-radius: var(–r-sm);
+padding: 13px 16px;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+margin-top: 10px;
+-webkit-tap-highlight-color: transparent;
+transition: opacity .15s;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-sec {
+background: var(–bg-raised);
+color: var(–text);
+border: 0.5px solid var(–line-2);
+border-radius: var(–r-sm);
+padding: 9px 14px;
+font-size: 13px;
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+}
+.btn-save-analysis {
+display: block;
+width: 100%;
+background: var(–accent);
+color: #fff;
+border: none;
+border-radius: var(–r-sm);
+padding: 11px 16px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+margin-top: 10px;
+}
+.btn-save-analysis:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-danger-sm {
+background: transparent;
+color: var(–red);
+border: 0.5px solid var(–line);
+border-radius: var(–r-xs);
+padding: 4px 10px;
+font-size: 12px;
+cursor: pointer;
+}
+.btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
-/* MISC */
-.empty{text-align:center;padding:2.5rem 1rem;color:var(–text-3);font-size:14px;}
-.storage-bar{font-size:11px;color:var(–text-3);padding:6px 0 0;display:flex;align-items:center;justify-content:flex-end;gap:5px;}
-.storage-dot{width:6px;height:6px;border-radius:50%;background:var(–green);}
-.spin{width:14px;height:14px;border:2px solid var(–line-2);border-top-color:var(–accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:4px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-input[type=file]{display:none;}
-textarea.json-area{width:100%;min-height:80px;font-family:monospace;font-size:12px;padding:10px;border:0.5px solid var(–line-2);border-radius:var(–r-sm);background:var(–bg-input);color:var(–text);resize:vertical;}
-textarea.json-area:focus{outline:none;border-color:var(–accent);}
+.feedback { font-size: 12px; margin-top: 8px; min-height: 16px; }
+.feedback.ok  { color: var(–green); }
+.feedback.err { color: var(–red); }
+
+/* \u2500\u2500 REG LIST (Facturas tab) \u2500\u2500 */
+.reg-panel {
+background: var(–bg-card);
+border: 0.5px solid var(–line);
+border-radius: var(–r);
+overflow: hidden;
+margin-top: 12px;
+}
+.reg-panel-hdr {
+padding: 10px 16px;
+border-bottom: 0.5px solid var(–line);
+font-size: 13px;
+font-weight: 600;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+.reg-list { max-height: 340px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.reg-item {
+padding: 11px 16px;
+border-bottom: 0.5px solid var(–line);
+display: flex;
+align-items: flex-start;
+gap: 10px;
+}
+.reg-item:last-child { border-bottom: none; }
+.reg-dot {
+width: 20px; height: 20px;
+border-radius: 50%;
+background: var(–green-bg);
+color: var(–green);
+display: flex; align-items: center; justify-content: center;
+font-size: 10px;
+flex-shrink: 0;
+margin-top: 2px;
+}
+.reg-body { flex: 1; min-width: 0; }
+.reg-name { font-size: 13px; font-weight: 600; color: var(–text); }
+.reg-detail { font-size: 12px; color: var(–text-2); margin-top: 2px; }
+.reg-just {
+font-size: 10px;
+color: var(–accent);
+background: var(–accent-dim);
+padding: 2px 8px;
+border-radius: 20px;
+display: inline-block;
+margin-top: 4px;
+}
+.reg-chips { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.chip {
+font-size: 10px;
+padding: 2px 8px;
+border-radius: 20px;
+border: 0.5px solid;
+}
+.chip-INT     { background: var(–blue-bg);  color: var(–blue);  border-color: var(–blue-bd); }
+.chip-INTRA_S { background: var(–amber-bg); color: var(–amber); border-color: var(–amber-bd); }
+.chip-EXENTO  { background: var(–bg-raised); color: var(–text-2); border-color: var(–line-2); }
+.chip-ALQUILER{ background: var(–green-bg); color: var(–green); border-color: var(–green-bd); }
+.chip-PROF    { background: var(–blue-bg);  color: var(–blue);  border-color: var(–blue-bd); }
+.chip-ing     { background: var(–green-bg); color: var(–green); border-color: var(–green-bd); }
+.chip-amt     { background: var(–bg-raised); color: var(–text); border-color: var(–line-2); font-weight: 600; }
+.chip-ret     { background: var(–amber-bg); color: var(–amber); border-color: var(–amber-bd); }
+.chip-drive   { background: var(–blue-bg);  color: var(–blue);  border-color: var(–blue-bd); }
+.reg-del {
+background: none;
+border: none;
+cursor: pointer;
+color: var(–text-3);
+font-size: 16px;
+padding: 2px 4px;
+flex-shrink: 0;
+-webkit-tap-highlight-color: transparent;
+}
+
+/* \u2500\u2500 MODELOS \u2500\u2500 */
+.summary-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 10px;
+margin-bottom: 16px;
+}
+@media(min-width: 480px) {
+.summary-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.sum-card {
+background: var(–bg-card);
+border: 0.5px solid var(–line);
+border-radius: var(–r-sm);
+padding: 13px;
+}
+.sum-label { font-size: 10px; color: var(–text-3); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.sum-val { font-size: 19px; font-weight: 700; color: var(–text); }
+.sum-val.warn { color: var(–red); }
+.sum-val.good { color: var(–green); }
+
+.mod-card {
+background: var(–bg-card);
+border: 0.5px solid var(–line);
+border-radius: var(–r);
+margin-bottom: 10px;
+overflow: hidden;
+}
+.mod-hdr {
+padding: 14px 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+}
+.mod-left { display: flex; align-items: center; gap: 10px; }
+.mod-code { font-size: 20px; font-weight: 700; color: var(–accent); min-width: 44px; }
+.mod-name { font-size: 14px; font-weight: 500; color: var(–text); }
+.mod-res { font-size: 15px; font-weight: 700; }
+.mod-res.pagar   { color: var(–red); }
+.mod-res.devolver{ color: var(–green); }
+.mod-body { border-top: 0.5px solid var(–line); padding: 12px 16px; display: none; }
+.mod-body.open { display: block; }
+.cas-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 8px 0;
+border-bottom: 0.5px solid var(–line);
+font-size: 13px;
+}
+.cas-row:last-child { border-bottom: none; }
+.cas-num   { color: var(–text-3); min-width: 44px; font-weight: 600; font-size: 12px; }
+.cas-desc  { flex: 1; padding: 0 8px; color: var(–text); }
+.cas-base  { color: var(–text-2); min-width: 80px; text-align: right; font-size: 12px; }
+.cas-cuota { font-weight: 600; min-width: 80px; text-align: right; color: var(–text); }
+.cas-total { background: var(–accent-dim); border-radius: var(–r-xs); padding-left: 6px; }
+.cas-total .cas-desc { font-weight: 600; }
+
+/* \u2500\u2500 VALIDAR \u2500\u2500 */
+.val-card {
+background: var(–bg-card);
+border: 0.5px solid var(–line);
+border-radius: var(–r);
+overflow: hidden;
+margin-bottom: 12px;
+}
+.val-head {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr 1fr;
+padding: 10px 16px;
+border-bottom: 0.5px solid var(–line);
+font-size: 10px;
+font-weight: 700;
+color: var(–text-3);
+text-transform: uppercase;
+letter-spacing: 0.05em;
+}
+.val-row {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr 1fr;
+padding: 11px 16px;
+border-bottom: 0.5px solid var(–line);
+font-size: 13px;
+color: var(–text);
+}
+.val-row:last-child { border-bottom: none; }
+.val-ok   { color: var(–green); font-weight: 700; }
+.val-fail { color: var(–red);   font-weight: 700; }
+.val-result {
+margin-top: 12px;
+padding: 14px;
+border-radius: var(–r-sm);
+font-size: 13px;
+display: none;
+line-height: 1.6;
+}
+.val-result.ok   { background: var(–green-bg); color: var(–green); border: 0.5px solid var(–green-bd); }
+.val-result.fail { background: var(–red-bg);   color: var(–red);   border: 0.5px solid var(–red-bd); }
+
+/* \u2500\u2500 DRIVE \u2500\u2500 */
+.drive-file-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 9px 0;
+border-bottom: 0.5px solid var(–line);
+font-size: 13px;
+}
+.drive-file-item:last-child { border-bottom: none; }
+.file-info { flex: 1; min-width: 0; }
+.file-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(–text); }
+.file-meta { font-size: 11px; color: var(–text-3); margin-top: 2px; }
+.file-open {
+background: var(–blue-bg);
+color: var(–blue);
+border: 0.5px solid var(–blue-bd);
+border-radius: var(–r-xs);
+padding: 5px 11px;
+font-size: 12px;
+cursor: pointer;
+white-space: nowrap;
+}
+
+/* \u2500\u2500 CONFIG \u2500\u2500 */
+.config-row {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+padding: 13px 0;
+border-bottom: 0.5px solid var(–line);
+gap: 12px;
+}
+.config-row:last-child { border-bottom: none; }
+.config-label { font-size: 13px; font-weight: 500; color: var(–text); }
+.config-sub   { font-size: 11px; color: var(–text-3); margin-top: 2px; line-height: 1.5; }
+.config-input {
+font-size: 13px;
+padding: 7px 10px;
+border: 0.5px solid var(–line-2);
+border-radius: var(–r-xs);
+background: var(–bg-input);
+color: var(–text);
+font-family: monospace;
+}
+.config-input:focus { outline: none; border-color: var(–accent); }
+.status-pill {
+font-size: 11px;
+padding: 3px 9px;
+border-radius: 20px;
+white-space: nowrap;
+}
+.pill-ok  { background: var(–green-bg); color: var(–green); }
+.pill-off { background: var(–bg-raised); color: var(–text-3); }
+
+/* \u2500\u2500 REGISTROS TABLE \u2500\u2500 */
+.view-toggle { display: flex; gap: 6px; margin-bottom: 12px; }
+.view-btn {
+padding: 7px 16px;
+font-size: 13px;
+font-weight: 500;
+border: 0.5px solid var(–line-2);
+border-radius: 20px;
+background: var(–bg-raised);
+color: var(–text-2);
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+}
+.view-btn.active { background: var(–accent); color: #fff; border-color: var(–accent); }
+.totals-bar {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+gap: 8px;
+margin-bottom: 12px;
+}
+.total-box {
+background: var(–bg-card);
+border: 0.5px solid var(–line);
+border-radius: var(–r-sm);
+padding: 11px 12px;
+}
+.total-box-label { font-size: 10px; color: var(–text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.total-box-val   { font-size: 15px; font-weight: 700; color: var(–text); }
+.total-box-val.green { color: var(–green); }
+.total-box-val.blue  { color: var(–blue); }
+.total-box-val.amber { color: var(–amber); }
+.total-box-val.red   { color: var(–red); }
+.reg-table-wrap {
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+border-radius: var(–r);
+border: 0.5px solid var(–line);
+}
+.reg-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 12px;
+min-width: 680px;
+}
+.reg-table th {
+background: var(–accent);
+color: #fff;
+font-weight: 600;
+padding: 9px 11px;
+text-align: left;
+white-space: nowrap;
+}
+.reg-table th.right { text-align: right; }
+.reg-table td {
+padding: 8px 11px;
+border-bottom: 0.5px solid var(–line);
+color: var(–text);
+vertical-align: middle;
+}
+.reg-table tr:last-child td { border-bottom: none; }
+.reg-table tr:hover td { background: var(–bg-raised); }
+.reg-table .total-row td {
+background: var(–accent-dim);
+font-weight: 600;
+color: var(–accent);
+border-top: 1px solid var(–accent);
+}
+.reg-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.reg-table .date { white-space: nowrap; color: var(–text-3); font-size: 11px; }
+.reg-table .proveedor { font-weight: 500; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reg-table .concepto  { color: var(–text-2); max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.op-badge {
+font-size: 10px;
+padding: 2px 7px;
+border-radius: 20px;
+border: 0.5px solid;
+white-space: nowrap;
+display: inline-block;
+}
+.op-INT     { background: var(–blue-bg);  color: var(–blue);  border-color: var(–blue-bd); }
+.op-INTRA_S { background: var(–amber-bg); color: var(–amber); border-color: var(–amber-bd); }
+.op-EXENTO  { background: var(–bg-raised); color: var(–text-2); border-color: var(–line-2); }
+.op-ALQUILER{ background: var(–green-bg); color: var(–green); border-color: var(–green-bd); }
+.op-PROF    { background: var(–blue-bg);  color: var(–blue);  border-color: var(–blue-bd); }
+.just-badge {
+font-size: 10px;
+padding: 2px 7px;
+border-radius: 20px;
+background: var(–accent-dim);
+color: var(–accent);
+display: inline-block;
+max-width: 130px;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+/* \u2500\u2500 MISC \u2500\u2500 */
+.empty { text-align: center; padding: 2.5rem 1rem; color: var(–text-3); font-size: 14px; }
+.storage-bar {
+font-size: 11px;
+color: var(–text-3);
+padding: 6px 0 0;
+display: flex;
+align-items: center;
+justify-content: flex-end;
+gap: 5px;
+}
+.storage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(–green); }
+.spin {
+width: 14px; height: 14px;
+border: 2px solid var(–line-2);
+border-top-color: var(–accent);
+border-radius: 50%;
+animation: spin .7s linear infinite;
+display: inline-block;
+vertical-align: middle;
+margin-right: 4px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+input[type=file] { display: none; }
+textarea.json-area {
+width: 100%;
+min-height: 80px;
+font-family: monospace;
+font-size: 12px;
+padding: 10px;
+border: 0.5px solid var(–line-2);
+border-radius: var(–r-sm);
+background: var(–bg-input);
+color: var(–text);
+resize: vertical;
+}
+textarea.json-area:focus { outline: none; border-color: var(–accent); }
 </style>
 
 </head>
@@ -296,19 +930,24 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 
 <div id="login-screen">
   <div class="login-logo-wrap">
-    <svg class="login-logo-svg" width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="80" height="80" rx="20" fill="url(#grad1)"/>
-      <path d="M14 52V30h5l7 14 7-14h5v22h-5V40l-5 10h-4l-5-10v12h-5z" fill="white"/>
-      <path d="M46 41v-3h12v10c-2 2.5-5.5 4-9 4-7 0-12-5-12-12s5-12 12-12c4 0 7.5 1.8 9.5 4.5l-3.5 2.5c-1.5-1.8-3.5-2.8-6-2.8-4.2 0-7.2 3.2-7.2 7.8s3 7.8 7.2 7.8c2.2 0 4.2-.8 5.5-2.2V41h-8.5z" fill="white"/>
-      <defs><linearGradient id="grad1" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#8B4513"/></linearGradient></defs>
+    <svg class="login-logo-svg" width="80" height="80" viewBox="0 0 80 80" fill="none">
+      <rect width="80" height="80" rx="20" fill="url(#lg)"/>
+      <path d="M13 52V29h5.5l7.5 15 7.5-15H39v23h-5V39l-5.5 11h-5L18 39v13h-5z" fill="white"/>
+      <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#D4854A"/>
+          <stop offset="100%" stop-color="#7A3010"/>
+        </linearGradient>
+      </defs>
     </svg>
     <div class="login-app-name">MiGestor</div>
-    <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.39</div>
+    <div class="login-app-sub">Gesti\u00f3n fiscal profesional</div>
+    <div class="login-version">v5.40</div>
   </div>
   <div class="login-card">
-    <p>Inicia sesión con tu cuenta de Google para acceder a tus datos fiscales.</p>
-    <a id="btn-google" href="https://accounts.google.com/o/oauth2/v2/auth?client_id=58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fvalentinis.github.io%2Fmi-gestor%2F&response_type=token&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.file+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fspreadsheets+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&include_granted_scopes=true&prompt=select_account" class="btn-google-new">
+    <p>Inicia sesi\u00f3n con Google para acceder a tus datos fiscales.</p>
+    <a href="#" onclick="doLogin(event)" class="btn-google">
       <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continuar con Google
     </a>
@@ -321,41 +960,34 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 <div id="pin-screen">
   <div class="pin-user-wrap">
     <img class="avatar-img" id="avatar-img" src="" alt="" onerror="this.style.display='none'"/>
-    <div class="avatar-name" id="avatar-name">—</div>
-    <div class="avatar-email" id="avatar-email">—</div>
+    <div class="avatar-name" id="avatar-name">\u2014</div>
+    <div class="avatar-email" id="avatar-email">\u2014</div>
   </div>
   <div class="pin-label">Introduce tu PIN</div>
   <div class="pin-card">
     <div class="pin-dots">
-      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
     </div>
     <div class="pin-grid">
-      <button class="pin-btn" onclick="pp('1')">1</button><button class="pin-btn" onclick="pp('2')">2</button><button class="pin-btn" onclick="pp('3')">3</button>
-      <button class="pin-btn" onclick="pp('4')">4</button><button class="pin-btn" onclick="pp('5')">5</button><button class="pin-btn" onclick="pp('6')">6</button>
-      <button class="pin-btn" onclick="pp('7')">7</button><button class="pin-btn" onclick="pp('8')">8</button><button class="pin-btn" onclick="pp('9')">9</button>
-      <button class="pin-btn del" onclick="pd()">&#x232B;</button><button class="pin-btn" onclick="pp('0')">0</button><button class="pin-btn enter" onclick="pe()">OK</button>
+      <button class="pin-btn" onclick="pp('1')">1</button>
+      <button class="pin-btn" onclick="pp('2')">2</button>
+      <button class="pin-btn" onclick="pp('3')">3</button>
+      <button class="pin-btn" onclick="pp('4')">4</button>
+      <button class="pin-btn" onclick="pp('5')">5</button>
+      <button class="pin-btn" onclick="pp('6')">6</button>
+      <button class="pin-btn" onclick="pp('7')">7</button>
+      <button class="pin-btn" onclick="pp('8')">8</button>
+      <button class="pin-btn" onclick="pp('9')">9</button>
+      <button class="pin-btn del" onclick="pd()">\u232b</button>
+      <button class="pin-btn" onclick="pp('0')">0</button>
+      <button class="pin-btn enter" onclick="pe()">OK</button>
     </div>
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-</div>
-
-<!-- MODAL DETALLE FACTURA -->
-
-<div id="factura-modal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);overflow-y:auto;padding:1rem;">
-  <div style="background:var(--bg-card);border-radius:20px;max-width:480px;margin:2rem auto;padding:0;overflow:hidden;border:0.5px solid var(--line);">
-    <div style="padding:16px;border-bottom:0.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:15px;font-weight:700;color:var(--text);" id="modal-title">Detalle factura</span>
-      <button onclick="closeModal()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-3);display:flex;align-items:center;justify-content:center;">✕</button>
-    </div>
-    <div style="padding:16px;" id="modal-body"></div>
-    <div style="padding:12px 16px;border-top:0.5px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
-      <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">📂 Ver en Drive</button>
-      <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Reprocesar</button>
-      <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Eliminar</button>
-    </div>
-  </div>
 </div>
 
 <!-- MAIN -->
@@ -381,6 +1013,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <button class="btn-sm" onclick="signOut()">Salir</button>
     </div>
   </div>
+
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('facturas',this)">Facturas</button>
     <button class="tab-btn" onclick="switchTab('registros',this)">Registros</button>
@@ -390,6 +1023,9 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <button class="tab-btn" onclick="switchTab('validar',this)">Validar 1T</button>
     <button class="tab-btn" onclick="switchTab('config',this)">Config</button>
   </div>
+
+  <!-- FACTURAS -->
+
   <div id="tab-facturas" class="tab-pane active">
     <div class="section-label">Trimestre activo</div>
     <div class="q-selector" id="qs-f">
@@ -398,39 +1034,32 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <button class="q-pill" onclick="setQ('3T 2026',this,'qs-f')">3T 2026</button>
       <button class="q-pill" onclick="setQ('4T 2026',this,'qs-f')">4T 2026</button>
     </div>
-    <div id="claude-no-key" class="tip-box" style="display:none;"><h4>Claude API no configurada</h4>Ve a <strong>Config</strong> e introduce tu API key.</div>
-    <div class="upload-actions">
-      <div class="upload-btn-row">
-        <button class="upload-action-btn" onclick="triggerUpload()">
-          <span style="font-size:22px;">📁</span>
-          <span class="upload-action-label">Seleccionar</span>
-          <span class="upload-action-sub">Foto o PDF</span>
-        </button>
-        <button class="upload-action-btn" onclick="pasteFromClipboard()">
-          <span style="font-size:22px;">📋</span>
-          <span class="upload-action-label">Pegar</span>
-          <span class="upload-action-sub">Imagen o PDF</span>
-        </button>
-        <div class="upload-action-btn upload-drop-target" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
-          <span style="font-size:22px;">⬇️</span>
-          <span class="upload-action-label">Arrastrar</span>
-          <span class="upload-action-sub">Suelta aquí</span>
-        </div>
-      </div>
-      <div id="paste-status" style="font-size:12px;color:var(--text-3);text-align:center;min-height:16px;margin-top:6px;"></div>
+    <div id="claude-no-key" class="tip-box" style="display:none;">
+      <h4>Claude API no configurada</h4>
+      Ve a <strong>Config</strong> e introduce tu API key para activar el an\u00e1lisis autom\u00e1tico.
+    </div>
+    <div class="upload-zone" id="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+      <div class="upload-icon">\ud83d\udcc4</div>
+      <div class="upload-title">Sube la foto o PDF de la factura</div>
+      <div class="upload-sub">Claude la analiza autom\u00e1ticamente \u00b7 JPG, PNG o PDF</div>
     </div>
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
-    <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
     <div id="analysis-list"></div>
     <div class="reg-panel" style="margin-top:16px;">
       <div class="reg-panel-hdr">
-        <span>Registros — <span id="pq-f">1T 2026</span></span>
-        <div style="display:flex;gap:8px;align-items:center;"><span id="rc-f" style="font-size:12px;color:var(--text-3);">0</span><button class="btn-danger-sm" onclick="clearQ()">Borrar</button></div>
+        <span>Registros \u2014 <span id="pq-f">1T 2026</span></span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="rc-f" style="font-size:12px;color:var(--text-3);">0</span>
+          <button class="btn-danger-sm" onclick="clearQ()">Borrar</button>
+        </div>
       </div>
       <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
     </div>
     <div class="storage-bar"><span class="storage-dot"></span><span id="si">Cargando...</span></div>
   </div>
+
+  <!-- REGISTROS -->
+
   <div id="tab-registros" class="tab-pane">
     <div class="section-label">Trimestre</div>
     <div class="q-selector" id="qs-r">
@@ -441,14 +1070,29 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
       <button class="q-pill" onclick="setQReg('todos',this)">Todos</button>
     </div>
     <div class="view-toggle">
-      <button class="view-btn active" onclick="setView('gastos',this)">Gastos</button>
-      <button class="view-btn" onclick="setView('ingresos',this)">Ingresos</button>
+      <button class="view-btn active" onclick="setView('gastos',this)">Gastos recibidos</button>
+      <button class="view-btn" onclick="setView('ingresos',this)">Ingresos emitidos</button>
     </div>
     <div class="totals-bar" id="reg-totals-bar"></div>
-    <div class="reg-table-wrap"><table class="reg-table"><thead id="reg-thead"></thead><tbody id="reg-tbody"></tbody></table></div>
+    <div class="reg-table-wrap">
+      <table class="reg-table">
+        <thead id="reg-thead"></thead>
+        <tbody id="reg-tbody"></tbody>
+      </table>
+    </div>
   </div>
+
+  <!-- MANUAL -->
+
   <div id="tab-manual" class="tab-pane">
-    <div class="tip-box"><h4>Importar JSON manualmente</h4><ol><li>Sube la factura al chat con Claude</li><li>Claude te devuelve un <code>JSON</code></li><li>Cópialo y pégalo aquí</li></ol></div>
+    <div class="tip-box">
+      <h4>Importar JSON manualmente</h4>
+      <ol>
+        <li>Sube la factura al chat con Claude</li>
+        <li>Claude te devuelve un <code>JSON</code></li>
+        <li>C\u00f3pialo y p\u00e9galo aqu\u00ed</li>
+      </ol>
+    </div>
     <div class="section-label">Trimestre</div>
     <div class="q-selector" id="qs-m">
       <button class="q-pill active" onclick="setQ('1T 2026',this,'qs-m')">1T 2026</button>
@@ -458,31 +1102,85 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </div>
     <div class="card">
       <textarea class="json-area" id="json-in" placeholder='{"tipo":"gasto","proveedor_cliente":"..."}'></textarea>
-      <div class="btn-row"><button class="btn-sec" onclick="clearJ()">Limpiar</button><button class="btn-sec" onclick="loadDemo()">Demo 1T</button></div>
+      <div class="btn-row">
+        <button class="btn-sec" onclick="clearJ()">Limpiar</button>
+        <button class="btn-sec" onclick="loadDemo()">Demo 1T</button>
+      </div>
       <button class="btn-primary" onclick="importJ()">Guardar</button>
       <div class="feedback" id="imp-fb"></div>
     </div>
   </div>
+
+  <!-- MODELOS -->
+
   <div id="tab-modelos" class="tab-pane">
     <div class="summary-grid">
-      <div class="sum-card"><div class="sum-label">303 IVA</div><div class="sum-val warn" id="s303">—</div></div>
-      <div class="sum-card"><div class="sum-label">130 IRPF</div><div class="sum-val warn" id="s130">—</div></div>
-      <div class="sum-card"><div class="sum-label">115 Alquiler</div><div class="sum-val warn" id="s115">—</div></div>
-      <div class="sum-card"><div class="sum-label">349 Intracom.</div><div class="sum-val" id="s349">—</div></div>
+      <div class="sum-card"><div class="sum-label">303 IVA</div><div class="sum-val warn" id="s303">\u2014</div></div>
+      <div class="sum-card"><div class="sum-label">130 IRPF</div><div class="sum-val warn" id="s130">\u2014</div></div>
+      <div class="sum-card"><div class="sum-label">115 Alquiler</div><div class="sum-val warn" id="s115">\u2014</div></div>
+      <div class="sum-card"><div class="sum-label">349 Intracom.</div><div class="sum-val" id="s349">\u2014</div></div>
     </div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b303')"><div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div><div class="mod-res pagar" id="r303">—</div></div><div class="mod-body" id="b303"><div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div><div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div><div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div><div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div><div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div><div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div><div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b130')"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div><div class="mod-body" id="b130"><div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div><div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div><div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div><div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')"><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
+    <div class="mod-card">
+      <div class="mod-hdr" onclick="tog('b303')">
+        <div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div>
+        <div class="mod-res pagar" id="r303">\u2014</div>
+      </div>
+      <div class="mod-body" id="b303">
+        <div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">\u2014</span><span class="cas-cuota" id="c07q">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">\u2014</span><span class="cas-cuota" id="c10q">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">\u2014</span><span class="cas-cuota" id="c28q">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">\u2014</span><span class="cas-cuota" id="c36q">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">\u2014</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">\u2014</span></div>
+      </div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-hdr" onclick="tog('b130')">
+        <div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div>
+        <div class="mod-res pagar" id="r130">\u2014</div>
+      </div>
+      <div class="mod-body" id="b130">
+        <div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">\u2014</span></div>
+        <div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">\u2014</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">\u2014</span></div>
+      </div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-hdr" onclick="tog('b115')">
+        <div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div>
+        <div class="mod-res pagar" id="r115">\u2014</div>
+      </div>
+      <div class="mod-body" id="b115">
+        <div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">\u2014</span></div>
+        <div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">\u2014</span></div>
+      </div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-hdr" onclick="tog('b349')">
+        <div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div>
+        <div class="mod-res" id="r349">\u2014</div>
+      </div>
+      <div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div>
+    </div>
     <button class="btn-primary" onclick="recalc()">Recalcular modelos</button>
     <button class="btn-sec" style="width:100%;margin-top:8px;" onclick="exportToSheets()">Exportar a Google Sheets</button>
     <div class="feedback" id="sheets-fb"></div>
   </div>
+
+  <!-- DRIVE -->
+
   <div id="tab-drive" class="tab-pane">
     <div class="section-label">Cuenta conectada</div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div><div style="font-size:14px;font-weight:600;color:var(--text);" id="drive-user-name">—</div><div style="font-size:12px;color:var(--text-2);" id="drive-user-email">—</div></div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);" id="drive-user-name">\u2014</div>
+          <div style="font-size:12px;color:var(--text-2);" id="drive-user-email">\u2014</div>
+        </div>
         <button class="btn-sec" onclick="syncDrive()">Sincronizar</button>
       </div>
       <div style="font-size:11px;color:var(--text-3);" id="drive-last-sync">Sin sincronizar</div>
@@ -492,37 +1190,54 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="section-label">Datos por trimestre</div>
     <div class="card"><div id="drive-json-list"><div class="empty">Sin datos</div></div></div>
   </div>
+
+  <!-- VALIDAR -->
+
   <div id="tab-validar" class="tab-pane">
-    <div class="section-label">Comparación con 1T 2026 presentado</div>
+    <div class="section-label">Comparaci\u00f3n con 1T 2026 presentado</div>
     <div class="val-card">
       <div class="val-head"><span>Modelo</span><span style="text-align:right">Correcto</span><span style="text-align:right">App</span><span style="text-align:right">Diff</span></div>
-      <div class="val-row"><span>303 IVA</span><span style="text-align:right">528,87€</span><span style="text-align:right" id="v303">—</span><span style="text-align:right" id="dv303">—</span></div>
-      <div class="val-row"><span>130 IRPF</span><span style="text-align:right">129,48€</span><span style="text-align:right" id="v130">—</span><span style="text-align:right" id="dv130">—</span></div>
-      <div class="val-row"><span>115 Alquiler</span><span style="text-align:right">513,00€</span><span style="text-align:right" id="v115">—</span><span style="text-align:right" id="dv115">—</span></div>
-      <div class="val-row"><span>349 Intracom.</span><span style="text-align:right">57,03€</span><span style="text-align:right" id="v349">—</span><span style="text-align:right" id="dv349">—</span></div>
+      <div class="val-row"><span>303 IVA</span><span style="text-align:right">528,87\u20ac</span><span style="text-align:right" id="v303">\u2014</span><span style="text-align:right" id="dv303">\u2014</span></div>
+      <div class="val-row"><span>130 IRPF</span><span style="text-align:right">129,48\u20ac</span><span style="text-align:right" id="v130">\u2014</span><span style="text-align:right" id="dv130">\u2014</span></div>
+      <div class="val-row"><span>115 Alquiler</span><span style="text-align:right">513,00\u20ac</span><span style="text-align:right" id="v115">\u2014</span><span style="text-align:right" id="dv115">\u2014</span></div>
+      <div class="val-row"><span>349 Intracom.</span><span style="text-align:right">57,03\u20ac</span><span style="text-align:right" id="v349">\u2014</span><span style="text-align:right" id="dv349">\u2014</span></div>
     </div>
-    <button class="btn-primary" onclick="validar()">Ejecutar validación</button>
+    <button class="btn-primary" onclick="validar()">Ejecutar validaci\u00f3n</button>
     <div class="val-result" id="val-res"></div>
   </div>
+
+  <!-- CONFIG -->
+
   <div id="tab-config" class="tab-pane">
     <div class="section-label">Claude API</div>
     <div class="card">
-      <div class="config-row"><div><div class="config-label">API Key</div><div class="config-sub">Guardada solo en tu navegador</div></div><span class="status-pill pill-off" id="claude-key-status">No configurada</span></div>
+      <div class="config-row">
+        <div><div class="config-label">API Key</div><div class="config-sub">Guardada solo en tu navegador</div></div>
+        <span class="status-pill pill-off" id="claude-key-status">No configurada</span>
+      </div>
       <input type="password" class="config-input" id="claude-key-input" placeholder="sk-ant-api03-..." style="width:100%;margin-top:10px;" oninput="updateClaudeKey(this.value)"/>
       <div class="feedback" id="claude-key-fb"></div>
     </div>
     <div class="section-label">Datos del emisor</div>
     <div class="card">
-      <div class="config-row"><span class="config-label">Nombre</span><span style="font-size:13px;color:var(--text-2);">Valentín López Pérez</span></div>
+      <div class="config-row"><span class="config-label">Nombre</span><span style="font-size:13px;color:var(--text-2);">Valent\u00edn L\u00f3pez P\u00e9rez</span></div>
       <div class="config-row"><span class="config-label">NIF</span><span style="font-size:13px;color:var(--text-2);">48220739C</span></div>
-      <div class="config-row"><span class="config-label">Dirección</span><span style="font-size:13px;color:var(--text-2);">Badajoz 95 LOC 1, 08005 Barcelona</span></div>
-      <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text-2);">86.2 Ceramista</span></div>
+      <div class="config-row"><span class="config-label">Direcci\u00f3n</span><span style="font-size:13px;color:var(--text-2);">Badajoz 95 LOC 1, 08005 Barcelona</span></div>
+      <div class="config-row" style="border:none;"><span class="config-label">Ep\u00edgrafe IAE</span><span style="font-size:13px;color:var(--text-2);">86.2 Ceramista</span></div>
     </div>
     <div class="section-label">Google Sheets</div>
-    <div class="card"><div class="config-row"><div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div><button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear</button></div></div>
+    <div class="card">
+      <div class="config-row">
+        <div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div>
+        <button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear</button>
+      </div>
+    </div>
     <div class="section-label">PIN</div>
     <div class="card">
-      <div class="config-row"><div><div class="config-label">Cambiar PIN</div><div class="config-sub">4 dígitos</div></div><input type="password" class="config-input" id="new-pin-input" placeholder="1234" maxlength="4" style="width:90px;"/></div>
+      <div class="config-row">
+        <div><div class="config-label">Cambiar PIN</div><div class="config-sub">4 d\u00edgitos</div></div>
+        <input type="password" class="config-input" id="new-pin-input" placeholder="1234" maxlength="4" style="width:90px;"/>
+      </div>
       <button class="btn-primary" onclick="changePin()">Guardar PIN</button>
       <div class="feedback" id="pin-fb"></div>
     </div>
@@ -530,14 +1245,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 </div>
 
 <script>
-
 const CLIENT_ID='58543443145-2704tle4unpg9abpf1q4rrh9o33igjr7.apps.googleusercontent.com';
-// JS LOAD TEST
-document.addEventListener('DOMContentLoaded',function(){
-  var el=document.getElementById('login-status');
-  if(el) el.textContent='JS OK';
-});
-console.log('MiGestor v5.23 loaded');
 const SCOPES='https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
 
@@ -546,41 +1254,30 @@ let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
 
 const JUST_OPTIONS=[
-  '','Material de taller (arcilla, esmaltes, herramientas)','Mobiliario y equipamiento del taller (mesas, sillas, lámparas, almacenamiento)','Alquiler local de actividad','Suministros del local (luz, agua, gas)','Material fotográfico para documentar obra','Seguridad del local','Limpieza y mantenimiento del taller','Material de oficina y administración','Formación y desarrollo profesional','Marketing y promoción de la actividad','Equipamiento informático (uso profesional)','Servicio digital para la actividad','Servicios profesionales externos (autónomo con retención 15%)','Otro (especificar)'
+  '','Material de taller (arcilla, esmaltes, herramientas)','Alquiler local de actividad','Suministros del local (luz, agua, gas)','Material fotogr\u00e1fico para documentar obra','Seguridad del local','Limpieza y mantenimiento del taller','Material de oficina y administraci\u00f3n','Formaci\u00f3n y desarrollo profesional','Marketing y promoci\u00f3n de la actividad','Equipamiento inform\u00e1tico (uso profesional)','Servicio digital para la actividad','Otro (especificar)'
 ];
 
-// ── CFG ──
+// \u2500\u2500 CFG \u2500\u2500
 function loadCfg(){ try{ const c=JSON.parse(localStorage.getItem(LS_CFG)||'{}'); if(c.claudeKey) claudeKey=c.claudeKey; if(c.userPin) userPin=c.userPin; if(c.sheetId) sheetId=c.sheetId; }catch(e){} }
 function saveCfg(){ localStorage.setItem(LS_CFG,JSON.stringify({claudeKey,userPin,sheetId})); }
-function updateClaudeKey(val){ claudeKey=val.trim(); saveCfg(); const ok=claudeKey.startsWith('sk-ant-'); document.getElementById('claude-key-status').textContent=ok?'Configurada':'No configurada'; document.getElementById('claude-key-status').className='claude-status '+(ok?'claude-ok':'claude-off'); document.getElementById('claude-dot').className='dot '+(ok?'dot-ok':'dot-off'); document.getElementById('claude-no-key').style.display=ok?'none':'block'; document.getElementById('claude-key-fb').textContent=ok?'✓ API key guardada':''; document.getElementById('claude-key-fb').className=ok?'feedback ok':'feedback'; }
-function changePin(){ const np=document.getElementById('new-pin-input').value.trim(); const fb=document.getElementById('pin-fb'); if(!/^\d{4}$/.test(np)){fb.textContent='El PIN debe ser 4 dígitos.';fb.className='feedback err';return;} userPin=np; saveCfg(); fb.textContent='✓ PIN actualizado.'; fb.className='feedback ok'; document.getElementById('new-pin-input').value=''; setTimeout(()=>fb.textContent='',3000); }
+function updateClaudeKey(val){ claudeKey=val.trim(); saveCfg(); const ok=claudeKey.startsWith('sk-ant-'); document.getElementById('claude-key-status').textContent=ok?'Configurada':'No configurada'; document.getElementById('claude-key-status').className='status-pill '+(ok?'pill-ok':'pill-off'); document.getElementById('claude-dot').className='dot '+(ok?'dot-ok':'dot-off'); document.getElementById('claude-no-key').style.display=ok?'none':'block'; document.getElementById('claude-key-fb').textContent=ok?'\u2713 API key guardada':''; document.getElementById('claude-key-fb').className=ok?'feedback ok':'feedback'; }
+function changePin(){ const np=document.getElementById('new-pin-input').value.trim(); const fb=document.getElementById('pin-fb'); if(!/^\d{4}$/.test(np)){fb.textContent='El PIN debe ser 4 d\u00edgitos.';fb.className='feedback err';return;} userPin=np; saveCfg(); fb.textContent='\u2713 PIN actualizado.'; fb.className='feedback ok'; document.getElementById('new-pin-input').value=''; setTimeout(()=>fb.textContent='',3000); }
 
-// ── DATA ──
+// \u2500\u2500 DATA \u2500\u2500
 function loadLocal(){ try{ data=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){ data={}; } migrar(); }
 function saveLocal(){ localStorage.setItem(LS,JSON.stringify(data)); updateSI(); }
-function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros · '+(token?'Drive conectado':'sin Drive'); }
+function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros \u00b7 '+(token?'Drive conectado':'sin Drive'); }
 function getF(q){ if(!data[q]) data[q]=[]; return data[q]; }
 function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1','migestor_v2','migestor_v3'].forEach(k=>{ try{ const o=JSON.parse(localStorage.getItem(k)||'{}'); Object.entries(o).forEach(([q,fs])=>{ if(!data[q]) data[q]=[]; (fs||[]).forEach(f=>{ if(!data[q].find(x=>x._id===f._id)) data[q].push(f); }); }); }catch(e){} }); }
 
-// ── AUTH ──
+// \u2500\u2500 AUTH \u2500\u2500
 function doLogin(e){
   e.preventDefault();
-  var redirectUri=window.location.origin+window.location.pathname;
-  if(redirectUri.slice(-1)==='/') redirectUri=redirectUri.slice(0,-1);
-  redirectUri=redirectUri+'/';
-  const params=new URLSearchParams({
-    client_id:CLIENT_ID,
-    redirect_uri:redirectUri,
-    response_type:'token',
-    scope:SCOPES,
-    include_granted_scopes:'true',
-    prompt:'select_account'
-  });
-  const url='https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
-  window.location.href=url;
+  const redirectUri='https://valentinis.github.io/mi-gestor/';
+  const params=new URLSearchParams({client_id:CLIENT_ID,redirect_uri:redirectUri,response_type:'token',scope:SCOPES,include_granted_scopes:'true',prompt:'select_account'});
+  window.location.assign('https://accounts.google.com/o/oauth2/v2/auth?'+params.toString());
 }
 function loginGoogle(){ doLogin({preventDefault:()=>{}}); }
-
 async function handleToken(access_token){
   token=access_token;
   const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}});
@@ -588,591 +1285,165 @@ async function handleToken(access_token){
   localStorage.setItem(LS_AUTH,JSON.stringify({token,user,ts:Date.now()}));
   showPin();
 }
-
 function checkRedirectToken(){
-  const st=document.getElementById('login-status');
   const hash=window.location.hash.substring(1);
-  if(st) st.textContent='hash:'+hash.substring(0,60);
-  if(!hash){ if(st) st.textContent='hash vacío'; return; }
+  if(!hash) return;
   const params=new URLSearchParams(hash);
   const access_token=params.get('access_token');
-  if(st) st.textContent='token:'+(access_token?access_token.substring(0,20)+'...':'NO');
-  if(access_token){
-    history.replaceState(null,'',window.location.pathname);
-    loadLocal(); loadCfg();
-    handleToken(access_token).then(()=>{ showPin(); }).catch(e=>{ if(st) st.textContent='handleToken error:'+e.message; });
-  }
+  if(access_token){ history.replaceState(null,'',window.location.pathname); loadLocal(); loadCfg(); handleToken(access_token).then(()=>{ showPin(); }); }
 }
 function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }
-function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
-window.addEventListener('error', function(e){
-  var d=document.getElementById('login-status');
-  if(d) d.textContent='ERROR: '+e.message+' (línea '+e.lineno+')';
-});
-window.addEventListener('load',()=>{
-  // Connect login button
-  var btn=document.getElementById('btn-google');
-  if(btn) btn.addEventListener('click',function(e){ e.preventDefault(); doLogin(e); });
-  const st=document.getElementById('login-status');
-  try{ loadLocal(); }catch(e){ if(st) st.textContent='ERROR loadLocal: '+e.message; return; }
-  try{ loadCfg(); }catch(e){ if(st) st.textContent='ERROR loadCfg: '+e.message; return; }
-  // Check hash saved by head script before Safari clears it
-  var saved=localStorage.getItem('_mg');
-  if(saved&&saved.indexOf('access_token')!==-1){
-    localStorage.removeItem('_mg');
-    var m=saved.match(/access_token=([^&]+)/);
-    if(m){ if(st) st.textContent='token ok, verificando...'; handleToken(m[1]).then(()=>showPin()).catch(e=>{ if(st) st.textContent='error:'+e.message; }); return; }
+function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin=''; ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
+window.addEventListener('load',()=>{ loadLocal();loadCfg();
+  var mg=localStorage.getItem('_mg');
+  var mgTs=parseInt(localStorage.getItem('_mg_ts')||'0');
+  if(mg&&(Date.now()-mgTs)<120000){
+    localStorage.removeItem('_mg'); localStorage.removeItem('_mg_ts');
+    history.replaceState(null,'',location.pathname);
+    handleToken(mg); return;
   }
   if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }
-  try{
-    const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
-    if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
-  }catch(e){}
+  try{ const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}'); if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;} }catch(e){}
   document.getElementById('login-screen').style.display='flex';
-  if(st) st.textContent='JS OK';
 });
 
-// ── PIN ──
+// \u2500\u2500 PIN \u2500\u2500
 function pp(d){ if(pin.length>=4)return; pin+=d; updateDots(); }
 function pd(){ pin=pin.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent=''; }
 function updateDots(){ for(let i=0;i<4;i++) document.getElementById('d'+i).classList.toggle('filled',i<pin.length); }
-function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.display='none'; document.getElementById('main-screen').style.display='block'; if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);} else{document.getElementById('claude-no-key').style.display='block';} updateSheetDisplay(); renderAll(); initDrive(); } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
+function pe(){ if(pin===userPin){ document.getElementById('pin-screen').style.display='none'; document.getElementById('main-screen').style.display='block'; if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);}else{document.getElementById('claude-no-key').style.display='block';} updateSheetDisplay(); renderAll(); initDrive(); }else{ document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
 
-// ── CLAUDE API ──
-const SYSTEM_PROMPT=`Eres un experto en fiscalidad española para autónomos. Analiza facturas y extrae datos fiscales con máxima precisión.
+// \u2500\u2500 CLAUDE API \u2500\u2500
+const SYSTEM_PROMPT=`Eres un asistente fiscal espa\u00f1ol experto en aut\u00f3nomos. Analiza esta factura y extrae los datos fiscales.
+Aut\u00f3nomo: Valent\u00edn L\u00f3pez P\u00e9rez, ceramista, NIF 48220739C, estimaci\u00f3n directa simplificada, Barcelona, IAE 86.2.
+REGLAS:
+- Endesa: SIEMPRE 2 facturas en 1 PDF. Base IVA electricidad = l\u00ednea 'IVA normal 21% s/ XXX'. Ignora impuesto especial.
+- SumUp: IVA 0% exento. Genera 2 registros en array: ingreso (base=transacciones/1.21, pct_iva=21, cuota_iva=transacciones-base) y gasto comisi\u00f3n (operacion=EXENTO).
+- IA desde Irlanda (OpenAI, Anthropic): operacion=INTRA_S, pct_iva=0, cuota_iva=0.
+- Alquiler Alibau: base=900, pct_iva=21, cuota_iva=189, retencion_pct=19, retencion_importe=171, operacion=ALQUILER.
+- Amazon CN/GB con IVA declarado por Amazon ES: operacion=INT, IVA deducible.
+- Recibos sin IVA: cuota_iva=0.
+OPERACIONES: INT, INTRA_S, EXENTO, ALQUILER, PROF.
+Responde SOLO con JSON v\u00e1lido sin markdown:
+{"tipo":"gasto|ingreso","proveedor_cliente":"","nif":"","fecha":"YYYY-MM-DD","concepto":"","num_factura":"","trimestre":"1T 2026","operacion":"INT","base_iva":0,"pct_iva":21,"cuota_iva":0,"base_irpf":0,"retencion_pct":0,"retencion_importe":0,"ingresos_brutos":0,"notas":""}
+Si hay m\u00faltiples facturas devuelve array JSON.`;
 
-IDENTIDAD DEL AUTÓNOMO:
-- Nombre: Valentín López Pérez
-- NIF: 48220739C
-- Actividad: ceramista, talleres de cerámica
-- Barcelona, estimación directa simplificada, IAE 86.2
-
-REGLA CRÍTICA — TIPO GASTO vs INGRESO:
-- tipo="gasto": cuando Valentín López Pérez aparece como CLIENTE/CLIENT/DESTINATARIO/KÄUFER/BUYER — él está COMPRANDO o RECIBIENDO un servicio
-- tipo="ingreso": cuando Valentín López Pérez aparece como EMISOR/PROVEEDOR/SELLER/VENDEDOR — él está VENDIENDO
-- Si la factura la emite OTRA PERSONA o EMPRESA y Valentín es el cliente → SIEMPRE gasto
-- proveedor_cliente = quien EMITE la factura (el que cobra), NO Valentín
-
-REGLA CRÍTICA — RETENCIÓN IRPF:
-- Solo añadir retencion_pct y retencion_importe si aparece EXPLÍCITAMENTE en la factura (línea IRPF, retención, withholding)
-- Si no hay mención explícita de retención → retencion_pct=0, retencion_importe=0
-- Nunca inferir retención por el tipo de proveedor
-- operacion=PROF solo si hay retención 15% explícita en la factura
-
-REGLA CRÍTICA — BASE IMPONIBLE:
-- La factura puede estar en catalán, inglés, alemán, francés u otro idioma
-- Catalán: Base=base, IVA=IVA, IRPF=IRPF, Total=Total/TOTAL, Tasca=tarea/concepto
-- Inglés: Base=subtotal/net amount, VAT/Tax=IVA, Total=total
-- Alemán: Nettobetrag=base, MwSt=IVA, Gesamtbetrag=total
-- SIEMPRE extraer la base imponible (antes de IVA), nunca usar el total como base
-- Si hay descuento, la base es el importe después del descuento
-
-REGLAS ESPECÍFICAS POR PROVEEDOR:
-- Endesa: SIEMPRE 2 facturas en 1 PDF. Base IVA = línea "IVA normal 21% s/ XXX". Ignorar impuesto especial electricidad.
-- SumUp: tipo=ingreso. Genera array con 2 registros: [ingreso(base=transacciones/1.21, pct_iva=21, cuota_iva=transacciones-base), gasto comisión(operacion=EXENTO)]
-- OpenAI/Anthropic/servicios IA desde Irlanda: operacion=INTRA_S, pct_iva=0, cuota_iva=0
-- PROF aplica ÚNICAMENTE si: (1) el emisor es una persona física autónoma (nombre y apellidos, no empresa), Y (2) la factura tiene una línea IRPF/retención con importe explícito. Cerámica Collet, IKEA, Amazon y cualquier S.A., S.L., S.A.U., CB o empresa → NUNCA PROF, siempre INT
-- Patrícia Peix Roldán (NIF 47847236Z): tipo=gasto, operacion=PROF, retencion_pct=15
-- Alibau Gestio CB (alquiler): base=900, pct_iva=21, cuota_iva=189, retencion_pct=19, retencion_importe=171, operacion=ALQUILER
-- Amazon (CN/GB vendedores, IVA declarado por Amazon ES): operacion=INT, IVA deducible normal
-- Facturas sin IVA desglosado: cuota_iva=0, base_iva=importe total
-
-OPERACIONES:
-- INT: gasto/ingreso español con IVA (lo más común)
-- INTRA_S: servicio de empresa UE (inversión sujeto pasivo)
-- EXENTO: sin IVA (comisiones SumUp, algunos servicios)
-- ALQUILER: alquiler local con retención 19%
-- PROF: profesional español con retención 15% EXPLÍCITA en factura
-
-REGLA AMORTIZACIÓN:
-- Si un artículo individual supera 300€ de base imponible (maquinaria, mobiliario, equipamiento, ordenador, cámara, etc.) → notas="⚠️ Posible amortización: importe superior a 300€. Consultar si debe amortizarse en lugar de deducirse directamente."
-- Si son varios artículos en una misma factura, evalúa cada uno por separado
-- Gastos recurrentes (alquiler, suministros, servicios) → nunca amortizables
-
-Responde SOLO con JSON válido sin markdown ni texto adicional:
-{"tipo":"gasto|ingreso","proveedor_cliente":"nombre del emisor","nif":"NIF del emisor","fecha":"YYYY-MM-DD","concepto":"descripción del servicio/producto","num_factura":"número","trimestre":"XT 2026","operacion":"INT|INTRA_S|EXENTO|ALQUILER|PROF","base_iva":0.00,"pct_iva":21,"cuota_iva":0.00,"base_irpf":0.00,"retencion_pct":0,"retencion_importe":0.00,"ingresos_brutos":0.00,"notas":""}
-Si hay múltiples facturas en el documento devuelve array JSON.`;
-
-async function analyzeWithClaude(file){
-  const base64=await fileToBase64(file);
-  const isPDF=file.type==='application/pdf';
-  const mt=isPDF?'application/pdf':(file.type||'image/jpeg');
-  const content=isPDF?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales siguiendo exactamente las reglas del sistema.'}]:[{type:'image',source:{type:'base64',media_type:mt,data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales siguiendo exactamente las reglas del sistema.'}];
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
-  const d=await resp.json();
-  if(d.error) throw new Error(d.error.message);
-  const raw=d.content.find(b=>b.type==='text')?.text||'{}';
-  return JSON.parse(raw.replace(/```json|```/g,'').trim());
-}
+async function analyzeWithClaude(file){ const base64=await fileToBase64(file); const isPDF=file.type==='application/pdf'; const mt=isPDF?'application/pdf':(file.type||'image/jpeg'); const content=isPDF?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Extrae los datos fiscales.'}]:[{type:'image',source:{type:'base64',media_type:mt,data:base64}},{type:'text',text:'Extrae los datos fiscales.'}]; const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,system:SYSTEM_PROMPT,messages:[{role:'user',content}]})}); const d=await resp.json(); if(d.error) throw new Error(d.error.message); const raw=d.content.find(b=>b.type==='text')?.text||'{}'; return JSON.parse(raw.replace(/```json|```/g,'').trim()); }
 function fileToBase64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); }); }
 function triggerUpload(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;} document.getElementById('file-claude').click(); }
-function dragOver(e){ e.preventDefault(); if(!claudeKey.startsWith('sk-ant-')) return; document.getElementById('upload-zone').classList.add('over'); }
+function dragOver(e){ e.preventDefault(); document.getElementById('upload-zone').classList.add('over'); }
 function dragLeave(){ document.getElementById('upload-zone').classList.remove('over'); }
 function dropFile(e){ e.preventDefault(); dragLeave(); if(!claudeKey.startsWith('sk-ant-')) return; handleClaudeFiles(e.dataTransfer.files); }
-async function pasteFromClipboard(){
-  if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
-  const status=document.getElementById('paste-status');
-  try{
-    if(!navigator.clipboard||!navigator.clipboard.read){
-      status.textContent='Pulsa Ctrl+V o ⌘+V para pegar...';
-      document.addEventListener('paste',handlePasteEvent,{once:true});
-      return;
-    }
-    status.textContent='Leyendo portapapeles...';
-    const items=await navigator.clipboard.read();
-    let found=false;
-    for(const item of items){
-      // Try PDF first
-      if(item.types.includes('application/pdf')){
-        const blob=await item.getType('application/pdf');
-        const file=new File([blob],'pasted_'+Date.now()+'.pdf',{type:'application/pdf'});
-        status.textContent='';
-        handleClaudeFiles([file]);
-        found=true; break;
-      }
-      // Then image
-      const imgType=item.types.find(t=>t.startsWith('image/'));
-      if(imgType){
-        const blob=await item.getType(imgType);
-        const file=new File([blob],'pasted_'+Date.now()+'.'+imgType.split('/')[1],{type:imgType});
-        status.textContent='';
-        handleClaudeFiles([file]);
-        found=true; break;
-      }
-    }
-    if(!found) status.textContent='No hay imagen ni PDF en el portapapeles.';
-  }catch(e){
-    status.textContent='Pulsa Ctrl+V o ⌘+V para pegar...';
-    document.addEventListener('paste',handlePasteEvent,{once:true});
-  }
-}
-function handlePasteEvent(e){
-  const status=document.getElementById('paste-status');
-  const items=[...(e.clipboardData?.items||[])];
-  const pdfItem=items.find(i=>i.type==='application/pdf');
-  if(pdfItem){ const file=pdfItem.getAsFile(); if(file){status.textContent='';handleClaudeFiles([file]);return;} }
-  const imgItem=items.find(i=>i.type.startsWith('image/'));
-  if(imgItem){ const file=imgItem.getAsFile(); if(file){status.textContent='';handleClaudeFiles([file]);return;} }
-  status.textContent='No se detectó imagen ni PDF en el portapapeles.';
-}
-// Global paste listener moved to load event
 
 async function handleClaudeFiles(files){
   const list=document.getElementById('analysis-list');
   for(const file of files){
     const divId='ai_'+Date.now()+'_'+Math.random().toString(36).slice(2);
     const div=document.createElement('div'); div.className='analysis-item'; div.id=divId;
-    div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-analyzing"><span class="spin" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>Analizando...</span></div>`;
+    div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-analyzing"><span class="spin"></span>Analizando...</span></div>`;
     list.prepend(div);
     try{
       const result=await analyzeWithClaude(file);
       const items=Array.isArray(result)?result:[result];
-      // Build review UI with checkboxes and justification
-      const reviewHTML=items.map((f,i)=>{
-        const amount=f.cuota_iva>0?`IVA ${f.cuota_iva.toFixed(2)}€`:f.tipo==='ingreso'?`Ingreso ${(f.base_irpf||0).toFixed(2)}€`:`Base ${(f.base_iva||0).toFixed(2)}€`;
-        const justOpts=JUST_OPTIONS.map(o=>`<option value="${o}" ${o===''?'selected':''}>${o===''?'— Seleccionar justificación (opcional) —':o}</option>`).join('');
-        return `<div class="factura-review" id="${divId}_r${i}">
-          <div class="factura-review-hdr">
-            <input type="checkbox" checked onchange="toggleReview('${divId}_r${i}',this.checked)" />
-            <span class="factura-review-title">${f.proveedor_cliente||'—'} · ${f.fecha||'—'}</span>
-            <span class="factura-review-amount">${amount}</span>
-          </div>
-          <div class="factura-review-body">
-            <div class="factura-review-detail">${f.concepto||''} · ${f.operacion||'INT'} · ${f.tipo==='ingreso'?'Ingreso':'Gasto'}</div>
-            ${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:6px 10px;border-radius:var(--r-xs);margin-bottom:8px;">${f.notas}</div>`:''}
-            <div class="just-row">
-              <label class="just-label">Justificación deducción</label>
-              <select class="just-select" id="${divId}_j${i}" onchange="toggleJustOther('${divId}_j${i}','${divId}_jo${i}')">
-                ${justOpts}
-              </select>
-              <input class="just-input" type="text" id="${divId}_jo${i}" placeholder="Especifica el motivo..." style="display:none;" />
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-      div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-done">✓ Analizado · ${items.length} factura(s)</span></div>${reviewHTML}<button class="btn-save-analysis" onclick="saveAnalysis('${divId}',${items.length})">Guardar seleccionadas en ${Q}</button>`;
-      div._items=items;
-      // Store items on div element
+      const reviewHTML=items.map((f,i)=>{ const amount=f.cuota_iva>0?`IVA ${f.cuota_iva.toFixed(2)}\u20ac`:f.tipo==='ingreso'?`Ingreso ${(f.base_irpf||0).toFixed(2)}\u20ac`:`Base ${(f.base_iva||0).toFixed(2)}\u20ac`; const justOpts=JUST_OPTIONS.map(o=>`<option value="${o}" ${o===''?'selected':''}>${o===''?'\u2014 Justificaci\u00f3n (opcional) \u2014':o}</option>`).join(''); return `<div class="factura-review" id="${divId}_r${i}"><div class="factura-review-hdr"><input type="checkbox" checked onchange="toggleReview('${divId}_r${i}',this.checked)"/><span class="factura-review-title">${f.proveedor_cliente||'\u2014'} \u00b7 ${f.fecha||'\u2014'}</span><span class="factura-review-amount">${amount}</span></div><div class="factura-review-body"><div class="factura-review-detail">${f.concepto||''} \u00b7 ${f.operacion||'INT'} \u00b7 ${f.tipo==='ingreso'?'Ingreso':'Gasto'}</div><div class="just-row"><label class="just-label">Justificaci\u00f3n</label><select class="just-select" id="${divId}_j${i}" onchange="toggleJustOther('${divId}_j${i}','${divId}_jo${i}')">${justOpts}</select><input class="just-input" type="text" id="${divId}_jo${i}" placeholder="Especifica..." style="display:none;"/></div></div></div>`; }).join('');
+      div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-done">\u2713 ${items.length} factura(s)</span></div>${reviewHTML}<button class="btn-save-analysis" onclick="saveAnalysis('${divId}',${items.length})">Guardar en ${Q}</button>`;
       window['_analysis_'+divId]=items;
-      // Upload file to Drive — link will be stored on record after saveAnalysis
-      if(token&&facturasFId){ const f0=items[0]||{}; const fecha=(f0.fecha||'').slice(0,10); const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30); const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20); const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg'; const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext; window['_pendingUpload_'+divId]={file:new File([file],newName,{type:file.type}),q:Q}; }
-    }catch(e){
-      div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-error">Error</span></div><div style="font-size:12px;color:var(--red);padding:8px;">${e.message}</div>`;
-    }
+      if(token&&facturasFId){ const f0=items[0]||{}; const fecha=(f0.fecha||'').slice(0,10); const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30); const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20); const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg'; uploadFileToDrive(new File([file],[fecha,prov,numf].filter(Boolean).join('_')+ext,{type:file.type}),Q).catch(()=>{}); }
+    }catch(e){ div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-error">Error</span></div><div style="font-size:12px;color:var(--red);padding:8px;">${e.message}</div>`; }
   }
 }
+function toggleReview(id,checked){ const el=document.getElementById(id); if(el) el.classList.toggle('discarded',!checked); }
+function toggleJustOther(selId,otherId){ const sel=document.getElementById(selId); const oth=document.getElementById(otherId); if(sel&&oth) oth.style.display=sel.value==='Otro (especificar)'?'block':'none'; }
+function saveAnalysis(divId,count){ const items=window['_analysis_'+divId]; if(!items) return; let saved=0; items.forEach((f,i)=>{ const row=document.getElementById(divId+'_r'+i); if(!row||row.classList.contains('discarded')) return; const jSel=document.getElementById(divId+'_j'+i); const jOth=document.getElementById(divId+'_jo'+i); let just=jSel?jSel.value:''; if(just==='Otro (especificar)'&&jOth) just=jOth.value||'Otro'; f.justificacion=just; f._quarter=Q; f._id=Date.now()+Math.random(); if(!data[Q]) data[Q]=[]; data[Q].push(f); saved++; }); if(saved===0){alert('No hay facturas seleccionadas.');return;} saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); const btn=document.querySelector('#'+divId+' .btn-save-analysis'); if(btn){btn.textContent='\u2713 '+saved+' guardada(s)';btn.disabled=true;} }
 
-function toggleReview(id, checked){ const el=document.getElementById(id); if(el) el.classList.toggle('discarded',!checked); }
-function toggleJustOther(selId, otherId){ const sel=document.getElementById(selId); const oth=document.getElementById(otherId); if(sel&&oth) oth.style.display=sel.value==='Otro (especificar)'?'block':'none'; }
-
-function saveAnalysis(divId, count){
-  const items=window['_analysis_'+divId];
-  if(!items) return;
-  let saved=0;
-  items.forEach((f,i)=>{
-    const row=document.getElementById(divId+'_r'+i);
-    if(!row||row.classList.contains('discarded')) return;
-    // Get justification
-    const jSel=document.getElementById(divId+'_j'+i);
-    const jOth=document.getElementById(divId+'_jo'+i);
-    let just=jSel?jSel.value:'';
-    if(just==='Otro (especificar)'&&jOth) just=jOth.value||'Otro';
-    f.justificacion=just;
-    f._quarter=Q; f._id=Date.now()+Math.random();
-    if(!data[Q]) data[Q]=[];
-    data[Q].push(f); saved++;
-  });
-  if(saved===0){ alert('No hay facturas seleccionadas.'); return; }
-  saveLocal(); renderAll();
-  if(token) saveDataToDrive(Q).catch(()=>{});
-  // Upload file to Drive now that we have record IDs, link to first record
-  const pending=window['_pendingUpload_'+divId];
-  if(pending&&token&&facturasFId){
-    const firstSavedId=data[Q]&&data[Q].length?data[Q][data[Q].length-1]._id:null;
-    uploadFileToDrive(pending.file,pending.q,firstSavedId).catch(()=>{});
-    delete window['_pendingUpload_'+divId];
-  }
-  const btn=document.querySelector('#'+divId+' .btn-save-analysis');
-  if(btn){btn.textContent='✓ '+saved+' guardada(s)';btn.disabled=true;}
-}
-
-// ── DRIVE ──
+// \u2500\u2500 DRIVE \u2500\u2500
 function setDS(s,l){ document.getElementById('drive-dot').className='dot dot-'+s; document.getElementById('drive-lbl').textContent=l; }
 async function driveReq(url,opts={}){ const r=await fetch(url,{...opts,headers:{Authorization:'Bearer '+token,...(opts.headers||{})}}); if(!r.ok) throw new Error('Drive '+r.status); return r; }
 async function findOrCreate(name,parent){ const q=encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parent}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`); const j=await r.json(); if(j.files&&j.files.length) return j.files[0].id; const cr=await driveReq('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,mimeType:'application/vnd.google-apps.folder',parents:[parent]})}); return (await cr.json()).id; }
 async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); await loadFromDrive(); setDS('ok','Drive OK'); }catch(e){setDS('err','Error Drive');} }
-async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); } else { const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
-async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace('_',' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal(); renderAll(); renderDriveTab(); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); }
-async function uploadFileToDrive(file,q,linkedRecordId=null){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); // Store link on record if provided if(linkedRecordId&&created.webViewLink){ const all=Object.values(data).flat(); const rec=all.find(f=>f._id===linkedRecordId); if(rec){rec._driveLink=created.webViewLink;saveLocal();} } renderDriveTab(); return created; }
-async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
-function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
+async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); }else{ const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
+async function loadFromDrive(){ if(!token||!dataFId) return; const q=encodeURIComponent(`'${dataFId}' in parents and trashed=false and mimeType='application/json'`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`); const j=await r.json(); if(!j.files) return; for(const f of j.files){ const qn=f.name.replace('.json','').replace('_',' '); const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`); const recs=await fr.json(); if(!data[qn]) data[qn]=[]; recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);}); } saveLocal();renderAll();renderDriveTab(); document.getElementById('drive-last-sync').textContent='\u00daltima sync: '+new Date().toLocaleTimeString('es'); }
+async function uploadFileToDrive(file,q){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); renderDriveTab(); return created; }
+async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='\u00daltima sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
+function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">\ud83d\udcc4</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} \u00b7 ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">\ud83d\udcca</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos</div>'; }
 
-// ── GOOGLE SHEETS ──
-async function exportToSheets(){
-  const fb=document.getElementById('sheets-fb');
-  if(!token){fb.textContent='Necesitas estar conectado con Google.';fb.className='feedback err';return;}
-  fb.textContent='Creando/actualizando hoja...'; fb.className='feedback ok';
-  document.getElementById('sheets-dot').className='dot dot-sync';
-  document.getElementById('sheets-lbl').textContent='Sheets';
-  try{
-    // Create or reuse spreadsheet inside MiGestor folder
-    if(!sheetId){
-      if(!rootFId) await initDrive();
-      const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({properties:{title:'MiGestor — Registros Fiscales'}})});
-      const s=await r.json();
-      sheetId=s.spreadsheetId;
-      saveCfg();
-      // Move to MiGestor folder
-      if(rootFId){
-        await fetch(`https://www.googleapis.com/drive/v3/files/${sheetId}?addParents=${rootFId}&removeParents=root`,{method:'PATCH',headers:{Authorization:'Bearer '+token}});
-      }
-    }
-    // Get all quarters with data
-    const quarters=Object.keys(data).filter(q=>data[q]&&data[q].length);
-    // Get existing sheets
-    const sr=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+token}});
-    const sd=await sr.json();
-    const existingSheets=(sd.sheets||[]).map(s=>s.properties.title);
-    // Create missing sheets and wait
-    const requests=[];
-    for(const q of quarters){
-      if(!existingSheets.includes(q)) requests.push({addSheet:{properties:{title:q}}});
-    }
-    if(!existingSheets.includes('Resumen')) requests.push({addSheet:{properties:{title:'Resumen'}}});
-    if(requests.length){
-      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({requests})});
-      // Small wait to ensure sheets are ready
-      await new Promise(r=>setTimeout(r,800));
-    }
-    // Write data to each quarter sheet
-    const HEADERS=['Fecha','Tipo','Proveedor/Cliente','NIF','Concepto','Nº Factura','Operación','Base IVA','% IVA','Cuota IVA','Base IRPF','% Retención','Importe Retención','Ingresos Brutos','Justificación','Notas'];
-    const valueData=[];
-    for(const q of quarters){
-      const rows=[HEADERS];
-      for(const f of data[q]){
-        rows.push([f.fecha||'',f.tipo||'',f.proveedor_cliente||'',f.nif||'',f.concepto||'',f.num_factura||'',f.operacion||'',f.base_iva||0,f.pct_iva||0,f.cuota_iva||0,f.base_irpf||0,f.retencion_pct||0,f.retencion_importe||0,f.ingresos_brutos||0,f.justificacion||'',f.notas||'']);
-      }
-      valueData.push({range:`${q}!A1`,values:rows});
-    }
-    // Resumen sheet
-    const resRows=[['Trimestre','Registros','Total ingresos','Total gastos','Rendimiento neto','Resultado 303','Resultado 130','Resultado 115']];
-    for(const q of quarters){
-      const fs=data[q]||[];
-      const ing=fs.filter(f=>f.tipo==='ingreso').reduce((a,f)=>a+(f.base_irpf||0),0);
-      const gas=fs.filter(f=>f.tipo==='gasto').reduce((a,f)=>a+(f.base_irpf||f.base_iva||0),0);
-      resRows.push([q,fs.length,ing.toFixed(2),gas.toFixed(2),(ing-gas).toFixed(2),'','','']);
-    }
-    valueData.push({range:'Resumen!A1',values:resRows});
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({valueInputOption:'RAW',data:valueData})});
-    document.getElementById('sheets-dot').className='dot dot-ok';
-    fb.textContent='✓ Exportado a Google Sheets';
-    fb.className='feedback ok';
-    // Open sheet
-    window.open(`https://docs.google.com/spreadsheets/d/${sheetId}`,`_blank`);
-  }catch(e){
-    document.getElementById('sheets-dot').className='dot dot-err';
-    fb.textContent='Error Sheets: '+e.message; fb.className='feedback err';
-  }
-}
+// \u2500\u2500 SHEETS \u2500\u2500
+async function exportToSheets(){ const fb=document.getElementById('sheets-fb'); if(!token){fb.textContent='Necesitas estar conectado.';fb.className='feedback err';return;} fb.textContent='Exportando...';fb.className='feedback ok'; document.getElementById('sheets-dot').className='dot dot-sync'; try{ if(!sheetId){ if(!rootFId) await initDrive(); const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({properties:{title:'MiGestor \u2014 Registros Fiscales'}})}); const s=await r.json(); sheetId=s.spreadsheetId; saveCfg(); if(rootFId) await fetch(`https://www.googleapis.com/drive/v3/files/${sheetId}?addParents=${rootFId}&removeParents=root`,{method:'PATCH',headers:{Authorization:'Bearer '+token}}); } const quarters=Object.keys(data).filter(q=>data[q]&&data[q].length); const sr=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+token}}); const sd=await sr.json(); const existing=(sd.sheets||[]).map(s=>s.properties.title); const reqs=[]; for(const q of quarters){ if(!existing.includes(q)) reqs.push({addSheet:{properties:{title:q}}}); } if(!existing.includes('Resumen')) reqs.push({addSheet:{properties:{title:'Resumen'}}}); if(reqs.length){ await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({requests:reqs})}); await new Promise(r=>setTimeout(r,800)); } const HEADERS=['Fecha','Tipo','Proveedor/Cliente','NIF','Concepto','N\u00ba Factura','Operaci\u00f3n','Base IVA','% IVA','Cuota IVA','Base IRPF','% Retenci\u00f3n','Retenci\u00f3n','Ingresos Brutos','Justificaci\u00f3n','Notas']; const valueData=[]; for(const q of quarters){ const rows=[HEADERS]; for(const f of data[q]) rows.push([f.fecha||'',f.tipo||'',f.proveedor_cliente||'',f.nif||'',f.concepto||'',f.num_factura||'',f.operacion||'',f.base_iva||0,f.pct_iva||0,f.cuota_iva||0,f.base_irpf||0,f.retencion_pct||0,f.retencion_importe||0,f.ingresos_brutos||0,f.justificacion||'',f.notas||'']); valueData.push({range:`${q}!A1`,values:rows}); } const resRows=[['Trimestre','Registros','Total ingresos','Total gastos','Rendimiento neto']]; for(const q of quarters){ const fs=data[q]||[]; const ing=fs.filter(f=>f.tipo==='ingreso').reduce((a,f)=>a+(f.base_irpf||0),0); const gas=fs.filter(f=>f.tipo==='gasto').reduce((a,f)=>a+(f.base_irpf||f.base_iva||0),0); resRows.push([q,fs.length,ing.toFixed(2),gas.toFixed(2),(ing-gas).toFixed(2)]); } valueData.push({range:'Resumen!A1',values:resRows}); await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({valueInputOption:'RAW',data:valueData})}); document.getElementById('sheets-dot').className='dot dot-ok'; fb.textContent='\u2713 Exportado'; window.open(`https://docs.google.com/spreadsheets/d/${sheetId}`,'_blank'); }catch(e){ document.getElementById('sheets-dot').className='dot dot-err'; fb.textContent='Error: '+e.message; fb.className='feedback err'; } }
 
-// ── IMPORT MANUAL ──
-function importJ(){ const raw=document.getElementById('json-in').value.trim(),fb=document.getElementById('imp-fb'); if(!raw){fb.textContent='Pega un JSON primero.';fb.className='feedback err';return;} try{ const clean=raw.replace(/```json|```/g,'').trim(); let parsed=JSON.parse(clean); const items=Array.isArray(parsed)?parsed:[parsed]; if(!data[Q]) data[Q]=[]; items.forEach(f=>{f._quarter=Q;f._id=Date.now()+Math.random();data[Q].push(f);}); saveLocal();renderAll(); document.getElementById('json-in').value=''; fb.textContent='✓ '+items.length+' registro(s) guardado(s)';fb.className='feedback ok'; if(token) saveDataToDrive(Q).catch(()=>{}); setTimeout(()=>fb.textContent='',3000); }catch(e){fb.textContent='JSON inválido: '+e.message;fb.className='feedback err';} }
+// \u2500\u2500 IMPORT MANUAL \u2500\u2500
+function importJ(){ const raw=document.getElementById('json-in').value.trim(),fb=document.getElementById('imp-fb'); if(!raw){fb.textContent='Pega un JSON primero.';fb.className='feedback err';return;} try{ const clean=raw.replace(/```json|```/g,'').trim(); let parsed=JSON.parse(clean); const items=Array.isArray(parsed)?parsed:[parsed]; if(!data[Q]) data[Q]=[]; items.forEach(f=>{f._quarter=Q;f._id=Date.now()+Math.random();data[Q].push(f);}); saveLocal();renderAll(); document.getElementById('json-in').value=''; fb.textContent='\u2713 '+items.length+' guardado(s)';fb.className='feedback ok'; if(token) saveDataToDrive(Q).catch(()=>{}); setTimeout(()=>fb.textContent='',3000); }catch(e){fb.textContent='JSON inv\u00e1lido: '+e.message;fb.className='feedback err';} }
 function clearJ(){ document.getElementById('json-in').value=''; document.getElementById('imp-fb').textContent=''; }
-function clearQ(){ if(!confirm('Borrar todos los registros de '+Q+'?')) return; data[Q]=[]; saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); }
+function clearQ(){ if(!confirm('Borrar registros de '+Q+'?')) return; data[Q]=[]; saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); }
 function delR(id){ data[Q]=(data[Q]||[]).filter(f=>f._id!==id); saveLocal();renderAll(); if(token) saveDataToDrive(Q).catch(()=>{}); }
 
-// ── RENDER ──
+// \u2500\u2500 RENDER \u2500\u2500
 function switchTab(id,btn){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+id).classList.add('active'); if(id==='drive') renderDriveTab(); if(id==='registros') renderRegistros(); }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('qbadge').textContent=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
 function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
-function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros en este trimestre</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item" onclick="openModal(${f._id})" style="cursor:pointer;"><div class="reg-dot">✓</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'—'} <span style="font-weight:400;color:var(--text-3);font-size:11px;">${f.fecha||''}</span></div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><span style="color:var(--text-3);font-size:18px;padding:4px;">›</span></div>`).join(''); }
+function renderList(){ const fs=getF(Q),list=document.getElementById('reg-list'); document.getElementById('rc-f').textContent=fs.length+' reg.'; if(!fs.length){list.innerHTML='<div class="empty">Sin registros</div>';return;} list.innerHTML=[...fs].reverse().map(f=>`<div class="reg-item"><div class="reg-dot">\u2713</div><div class="reg-body"><div class="reg-name">${f.proveedor_cliente||'\u2014'} <span style="font-weight:400;color:var(--text-3);font-size:11px;">${f.fecha||''}</span></div><div class="reg-detail">${f.concepto||''}</div>${f.justificacion?`<span class="reg-just">${f.justificacion}</span>`:''}<div class="reg-chips">${mkChips(f).map(c=>`<span class="chip ${c.c}">${c.l}</span>`).join('')}</div></div><button class="reg-del" onclick="delR(${f._id})">\u2715</button></div>`).join(''); }
+function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'\u20ac',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'\u20ac',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'\u20ac',c:'chip-ret'}); return r; }
 
-// ── MODAL ──
-let modalFacturaId=null;
-function openModal(id){
-  const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===id);
-  if(!f) return;
-  modalFacturaId=id;
-  document.getElementById('modal-title').textContent=(f.proveedor_cliente||'—')+' · '+(f.fecha||'—');
-  const rows=[
-    ['Tipo', f.tipo==='ingreso'?'💚 Ingreso':'🔴 Gasto'],
-    ['Fecha', f.fecha||'—'],
-    ['Trimestre', f._quarter||f.trimestre||'—'],
-    ['Concepto', f.concepto||'—'],
-    ['Nº Factura', f.num_factura||'—'],
-    ['NIF', f.nif||'—'],
-    ['Operación', f.operacion||'—'],
-    ['Base IVA', fmt(f.base_iva)],
-    ['% IVA', (f.pct_iva||0)+'%'],
-    ['Cuota IVA', fmt(f.cuota_iva)],
-    ['Base IRPF', fmt(f.base_irpf)],
-    ['% Retención', (f.retencion_pct||0)+'%'],
-    ['Retención', fmt(f.retencion_importe)],
-    ['Ingresos brutos', f.ingresos_brutos?fmt(f.ingresos_brutos):'—'],
-    ['Justificación', f.justificacion||'—'],
-    ['Notas', f.notas||'—'],
-  ];
-  document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:0;">${rows.filter(([k,v])=>v&&v!=='—'&&v!=='0,00 €').map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--line);font-size:13px;gap:12px;"><span style="color:var(--text-3);font-weight:500;flex-shrink:0;">${k}</span><span style="color:var(--text);text-align:right;">${v}</span></div>`).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
-  // Show Drive button - look up by num_factura, proveedor or date
-  const driveFile=driveFiles.find(df=>{
-    if(!df.name) return false;
-    const n=df.name.toLowerCase();
-    if(f.num_factura&&n.includes(f.num_factura.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10))) return true;
-    if(f.proveedor_cliente&&n.includes((f.proveedor_cliente||'').toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,10))) return true;
-    if(f.fecha&&n.includes((f.fecha||'').slice(0,10))) return true;
-    return false;
-  }) || (f._driveLink ? {link:f._driveLink} : null);
-  const driveBtn=document.getElementById('modal-drive-btn');
-  driveBtn.style.display=driveFile?'flex':'none';
-  driveBtn._link=driveFile?driveFile.link:'';
-  document.getElementById('factura-modal').style.display='block';
-  document.body.style.overflow='hidden';
-}
-function closeModal(){ document.getElementById('factura-modal').style.display='none'; document.body.style.overflow=''; modalFacturaId=null; }
-function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
-function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar este registro?')) return; const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id===modalFacturaId)); if(q){ data[q]=data[q].filter(f=>f._id!==modalFacturaId); saveLocal(); renderAll(); if(token) saveDataToDrive(q).catch(()=>{}); } closeModal(); }
-function reprocessFromModal(){
-  if(!modalFacturaId) return;
-  if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config.'); return; }
-  // Trigger file picker — when file selected, analyze and replace record
-  document.getElementById('file-reprocess').click();
-}
-// Handle reprocess file selection
-async function handleReprocessFile(files){
-  if(!files||!files.length||!modalFacturaId) return;
-  const file=files[0];
-  const oldId=modalFacturaId;
-  // Find which quarter this record belongs to
-  const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id===oldId));
-  if(!q){ closeModal(); return; }
-  // Update modal to show processing
-  document.getElementById('modal-reprocess-btn').textContent='⏳ Analizando...';
-  document.getElementById('modal-reprocess-btn').disabled=true;
-  try{
-    const result=await analyzeWithClaude(file);
-    const items=Array.isArray(result)?result:[result];
-    // Remove old record
-    data[q]=data[q].filter(f=>f._id!==oldId);
-    // Add new records
-    items.forEach(f=>{ f._quarter=q; f._id=Date.now()+Math.random(); data[q].push(f); });
-    saveLocal(); renderAll();
-    if(token){ saveDataToDrive(q).catch(()=>{}); }
-    // Upload new file to Drive
-    if(token&&facturasFId){ const f0=items[0]||{}; const fecha=(f0.fecha||'').slice(0,10); const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30); const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20); const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg'; const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext; uploadFileToDrive(new File([file],newName,{type:file.type}),q).catch(()=>{}); }
-    closeModal();
-    // Open modal for first new record so user can review
-    setTimeout(()=>openModal(items[0]._id),300);
-  }catch(e){
-    document.getElementById('modal-reprocess-btn').textContent='🔄 Reprocesar';
-    document.getElementById('modal-reprocess-btn').disabled=false;
-    alert('Error al reprocesar: '+e.message);
-  }
-  // Reset file input
-  document.getElementById('file-reprocess').value='';
-}
-function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
-
-// ── MODELOS ──
-function recalc(){ const fs=getF(Q); let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0; let intra={}; for(const f of fs){ if(f.tipo==='ingreso'){ing+=f.base_irpf||0;if(f.operacion==='INT'||f.operacion==='PROF'){c07b+=f.base_iva||0;c07q+=f.cuota_iva||0;}ret+=f.retencion_importe||0;} else{gas+=f.base_irpf||f.base_iva||0;if(f.operacion==='INTRA_S'){c10b+=f.base_iva||0;c10q+=(f.base_iva||0)*0.21;c36b+=f.base_iva||0;c36q+=(f.base_iva||0)*0.21;const p=f.proveedor_cliente||'UE';intra[p]=(intra[p]||0)+(f.base_iva||0);}else if(f.operacion==='ALQUILER'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;ab+=f.base_irpf||f.base_iva||0;ac+=f.retencion_importe||0;}else if(f.operacion==='INT'||f.operacion==='PROF'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;}}} const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gas,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0); tx('c07b',fmt(c07b));tx('c07q',fmt(c07q));tx('c10b',fmt(c10b));tx('c10q',fmt(c10q));tx('c27',fmt(c27));tx('c28b',fmt(c28b));tx('c28q',fmt(c28q));tx('c36b',fmt(c36b));tx('c36q',fmt(c36q));tx('c45',fmt(c45));tx('c46',fmt(c46));tx('r303',fmt(c46));tx('s303',fmt(c46));document.getElementById('r303').className='mod-res '+(c46>=0?'pagar':'devolver');document.getElementById('s303').className='sum-val '+(c46>0?'warn':'good');tx('m130-i',fmt(ing));tx('m130-g',fmt(gas));tx('m130-n',fmt(net));tx('m130-20',fmt(v20));tx('m130-r',fmt(ret));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));document.getElementById('s130').className='sum-val '+(res>0?'warn':'good');tx('m115-b',fmt(ab));tx('m115-c',fmt(ac));tx('r115',fmt(ac));tx('s115',fmt(ac));document.getElementById('s115').className='sum-val '+(ac>0?'warn':'good');const ops=Object.entries(intra);document.getElementById('ops349').innerHTML=ops.length?ops.map(([k,v])=>`<div class="cas-row"><span class="cas-num">I</span><span class="cas-desc">${k}</span><span class="cas-cuota">${fmt(v)}</span></div>`).join(''):'<div class="empty">Sin operaciones</div>';tx('r349',ops.length?fmt(it):'—');tx('s349',ops.length?fmt(it):'—');svSync(c46,res,ac,it); }
-function svSync(r303,r130,r115,r349){ const tg={303:528.87,130:129.48,115:513,349:57.03},ac={303:r303,130:r130,115:r115,349:r349}; for(const k of Object.keys(tg)){ const v=ac[k]||0,t=tg[k],d=v-t,ve=document.getElementById('v'+k),de=document.getElementById('dv'+k); if(ve) ve.textContent=v>0?fmtN(v):'—'; if(de&&v>0){de.textContent=(d>=0?'+':'')+d.toFixed(2).replace('.',',')+'€';de.className=Math.abs(d)<0.02?'val-ok':'val-fail';} } }
-function validar(){ recalc(); const fs=getF('1T 2026'); if(!fs.length){showV(false,'No hay registros del 1T 2026.');return;} const tg={303:528.87,130:129.48,115:513,349:57.03},get=id=>parseFloat((document.getElementById('v'+id).textContent||'0').replace(',','.'))||0,ac={303:get(303),130:get(130),115:get(115),349:get(349)},wrong=Object.keys(tg).filter(k=>ac[k]>0&&Math.abs(ac[k]-tg[k])>=0.02),miss=Object.keys(tg).filter(k=>!ac[k]); if(!wrong.length&&!miss.length) showV(true,'✓ Todos los modelos cuadran con el 1T 2026 presentado.'); else{let m='';if(miss.length) m+='Sin datos: '+miss.map(k=>'Mod.'+k).join(', ')+'. ';if(wrong.length) m+='Diferencias: '+wrong.map(k=>'Mod.'+k).join(', ')+'.';showV(false,m);} }
+// \u2500\u2500 MODELOS \u2500\u2500
+function recalc(){ const fs=getF(Q); let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0; let intra={}; for(const f of fs){ if(f.tipo==='ingreso'){ing+=f.base_irpf||0;if(f.operacion==='INT'||f.operacion==='PROF'){c07b+=f.base_iva||0;c07q+=f.cuota_iva||0;}ret+=f.retencion_importe||0;}else{gas+=f.base_irpf||f.base_iva||0;if(f.operacion==='INTRA_S'){c10b+=f.base_iva||0;c10q+=(f.base_iva||0)*0.21;c36b+=f.base_iva||0;c36q+=(f.base_iva||0)*0.21;const p=f.proveedor_cliente||'UE';intra[p]=(intra[p]||0)+(f.base_iva||0);}else if(f.operacion==='ALQUILER'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;ab+=f.base_irpf||f.base_iva||0;ac+=f.retencion_importe||0;}else if(f.operacion==='INT'||f.operacion==='PROF'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;}}} const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gas,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0); tx('c07b',fmt(c07b));tx('c07q',fmt(c07q));tx('c10b',fmt(c10b));tx('c10q',fmt(c10q));tx('c27',fmt(c27));tx('c28b',fmt(c28b));tx('c28q',fmt(c28q));tx('c36b',fmt(c36b));tx('c36q',fmt(c36q));tx('c45',fmt(c45));tx('c46',fmt(c46));tx('r303',fmt(c46));tx('s303',fmt(c46));document.getElementById('r303').className='mod-res '+(c46>=0?'pagar':'devolver');document.getElementById('s303').className='sum-val '+(c46>0?'warn':'good');tx('m130-i',fmt(ing));tx('m130-g',fmt(gas));tx('m130-n',fmt(net));tx('m130-20',fmt(v20));tx('m130-r',fmt(ret));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));document.getElementById('s130').className='sum-val '+(res>0?'warn':'good');tx('m115-b',fmt(ab));tx('m115-c',fmt(ac));tx('r115',fmt(ac));tx('s115',fmt(ac));document.getElementById('s115').className='sum-val '+(ac>0?'warn':'good');const ops=Object.entries(intra);document.getElementById('ops349').innerHTML=ops.length?ops.map(([k,v])=>`<div class="cas-row"><span class="cas-num">I</span><span class="cas-desc">${k}</span><span class="cas-cuota">${fmt(v)}</span></div>`).join(''):'<div class="empty">Sin operaciones</div>';tx('r349',ops.length?fmt(it):'\u2014');tx('s349',ops.length?fmt(it):'\u2014');svSync(c46,res,ac,it); }
+function svSync(r303,r130,r115,r349){ const tg={303:528.87,130:129.48,115:513,349:57.03},ac={303:r303,130:r130,115:r115,349:r349}; for(const k of Object.keys(tg)){ const v=ac[k]||0,t=tg[k],d=v-t,ve=document.getElementById('v'+k),de=document.getElementById('dv'+k); if(ve) ve.textContent=v>0?fmtN(v):'\u2014'; if(de&&v>0){de.textContent=(d>=0?'+':'')+d.toFixed(2).replace('.',',')+'\u20ac';de.className=Math.abs(d)<0.02?'val-ok':'val-fail';} } }
+function validar(){ recalc(); const fs=getF('1T 2026'); if(!fs.length){showV(false,'No hay registros del 1T 2026.');return;} const tg={303:528.87,130:129.48,115:513,349:57.03},get=id=>parseFloat((document.getElementById('v'+id).textContent||'0').replace(',','.'))||0,ac={303:get(303),130:get(130),115:get(115),349:get(349)},wrong=Object.keys(tg).filter(k=>ac[k]>0&&Math.abs(ac[k]-tg[k])>=0.02),miss=Object.keys(tg).filter(k=>!ac[k]); if(!wrong.length&&!miss.length) showV(true,'\u2713 Todos los modelos cuadran con el 1T 2026 presentado.'); else{let m='';if(miss.length) m+='Sin datos: '+miss.map(k=>'Mod.'+k).join(', ')+'. ';if(wrong.length) m+='Diferencias: '+wrong.map(k=>'Mod.'+k).join(', ')+'.';showV(false,m);} }
 function showV(ok,msg){ const e=document.getElementById('val-res'); e.style.display='block'; e.className='val-result '+(ok?'ok':'fail'); e.textContent=msg; }
-
 function tog(id){ document.getElementById(id).classList.toggle('open'); }
 function tx(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
-function fmt(n){ if(!n&&n!==0||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
-function fmtN(n){ return n.toFixed(2).replace('.',',')+' €'; }
+function fmt(n){ if(!n&&n!==0||isNaN(n)) return '\u2014'; return n.toFixed(2).replace('.',',')+' \u20ac'; }
+function fmtN(n){ return n.toFixed(2).replace('.',',')+' \u20ac'; }
 
-// ── REGISTROS ──
+// \u2500\u2500 REGISTROS \u2500\u2500
 let regQ='1T 2026', regView='gastos';
-
 function setQReg(q,btn){ regQ=q; document.querySelectorAll('#qs-r .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
 function setView(v,btn){ regView=v; document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
-
-function getRegFacts(){
-  if(regQ==='todos') return Object.values(data).flat();
-  return getF(regQ);
-}
-
-function fmtEur(n){ if(!n||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
-
+function getRegFacts(){ if(regQ==='todos') return Object.values(data).flat(); return getF(regQ); }
+function fmtEur(n){ if(!n||isNaN(n)) return '\u2014'; return n.toFixed(2).replace('.',',')+' \u20ac'; }
 function renderRegistros(){
   const all=getRegFacts();
   const facts=all.filter(f=>f.tipo===(regView==='gastos'?'gasto':'ingreso'));
-
-  // Totales bar
   const totBar=document.getElementById('reg-totals-bar');
   if(regView==='gastos'){
-    const tBase=facts.reduce((a,f)=>a+(f.base_iva||0),0);
-    const tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0);
-    const tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0);
-    const tIrpf=facts.reduce((a,f)=>a+(f.base_irpf||f.base_iva||0),0);
-    totBar.innerHTML=`
-      <div class="total-box"><div class="total-box-label">Base imponible</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div>
-      <div class="total-box"><div class="total-box-label">IVA soportado</div><div class="total-box-val green">${fmtEur(tIva)}</div></div>
-      <div class="total-box"><div class="total-box-label">Retenciones pagadas</div><div class="total-box-val amber">${fmtEur(tRet)}</div></div>
-      <div class="total-box"><div class="total-box-label">Base IRPF (gasto)</div><div class="total-box-val red">${fmtEur(tIrpf)}</div></div>
-      <div class="total-box"><div class="total-box-label">Nº facturas</div><div class="total-box-val blue">${facts.length}</div></div>`;
-  } else {
-    const tBase=facts.reduce((a,f)=>a+(f.base_irpf||0),0);
-    const tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0);
-    const tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0);
-    const tBruto=facts.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
-    totBar.innerHTML=`
-      <div class="total-box"><div class="total-box-label">Ingresos brutos</div><div class="total-box-val green">${fmtEur(tBruto)}</div></div>
-      <div class="total-box"><div class="total-box-label">Base imponible</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div>
-      <div class="total-box"><div class="total-box-label">IVA repercutido</div><div class="total-box-val amber">${fmtEur(tIva)}</div></div>
-      <div class="total-box"><div class="total-box-label">Retenciones soportadas</div><div class="total-box-val red">${fmtEur(tRet)}</div></div>
-      <div class="total-box"><div class="total-box-label">Nº facturas</div><div class="total-box-val blue">${facts.length}</div></div>`;
+    const tBase=facts.reduce((a,f)=>a+(f.base_iva||0),0),tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0),tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0),tIrpf=facts.reduce((a,f)=>a+(f.base_irpf||f.base_iva||0),0);
+    totBar.innerHTML=`<div class="total-box"><div class="total-box-label">Base</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div><div class="total-box"><div class="total-box-label">IVA soportado</div><div class="total-box-val green">${fmtEur(tIva)}</div></div><div class="total-box"><div class="total-box-label">Retenciones</div><div class="total-box-val amber">${fmtEur(tRet)}</div></div><div class="total-box"><div class="total-box-label">Base IRPF</div><div class="total-box-val red">${fmtEur(tIrpf)}</div></div><div class="total-box"><div class="total-box-label">N\u00ba</div><div class="total-box-val blue">${facts.length}</div></div>`;
+  }else{
+    const tBruto=facts.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0),tBase=facts.reduce((a,f)=>a+(f.base_irpf||0),0),tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0),tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0);
+    totBar.innerHTML=`<div class="total-box"><div class="total-box-label">Bruto</div><div class="total-box-val green">${fmtEur(tBruto)}</div></div><div class="total-box"><div class="total-box-label">Base</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div><div class="total-box"><div class="total-box-label">IVA</div><div class="total-box-val amber">${fmtEur(tIva)}</div></div><div class="total-box"><div class="total-box-label">Retenciones</div><div class="total-box-val red">${fmtEur(tRet)}</div></div><div class="total-box"><div class="total-box-label">N\u00ba</div><div class="total-box-val blue">${facts.length}</div></div>`;
   }
-
-  // Cabecera tabla
-  const thead=document.getElementById('reg-thead');
-  const tbody=document.getElementById('reg-tbody');
-
+  const thead=document.getElementById('reg-thead'),tbody=document.getElementById('reg-tbody');
   if(regView==='gastos'){
-    thead.innerHTML=`<tr>
-      <th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>Nº Factura</th>
-      <th>Op.</th><th class="right">Base</th><th class="right">% IVA</th>
-      <th class="right">IVA</th><th class="right">Base IRPF</th>
-      <th class="right">% Ret.</th><th class="right">Retención</th>
-      <th>Justificación</th><th></th>
-    </tr>`;
-
-    if(!facts.length){ tbody.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:2rem;color:var(--text3);">Sin gastos en este trimestre</td></tr>`; return; }
-
-    // Group by operacion
-    const groups={ ALQUILER:[], INTRA_S:[], INT:[], EXENTO:[], PROF:[], otros:[] };
-    facts.forEach(f=>{ const g=groups[f.operacion]||groups.otros; g.push(f); });
-
-    const groupLabels={ ALQUILER:'Alquiler local (→ 115 + 303 + 130)', INTRA_S:'Servicios intracomunitarios (→ 349 + 303 cas.10 + 130)', INT:'Gastos interiores con IVA (→ 303 + 130)', EXENTO:'Exentos de IVA (→ 130)', PROF:'Profesionales con retención (→ 111 + 303 + 130)', otros:'Otros' };
-    const groupColors={ ALQUILER:'var(--blue-bg)', INTRA_S:'var(--amber-bg)', INT:'var(--green-bg)', EXENTO:'#F1EFE8', PROF:'var(--blue-bg)', otros:'var(--bg3)' };
-    const groupText={ ALQUILER:'var(--blue)', INTRA_S:'var(--amber)', INT:'var(--green)', EXENTO:'#5F5E5A', PROF:'var(--blue)', otros:'var(--text2)' };
-
-    let rows='';
-    let gBase=0,gIva=0,gIrpf=0,gRet=0;
-
+    thead.innerHTML=`<tr><th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>N\u00ba Fac.</th><th>Op.</th><th class="right">Base</th><th class="right">%IVA</th><th class="right">IVA</th><th class="right">Base IRPF</th><th class="right">%Ret</th><th class="right">Ret.</th><th>Justif.</th><th></th></tr>`;
+    if(!facts.length){tbody.innerHTML=`<tr><td colspan="13" class="empty">Sin gastos</td></tr>`;return;}
+    const groups={ALQUILER:[],INTRA_S:[],INT:[],EXENTO:[],PROF:[],otros:[]};
+    facts.forEach(f=>{(groups[f.operacion]||groups.otros).push(f);});
+    const gLabels={ALQUILER:'Alquiler (\u2192 115+303+130)',INTRA_S:'Intracomunitarios (\u2192 349+303+130)',INT:'Interiores con IVA (\u2192 303+130)',EXENTO:'Exentos (\u2192 130)',PROF:'Profesionales (\u2192 111+303+130)',otros:'Otros'};
+    const gBg={ALQUILER:'var(--blue-bg)',INTRA_S:'var(--amber-bg)',INT:'var(--green-bg)',EXENTO:'var(--bg-raised)',PROF:'var(--blue-bg)',otros:'var(--bg-raised)'};
+    const gFg={ALQUILER:'var(--blue)',INTRA_S:'var(--amber)',INT:'var(--green)',EXENTO:'var(--text-2)',PROF:'var(--blue)',otros:'var(--text-2)'};
+    let rows='',gBase=0,gIva=0,gIrpf=0,gRet=0;
     Object.entries(groups).forEach(([op,items])=>{
       if(!items.length) return;
-      rows+=`<tr><td colspan="13" style="background:${groupColors[op]};color:${groupText[op]};font-weight:600;font-size:11px;padding:5px 10px;letter-spacing:.03em;">${groupLabels[op]} · ${items.length} registro(s)</td></tr>`;
+      rows+=`<tr><td colspan="13" style="background:${gBg[op]};color:${gFg[op]};font-weight:600;font-size:11px;padding:6px 11px;">${gLabels[op]} \u00b7 ${items.length}</td></tr>`;
       items.forEach(f=>{
-        const base=f.base_iva||0, iva=f.cuota_iva||0, irpf=f.base_irpf||f.base_iva||0, ret=f.retencion_importe||0;
-        gBase+=base; gIva+=iva; gIrpf+=irpf; gRet+=ret;
-        rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
-          <td class="date">${f.fecha||'—'}</td>
-          <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
-          <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
-          <td class="date">${f.num_factura||'—'}</td>
-          <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
-          <td class="num">${fmtEur(base)}</td>
-          <td class="num">${f.pct_iva||0}%</td>
-          <td class="num" style="color:${iva>0?'var(--green)':'var(--text-3)'}">${fmtEur(iva)}</td>
-          <td class="num">${fmtEur(irpf)}</td>
-          <td class="num">${f.retencion_pct||0}%</td>
-          <td class="num" style="color:${ret>0?'var(--amber)':'var(--text-3)'}">${fmtEur(ret)}</td>
-          <td>${f.justificacion?`<span class="just-badge" title="${f.justificacion}">${f.justificacion}</span>`:''}</td>
-          <td><button class="reg-del" onclick="event.stopPropagation();delR(${f._id})">✕</button></td>
-        </tr>`;
+        const base=f.base_iva||0,iva=f.cuota_iva||0,irpf=f.base_irpf||f.base_iva||0,ret=f.retencion_importe||0;
+        gBase+=base;gIva+=iva;gIrpf+=irpf;gRet+=ret;
+        rows+=`<tr><td class="date">${f.fecha||'\u2014'}</td><td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'\u2014'}</td><td class="concepto" title="${f.concepto||''}">${f.concepto||'\u2014'}</td><td class="date">${f.num_factura||'\u2014'}</td><td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td><td class="num">${fmtEur(base)}</td><td class="num">${f.pct_iva||0}%</td><td class="num" style="color:${iva>0?'var(--green)':'var(--text-3)'}">${fmtEur(iva)}</td><td class="num">${fmtEur(irpf)}</td><td class="num">${f.retencion_pct||0}%</td><td class="num" style="color:${ret>0?'var(--amber)':'var(--text-3)'}">${fmtEur(ret)}</td><td>${f.justificacion?`<span class="just-badge" title="${f.justificacion}">${f.justificacion}</span>`:''}</td><td><button class="reg-del" onclick="delR(${f._id})">\u2715</button></td></tr>`;
       });
     });
-
-    // Fila total
-    rows+=`<tr class="total-row">
-      <td colspan="5">TOTAL</td>
-      <td class="num">${fmtEur(gBase)}</td><td></td>
-      <td class="num">${fmtEur(gIva)}</td>
-      <td class="num">${fmtEur(gIrpf)}</td><td></td>
-      <td class="num">${fmtEur(gRet)}</td>
-      <td colspan="2"></td>
-    </tr>`;
+    rows+=`<tr class="total-row"><td colspan="5">TOTAL</td><td class="num">${fmtEur(gBase)}</td><td></td><td class="num">${fmtEur(gIva)}</td><td class="num">${fmtEur(gIrpf)}</td><td></td><td class="num">${fmtEur(gRet)}</td><td colspan="2"></td></tr>`;
     tbody.innerHTML=rows;
-
-  } else {
-    // INGRESOS
-    thead.innerHTML=`<tr>
-      <th>Fecha</th><th>Cliente</th><th>Concepto</th><th>Nº Factura</th>
-      <th>Op.</th><th class="right">Bruto cobrado</th>
-      <th class="right">Base</th><th class="right">% IVA</th><th class="right">IVA</th>
-      <th class="right">% Ret.</th><th class="right">Retención</th><th></th>
-    </tr>`;
-
-    if(!facts.length){ tbody.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--text3);">Sin ingresos en este trimestre</td></tr>`; return; }
-
-    let rows='';
-    let gBruto=0,gBase=0,gIva=0,gRet=0;
-    facts.forEach(f=>{
-      const bruto=f.ingresos_brutos||f.base_iva||0, base=f.base_irpf||0, iva=f.cuota_iva||0, ret=f.retencion_importe||0;
-      gBruto+=bruto; gBase+=base; gIva+=iva; gRet+=ret;
-      rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
-        <td class="date">${f.fecha||'—'}</td>
-        <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
-        <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
-        <td class="date">${f.num_factura||'—'}</td>
-        <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
-        <td class="num" style="color:var(--green);font-weight:600">${fmtEur(bruto)}</td>
-        <td class="num">${fmtEur(base)}</td>
-        <td class="num">${f.pct_iva||0}%</td>
-        <td class="num" style="color:var(--amber)">${fmtEur(iva)}</td>
-        <td class="num">${f.retencion_pct||0}%</td>
-        <td class="num" style="color:${ret>0?'var(--red)':'var(--text-3)'}">${fmtEur(ret)}</td>
-        <td><button class="reg-del" onclick="event.stopPropagation();delR(${f._id})">✕</button></td>
-      </tr>`;
-    });
-    rows+=`<tr class="total-row">
-      <td colspan="5">TOTAL</td>
-      <td class="num">${fmtEur(gBruto)}</td>
-      <td class="num">${fmtEur(gBase)}</td><td></td>
-      <td class="num">${fmtEur(gIva)}</td><td></td>
-      <td class="num">${fmtEur(gRet)}</td><td></td>
-    </tr>`;
+  }else{
+    thead.innerHTML=`<tr><th>Fecha</th><th>Cliente</th><th>Concepto</th><th>N\u00ba Fac.</th><th>Op.</th><th class="right">Bruto</th><th class="right">Base</th><th class="right">%IVA</th><th class="right">IVA</th><th class="right">%Ret</th><th class="right">Ret.</th><th></th></tr>`;
+    if(!facts.length){tbody.innerHTML=`<tr><td colspan="12" class="empty">Sin ingresos</td></tr>`;return;}
+    let rows='',gBruto=0,gBase=0,gIva=0,gRet=0;
+    facts.forEach(f=>{ const bruto=f.ingresos_brutos||f.base_iva||0,base=f.base_irpf||0,iva=f.cuota_iva||0,ret=f.retencion_importe||0; gBruto+=bruto;gBase+=base;gIva+=iva;gRet+=ret; rows+=`<tr><td class="date">${f.fecha||'\u2014'}</td><td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'\u2014'}</td><td class="concepto" title="${f.concepto||''}">${f.concepto||'\u2014'}</td><td class="date">${f.num_factura||'\u2014'}</td><td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td><td class="num" style="color:var(--green);font-weight:600">${fmtEur(bruto)}</td><td class="num">${fmtEur(base)}</td><td class="num">${f.pct_iva||0}%</td><td class="num" style="color:var(--amber)">${fmtEur(iva)}</td><td class="num">${f.retencion_pct||0}%</td><td class="num" style="color:${ret>0?'var(--red)':'var(--text-3)'}">${fmtEur(ret)}</td><td><button class="reg-del" onclick="delR(${f._id})">\u2715</button></td></tr>`; });
+    rows+=`<tr class="total-row"><td colspan="5">TOTAL</td><td class="num">${fmtEur(gBruto)}</td><td class="num">${fmtEur(gBase)}</td><td></td><td class="num">${fmtEur(gIva)}</td><td></td><td class="num">${fmtEur(gRet)}</td><td></td></tr>`;
     tbody.innerHTML=rows;
   }
 }
-function resetSheet(){ sheetId=null; saveCfg(); document.getElementById('sheet-id-display').textContent='Sin crear'; document.getElementById('sheets-dot').className='dot dot-off'; alert('Hoja reseteada. La próxima exportación creará una nueva dentro de la carpeta MiGestor.'); }
+
+function resetSheet(){ sheetId=null; saveCfg(); document.getElementById('sheet-id-display').textContent='Sin crear'; document.getElementById('sheets-dot').className='dot dot-off'; alert('Hoja reseteada. La pr\u00f3xima exportaci\u00f3n crear\u00e1 una nueva en la carpeta MiGestor.'); }
 function updateSheetDisplay(){ const el=document.getElementById('sheet-id-display'); if(el) el.textContent=sheetId?'ID: '+sheetId.slice(0,20)+'...':'Sin crear'; }
 function loadDemo(){ const demo=[{tipo:'ingreso',proveedor_cliente:'SumUp enero 2026',nif:'IE9813461A',fecha:'2026-02-01',concepto:'Ventas tarjeta enero 2026',operacion:'INT',base_iva:790.08,pct_iva:21,cuota_iva:165.92,base_irpf:790.08,ingresos_brutos:956,retencion_pct:0,retencion_importe:0,justificacion:'Ingresos por ventas de ceramica y talleres'},{tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-02-01',concepto:'Comision TPV enero 2026',operacion:'EXENTO',base_iva:14.34,pct_iva:0,cuota_iva:0,base_irpf:14.34,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-01-01',concepto:'Alquiler local enero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-02-01',concepto:'Alquiler local febrero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-03-01',concepto:'Alquiler local marzo',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'OpenAI Ireland Limited',fecha:'2026-02-15',concepto:'Suscripcion OpenAI',operacion:'INTRA_S',base_iva:57.03,pct_iva:0,cuota_iva:0,base_irpf:57.03,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'}]; if(!data['1T 2026']) data['1T 2026']=[]; demo.forEach(f=>{f._quarter='1T 2026';f._id=Date.now()+Math.random();data['1T 2026'].push(f);}); saveLocal();Q='1T 2026'; document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); document.getElementById('qbadge').textContent='1T 2026'; renderAll(); }
-
 </script>
 
 </body>

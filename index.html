@@ -285,7 +285,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.18</div>
+    <div class="login-version">v5.19</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -320,7 +320,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.18</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.19</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -351,7 +351,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.18</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.19</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -395,6 +395,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </div>
     <div id="paste-status" style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;min-height:16px;"></div>
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
+    <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
     <div id="analysis-list"></div>
     <div class="reg-panel" style="margin-top:16px;">
       <div class="reg-panel-hdr">
@@ -898,14 +899,31 @@ function deleteFromModal(){ if(!modalFacturaId) return; if(!confirm('¿Eliminar 
 async function reprocessFromModal(){
   if(!modalFacturaId) return;
   if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config.'); return; }
-  const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===modalFacturaId);
-  if(!f){ alert('No se puede reprocesar — archivo original no disponible. Sube la factura de nuevo desde la pestaña Facturas.'); return; }
-  // Find Drive file to reprocess
-  const driveFile=driveFiles.find(df=>df.name&&f.fecha&&df.name.includes((f.fecha||'').slice(0,10)));
-  if(!driveFile){ closeModal(); alert('No se encontró el archivo original en Drive. Sube la factura de nuevo desde la pestaña Facturas para reprocesarla.'); return; }
-  closeModal();
-  alert('Función de reprocesar: sube la factura original de nuevo desde la pestaña Facturas. El resultado se añadirá como nuevo registro y podrás eliminar el anterior.');
+  // Always open file picker directly — no need to find original in Drive
+  document.getElementById('file-reprocess').click();
+}
+async function handleReprocessFile(files){
+  if(!files||!files.length||!modalFacturaId) return;
+  const file=files[0];
+  const oldId=modalFacturaId;
+  const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id===oldId));
+  if(!q){ closeModal(); return; }
+  const btn=document.getElementById('modal-reprocess-btn');
+  btn.textContent='⏳ Analizando...'; btn.disabled=true;
+  try{
+    const result=await analyzeWithClaude(file);
+    const items=Array.isArray(result)?result:[result];
+    data[q]=data[q].filter(f=>f._id!==oldId);
+    items.forEach(f=>{ f._quarter=q; f._id=Date.now()+Math.random(); data[q].push(f); });
+    saveLocal(); renderAll();
+    if(token) saveDataToDrive(q).catch(()=>{});
+    closeModal();
+    setTimeout(()=>openModal(items[0]._id),300);
+  }catch(e){
+    btn.textContent='🔄 Reprocesar'; btn.disabled=false;
+    alert('Error al analizar: '+e.message);
+  }
+  document.getElementById('file-reprocess').value='';
 }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 

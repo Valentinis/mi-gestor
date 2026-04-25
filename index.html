@@ -318,6 +318,18 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
 
 html,body{overflow:hidden;max-width:100vw;height:100%;}
 img,video,iframe,table{max-width:100%;}
+
+/* Skeleton loading */
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.skeleton{background:linear-gradient(90deg,var(–bg-raised) 25%,var(–bg-input) 50%,var(–bg-raised) 75%);background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+.skel-line{height:13px;margin-bottom:8px;}
+.skel-line.short{width:40%;}
+.skel-line.med{width:65%;}
+.skel-line.full{width:100%;}
+.skel-amount{height:16px;width:70px;border-radius:8px;}
+.skel-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(–line);}
+.skel-bar{width:3px;height:36px;border-radius:2px;}
+#reg-list.loading,.registros-loading{pointer-events:none;}
 </style>
 
 </head>
@@ -335,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.77</div>
+    <div class="login-version">v5.78</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -370,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.77</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.78</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -408,7 +420,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.77</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.78</div>
       </div>
     </div>
     <div class="top-right">
@@ -708,7 +720,7 @@ const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
 
 // Auto-detect current quarter
 function currentQuarter(){ const m=new Date().getMonth(); const q=m<3?'1T':m<6?'2T':m<9?'3T':'4T'; return q+' 2026'; }
-let pin='', Q=currentQuarter(), data={}, token=null, user=null;
+let pin='', Q=currentQuarter(), data={}, token=null, user=null, driveLoaded=false;
 let regQ=currentQuarter(), regView='gastos';
 let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
@@ -851,7 +863,9 @@ function pe(){ if(pin===userPin){
   const hs=document.getElementById('header-q-select'); if(hs) hs.value=cq;
   ['qs-f','qs-m','qs-r'].forEach(id=>{ document.querySelectorAll('#'+id+' .q-pill').forEach(b=>{ b.classList.toggle('active', b.textContent.trim()===cq); }); });
   const qb=document.getElementById('qbadge'); if(qb) qb.textContent=cq;
-  // Render immediately with local data
+  // Clear data — always wait for Drive (don't show stale local data)
+  driveLoaded=false;
+  data={};
   renderAll(); updateSI();
   // Show sync banner
   showSyncBanner();
@@ -871,6 +885,8 @@ function showSyncBanner(){
   banner.style.opacity='1';
 }
 function hideSyncBanner(){
+  driveLoaded=true;
+  renderAll();
   const b=document.getElementById('sync-banner');
   if(b){b.textContent='✓ Sincronizado';setTimeout(()=>{b.style.opacity='0';setTimeout(()=>b.remove(),400);},1200);}
 }
@@ -1613,7 +1629,26 @@ function updateYearQ(ns){
 }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); const qb=document.getElementById('qbadge'); if(qb) qb.textContent=q; const hs=document.getElementById('header-q-select'); if(hs) hs.value=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
 function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
+function skeletonItems(n){
+  return Array(n).fill(0).map(()=>`
+    <div class="skel-item">
+      <div class="skeleton skel-bar"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="skeleton skel-line med"></div>
+        <div class="skeleton skel-line short" style="margin-bottom:0;"></div>
+      </div>
+      <div style="text-align:right;">
+        <div class="skeleton skel-amount"></div>
+        <div class="skeleton skel-line short" style="margin:4px 0 0 auto;height:10px;width:60px;"></div>
+      </div>
+    </div>`).join('');
+}
 function renderList(){
+  const list=document.getElementById('reg-list');
+  if(!driveLoaded){
+    list.innerHTML='<div style="padding:8px 0;">'+skeletonItems(6)+'</div>';
+    return;
+  }
   let fs=getF(Q);
   // Populate provider/client dropdowns
   const gastos=fs.filter(f=>f.tipo==='gasto');

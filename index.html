@@ -320,8 +320,8 @@ html,body{overflow:hidden;max-width:100vw;height:100%;position:fixed;width:100%;
 img,video,iframe,table{max-width:100%;}
 
 /* Skeleton loading */
-@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
-.skeleton{background:linear-gradient(90deg,var(–bg-raised) 25%,var(–bg-input) 50%,var(–bg-raised) 75%);background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+.skeleton{background:linear-gradient(90deg,#2a2218 0%,#3d3020 40%,#2a2218 80%);background-size:600px 100%;animation:shimmer 1.6s ease-in-out infinite;border-radius:8px;}
 .skel-line{height:13px;margin-bottom:8px;}
 .skel-line.short{width:40%;}
 .skel-line.med{width:65%;}
@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.93</div>
+    <div class="login-version">v5.96</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.93</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.96</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -420,7 +420,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.93</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.96</div>
       </div>
     </div>
     <div class="top-right">
@@ -985,7 +985,6 @@ function classifyRecord(f){
 
   if(hasRetention&&!isCompany&&f.tipo==='gasto'){
     f.operacion='PROF';
-    f.pct_iva=0; f.cuota_iva=0;
     if(!f.retencion_pct) f.retencion_pct=15;
     return f;
   }
@@ -1103,7 +1102,10 @@ async function handleClaudeFiles(files){
           <div class="factura-review-hdr">
             <input type="checkbox" checked onchange="toggleReview('${divId}_r${i}',this.checked)" />
             <span class="factura-review-title">${f.proveedor_cliente||'—'} · ${f.fecha||'—'}</span>
-            <span class="factura-review-amount" style="color:${isIng?'#30D158':'#FF5A48'}">${isIng?'+':'-'}${fmt(total)}</span>
+            <div style="text-align:right;">
+              <div style="font-size:14px;font-weight:700;color:${isIng?'#30D158':'#FF5A48'}">${isIng?'+':'-'}${fmt(total)}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);">Base ${fmt(f.base_iva||0)} + IVA ${fmt(f.cuota_iva||0)}</div>
+            </div>
           </div>
           <div class="factura-review-body">
             <!-- Tipo toggle -->
@@ -1192,7 +1194,7 @@ function getModelosAfectados(f){
   if(f.tipo==='gasto'){
     if(f.operacion==='ALQUILER'){m.push('115','303','130');}
     else if(f.operacion==='INTRA_S'){m.push('349','303','130');}
-    else if(f.operacion==='PROF'){m.push('111','130');}
+    else if(f.operacion==='PROF'){m.push('111','303','130');}
     else if(f.operacion==='INT'){m.push('303','130');}
     else if(f.operacion==='EXENTO'){m.push('130');}
   } else {

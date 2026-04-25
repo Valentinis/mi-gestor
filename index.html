@@ -856,9 +856,8 @@ async function saveCfgToFirestore(){
     sheetId:{stringValue:sheetId||''},
     updatedAt:{stringValue:new Date().toISOString()}
   }};
-  await fetch(url+'?currentDocument.exists=false', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)})
-    .catch(()=>{}); // doc may already exist, try PATCH
-  await fetch(url, {method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
+  const r=await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('Firestore PATCH '+r.status);
   setFsDot(true);
 }
 

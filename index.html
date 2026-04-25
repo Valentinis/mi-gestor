@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.114</div>
+    <div class="login-version">v5.115</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.114</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.115</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.114</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.115</div>
       </div>
     </div>
     <div class="top-right">
@@ -1088,6 +1088,8 @@ function showScanEditor(img, originalFile){
   editor._img=img;
   editor._file=originalFile;
   editor._imgRect={x:ox,y:oy,w:dw,h:dh};
+  editor._selected=-1;
+  editor._dragging=false;
 
   renderScanOverlay();
   setupScanDrag();
@@ -1097,48 +1099,99 @@ function renderScanOverlay(){
   const editor=document.getElementById('scan-editor');
   if(!editor) return;
   const pts=editor._pts;
+  const sel=editor._selected??-1;
   const svg=document.getElementById('scan-svg');
   const poly=pts.map(p=>`${p.x},${p.y}`).join(' ');
   svg.innerHTML=`
-    <polygon points="${poly}" fill="rgba(240,132,74,0.15)" stroke="#F0844A" stroke-width="2" stroke-dasharray="6,3"/>
+    <polygon points="${poly}" fill="rgba(240,132,74,0.12)" stroke="#F0844A" stroke-width="2" stroke-dasharray="6,3"/>
     ${pts.map((p,i)=>`
-      <circle cx="${p.x}" cy="${p.y}" r="22" fill="rgba(240,132,74,0.2)" data-i="${i}"/>
-      <circle cx="${p.x}" cy="${p.y}" r="12" fill="#F0844A" stroke="#fff" stroke-width="2.5" data-i="${i}" style="cursor:grab;"/>
-      <circle cx="${p.x}" cy="${p.y}" r="4" fill="#fff" pointer-events="none"/>
-    `).join('')}`;
+      <circle cx="${p.x}" cy="${p.y}" r="28" fill="rgba(240,132,74,${sel===i?'0.3':'0.1'})" data-handle="${i}" style="cursor:pointer;"/>
+      <circle cx="${p.x}" cy="${p.y}" r="${sel===i?16:12}" fill="${sel===i?'#fff':'#F0844A'}" stroke="${sel===i?'#F0844A':'#fff'}" stroke-width="3" data-handle="${i}" style="cursor:pointer;"/>
+      <circle cx="${p.x}" cy="${p.y}" r="5" fill="${sel===i?'#F0844A':'#fff'}" pointer-events="none"/>
+    `).join('')}
+    ${sel>=0?`<text x="${pts[sel].x}" y="${pts[sel].y-28}" text-anchor="middle" fill="#F0844A" font-size="12" font-weight="600">Toca para colocar</text>`:''}`;
 }
 
 function setupScanDrag(){
   const svg=document.getElementById('scan-svg');
   const editor=document.getElementById('scan-editor');
-  let dragging=-1;
 
-  function getPos(e){
-    const r=svg.getBoundingClientRect();
-    const t=e.touches?e.touches[0]:e;
-    return {x:t.clientX-r.left, y:t.clientY-r.top};
-  }
-  function onDown(e){
-    const target=e.target;
-    const i=target.dataset?.i;
-    if(i!==undefined){ dragging=parseInt(i); e.preventDefault(); }
-  }
-  function onMove(e){
-    if(dragging<0) return;
-    e.preventDefault();
-    const pos=getPos(e);
-    editor._pts[dragging]={x:pos.x, y:pos.y};
-    renderScanOverlay();
-    setupScanDrag(); // rebind after re-render
-  }
-  function onUp(){ dragging=-1; }
+  svg.addEventListener('touchstart', handleScanTouch, {passive:false});
+  svg.addEventListener('touchmove', handleScanMove, {passive:false});
+  svg.addEventListener('touchend', handleScanEnd, {passive:false});
+  svg.addEventListener('mousedown', handleScanMouse);
+  svg.addEventListener('mousemove', handleScanMouseMove);
+  svg.addEventListener('mouseup', handleScanMouseUp);
+}
 
-  svg.addEventListener('mousedown',onDown);
-  svg.addEventListener('mousemove',onMove);
-  svg.addEventListener('mouseup',onUp);
-  svg.addEventListener('touchstart',onDown,{passive:false});
-  svg.addEventListener('touchmove',onMove,{passive:false});
-  svg.addEventListener('touchend',onUp);
+function getScanPos(e){
+  const svg=document.getElementById('scan-svg');
+  const r=svg.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  return {x:t.clientX-r.left, y:t.clientY-r.top};
+}
+
+function handleScanTouch(e){
+  e.preventDefault();
+  const editor=document.getElementById('scan-editor');
+  const pos=getScanPos(e);
+  const handle=e.target.dataset?.handle;
+  if(handle!==undefined){
+    // Tap on a handle — select it
+    editor._selected=parseInt(handle);
+    editor._dragging=true;
+  } else if(editor._selected>=0){
+    // Tap elsewhere while selected — move point there and keep selected for drag
+    editor._pts[editor._selected]={x:pos.x, y:pos.y};
+    editor._dragging=true;
+  }
+  renderScanOverlay();
+  setupScanDrag();
+}
+
+function handleScanMove(e){
+  e.preventDefault();
+  const editor=document.getElementById('scan-editor');
+  if(!editor._dragging||editor._selected<0) return;
+  const pos=getScanPos(e);
+  editor._pts[editor._selected]={x:pos.x, y:pos.y};
+  renderScanOverlay();
+  setupScanDrag();
+}
+
+function handleScanEnd(e){
+  const editor=document.getElementById('scan-editor');
+  editor._dragging=false;
+  // Point stays selected — user taps another point or taps again to deselect
+}
+
+function handleScanMouse(e){
+  const editor=document.getElementById('scan-editor');
+  const pos=getScanPos(e);
+  const handle=e.target.dataset?.handle;
+  if(handle!==undefined){
+    editor._selected=parseInt(handle);
+    editor._dragging=true;
+  } else if(editor._selected>=0){
+    editor._pts[editor._selected]={x:pos.x, y:pos.y};
+    editor._dragging=true;
+  }
+  renderScanOverlay();
+  setupScanDrag();
+}
+
+function handleScanMouseMove(e){
+  const editor=document.getElementById('scan-editor');
+  if(!editor._dragging||editor._selected<0) return;
+  const pos=getScanPos(e);
+  editor._pts[editor._selected]={x:pos.x, y:pos.y};
+  renderScanOverlay();
+  setupScanDrag();
+}
+
+function handleScanMouseUp(){
+  const editor=document.getElementById('scan-editor');
+  editor._dragging=false;
 }
 
 function applyScanCorrection(){

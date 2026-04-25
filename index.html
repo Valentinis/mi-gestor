@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.79</div>
+    <div class="login-version">v5.80</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.79</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.80</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -420,7 +420,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.79</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.80</div>
       </div>
     </div>
     <div class="top-right">
@@ -691,7 +691,7 @@ img,video,iframe,table{max-width:100%;}
 <!-- CONFIG MODAL -->
 
 <div id="config-modal" style="display:none;position:fixed;inset:0;z-index:1001;background:rgba(0,0,0,0.6);" onclick="closeConfigModal(event)">
-  <div style="position:absolute;top:0;left:0;right:0;background:var(--bg-card);border-radius:0 0 20px 20px;padding:20px 16px 28px;max-height:88vh;overflow-y:auto;" onclick="event.stopPropagation()">
+  <div style="position:absolute;top:0;left:0;right:0;background:var(--bg-card);border-radius:0 0 24px 24px;padding:20px 16px 32px;max-height:90vh;overflow-y:auto;padding-top:calc(20px + env(safe-area-inset-top));" onclick="event.stopPropagation()">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <div style="display:flex;align-items:center;gap:10px;">
         <div id="config-avatar" style="width:40px;height:40px;border-radius:50%;background:var(--accent);overflow:hidden;display:flex;align-items:center;justify-content:center;">
@@ -866,9 +866,8 @@ function pe(){ if(pin===userPin){
   // Clear data — always wait for Drive (don't show stale local data)
   driveLoaded=false;
   data={};
-  renderAll(); updateSI();
-  // Show sync banner
-  showSyncBanner();
+  // Small delay to ensure DOM is visible before rendering
+  setTimeout(()=>{ renderAll(); updateSI(); showSyncBanner(); }, 50);
   // Then sync with Drive in background
   initDrive();
 } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
@@ -1646,7 +1645,11 @@ function skeletonItems(n){
 function renderList(){
   const list=document.getElementById('reg-list');
   if(!driveLoaded){
-    list.innerHTML='<div style="padding:8px 0;">'+skeletonItems(6)+'</div>';
+    // Show skeleton filter area too
+    const rcf=document.getElementById('rc-f'); if(rcf) rcf.textContent='';
+    const si=document.getElementById('fact-sum-ing'); if(si) si.textContent='';
+    const sg=document.getElementById('fact-sum-gas'); if(sg) sg.textContent='';
+    list.innerHTML='<div style="padding:4px 0;">'+skeletonItems(7)+'</div>';
     return;
   }
   let fs=getF(Q);

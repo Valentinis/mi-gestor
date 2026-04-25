@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.78</div>
+    <div class="login-version">v5.79</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.78</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.79</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -420,7 +420,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.78</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.79</div>
       </div>
     </div>
     <div class="top-right">
@@ -1679,7 +1679,6 @@ function renderList(){
   // Search
   const q=(document.getElementById('fact-search')||{}).value||'';
   if(q) fs=fs.filter(f=>(f.proveedor_cliente||'').toLowerCase().includes(q.toLowerCase())||(f.concepto||'').toLowerCase().includes(q.toLowerCase()));
-  const list=document.getElementById('reg-list');
   document.getElementById('rc-f').textContent=fs.length+' reg.';
   // Summary
   const totalIng=fs.filter(f=>f.tipo==='ingreso').reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);

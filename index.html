@@ -335,7 +335,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.71</div>
+    <div class="login-version">v5.72</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -370,7 +370,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.71</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.72</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -408,7 +408,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.71</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.72</div>
       </div>
     </div>
     <div class="top-right">
@@ -990,9 +990,40 @@ function triggerUpload(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura 
 function pasteFromClipboard(){
   if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
   const st=document.getElementById('paste-status');
-  st.textContent='📋 Pulsa ⌘+V o mantén pulsado y pega...';
+  // Create a hidden contenteditable div to capture paste on iOS
+  let trap=document.getElementById('_paste_trap');
+  if(!trap){
+    trap=document.createElement('div');
+    trap.id='_paste_trap';
+    trap.contentEditable='true';
+    trap.style.cssText='position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;overflow:hidden;z-index:9999;';
+    document.body.appendChild(trap);
+    trap.addEventListener('paste',function(e){
+      e.preventDefault();
+      const items=[...(e.clipboardData?.items||[])];
+      const pdf=items.find(i=>i.type==='application/pdf');
+      if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);trap.blur();return;}}
+      const img=items.find(i=>i.type.startsWith('image/'));
+      if(img){const f=img.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);trap.blur();return;}}
+      st.textContent='No se detectó imagen ni PDF.';st.style.color='var(--red)';
+      trap.blur();
+    });
+  }
+  st.textContent='📋 Mantén pulsado → Pegar...';
   st.style.color='var(--accent)';
-  document.addEventListener('paste',handlePasteEvent,{once:true});
+  trap.focus();
+  // Fallback: also listen on document
+  const onPaste=function(e){
+    e.preventDefault();
+    document.removeEventListener('paste',onPaste);
+    const items=[...(e.clipboardData?.items||[])];
+    const pdf=items.find(i=>i.type==='application/pdf');
+    if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);return;}}
+    const img=items.find(i=>i.type.startsWith('image/'));
+    if(img){const f=img.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);return;}}
+    st.textContent='No se detectó imagen ni PDF.';st.style.color='var(--red)';
+  };
+  document.addEventListener('paste',onPaste,{once:true});
 }
 function handlePasteEvent(e){
   const st=document.getElementById('paste-status');

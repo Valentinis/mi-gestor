@@ -105,19 +105,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 #add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:var(–bg-card);border-radius:20px 20px 0 0;padding:20px 16px 32px;max-height:85vh;overflow-y:auto;}
 #add-modal .add-sheet h3{font-size:17px;font-weight:700;margin:0 0 16px;text-align:center;}
 /* Facturas list compact */
-.fact-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(–line);}
+.fact-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(–line);}
 .fact-item:last-child{border-bottom:none;}
-.fact-color-bar{width:3px;height:36px;border-radius:2px;flex-shrink:0;}
+.fact-color-bar{width:3px;height:32px;border-radius:2px;flex-shrink:0;}
 .fact-color-bar.ingreso{background:var(–green);}
 .fact-color-bar.gasto{background:var(–red);}
 .fact-main{flex:1;min-width:0;}
 .fact-name{font-size:13px;font-weight:600;color:var(–text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fact-sub{font-size:11px;color:var(–text-3);margin-top:1px;}
-.fact-right{text-align:right;flex-shrink:0;}
-.fact-amount{font-size:13px;font-weight:700;}
-.fact-amount.ingreso{color:var(–green);}
-.fact-amount.gasto{color:var(–red);}
-.fact-date{font-size:10px;color:var(–text-3);margin-top:1px;}
+.fact-sub{font-size:11px;color:var(–text-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fact-right{text-align:right;flex-shrink:0;min-width:72px;}
+.fact-amount{font-size:13px;font-weight:700;white-space:nowrap;}
+.fact-date{font-size:10px;color:var(–text-3);margin-top:1px;white-space:nowrap;}
 /* Filter bar */
 .filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .filter-bar::-webkit-scrollbar{display:none;}
@@ -322,7 +320,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.60</div>
+    <div class="login-version">v5.61</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -357,7 +355,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.60</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.61</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -396,7 +394,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.60</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.61</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">
@@ -1830,109 +1828,58 @@ function renderRegistros(){
       <div class="total-box"><div class="total-box-label">Nº facturas</div><div class="total-box-val blue">${facts.length}</div></div>`;
   }
 
-  // Cabecera tabla
-  const thead=document.getElementById('reg-thead');
+  // Card-based layout (no table)
   const tbody=document.getElementById('reg-tbody');
+  const thead=document.getElementById('reg-thead');
+  if(thead) thead.innerHTML='';
+
+  const groupLabels={ ALQUILER:'Alquiler (→ 115)', INTRA_S:'Intracomunitario (→ 349)', INT:'Interior con IVA', EXENTO:'Exento', PROF:'Profesional (→ 111)', otros:'Otros' };
+  const groupColors={ ALQUILER:'var(--blue)', INTRA_S:'var(--amber)', INT:'var(--green)', EXENTO:'var(--text-3)', PROF:'var(--blue)', otros:'var(--text-3)' };
 
   if(regView==='gastos'){
-    thead.innerHTML=`<tr>
-      <th>Fecha</th><th>Proveedor</th><th>Concepto</th><th>Nº Factura</th>
-      <th>Op.</th><th class="right" style="color:var(--red);font-weight:700;">Total</th><th class="right">Base</th><th class="right">% IVA</th>
-      <th class="right">IVA</th><th class="right">Base IRPF</th>
-      <th class="right">% Ret.</th><th class="right">Retención</th>
-      <th>Justificación</th><th></th>
-    </tr>`;
-
-    if(!facts.length){ tbody.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:2rem;color:var(--text3);">Sin gastos en este trimestre</td></tr>`; return; }
-
-    // Group by operacion
+    if(!facts.length){ tbody.innerHTML='<div class="empty">Sin gastos en este trimestre</div>'; return; }
     const groups={ ALQUILER:[], INTRA_S:[], INT:[], EXENTO:[], PROF:[], otros:[] };
     facts.forEach(f=>{ const g=groups[f.operacion]||groups.otros; g.push(f); });
-
-    const groupLabels={ ALQUILER:'Alquiler local (→ 115 + 303 + 130)', INTRA_S:'Servicios intracomunitarios (→ 349 + 303 cas.10 + 130)', INT:'Gastos interiores con IVA (→ 303 + 130)', EXENTO:'Exentos de IVA (→ 130)', PROF:'Profesionales con retención (→ 111 + 303 + 130)', otros:'Otros' };
-    const groupColors={ ALQUILER:'var(--blue-bg)', INTRA_S:'var(--amber-bg)', INT:'var(--green-bg)', EXENTO:'#F1EFE8', PROF:'var(--blue-bg)', otros:'var(--bg3)' };
-    const groupText={ ALQUILER:'var(--blue)', INTRA_S:'var(--amber)', INT:'var(--green)', EXENTO:'#5F5E5A', PROF:'var(--blue)', otros:'var(--text2)' };
-
-    let rows='';
-    let gBase=0,gIva=0,gIrpf=0,gRet=0;
-
+    let html='';
     Object.entries(groups).forEach(([op,items])=>{
       if(!items.length) return;
-      rows+=`<tr><td colspan="13" style="background:${groupColors[op]};color:${groupText[op]};font-weight:600;font-size:11px;padding:5px 10px;letter-spacing:.03em;">${groupLabels[op]} · ${items.length} registro(s)</td></tr>`;
+      html+=`<div style="font-size:10px;font-weight:700;color:${groupColors[op]};text-transform:uppercase;letter-spacing:.06em;padding:8px 0 4px;border-top:0.5px solid var(--line);margin-top:4px;">${groupLabels[op]} · ${items.length}</div>`;
       items.forEach(f=>{
-        const base=f.base_iva||0, iva=f.cuota_iva||0, irpf=f.base_irpf||f.base_iva||0, ret=f.retencion_importe||0;
-        const total=base+iva;
-        gBase+=base; gIva+=iva; gIrpf+=irpf; gRet+=ret;
-        rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
-          <td class="date">${f.fecha||'—'}</td>
-          <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
-          <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
-          <td class="date">${f.num_factura||'—'}</td>
-          <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
-          <td class="num" style="font-weight:700;color:var(--red);">${fmtEur(total)}</td>
-          <td class="num">${fmtEur(base)}</td>
-          <td class="num">${f.pct_iva||0}%</td>
-          <td class="num" style="color:${iva>0?'var(--green)':'var(--text-3)'}">${fmtEur(iva)}</td>
-          <td class="num">${fmtEur(irpf)}</td>
-          <td class="num">${f.retencion_pct||0}%</td>
-          <td class="num" style="color:${ret>0?'var(--amber)':'var(--text-3)'}">${fmtEur(ret)}</td>
-          <td>${f.justificacion?`<span class="just-badge" title="${f.justificacion}">${f.justificacion}</span>`:''}</td>
-          <td style="text-align:center;">${driveIcon(f)}<button class="reg-del" onclick="event.stopPropagation();delR(${f._id})" style="margin-left:4px;">✕</button></td>
-        </tr>`;
+        const total=(f.base_iva||0)+(f.cuota_iva||0);
+        const ret=f.retencion_importe||0;
+        html+=`<div onclick="openModal(${f._id})" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
+          <div style="width:3px;height:32px;border-radius:2px;background:var(--red);flex-shrink:0;"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
+            <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.concepto||''}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;min-width:72px;">
+            <div style="font-size:13px;font-weight:700;color:var(--red);">−${fmtEur(total)}</div>
+            <div style="font-size:10px;color:var(--text-3);">${f.fecha||''} ${driveIcon(f)}</div>
+          </div>
+        </div>`;
       });
     });
-
-    // Fila total
-    rows+=`<tr class="total-row">
-      <td colspan="5">TOTAL</td>
-      <td class="num" style="font-weight:700;color:var(--red);">${fmtEur(gBase+gIva)}</td>
-      <td class="num">${fmtEur(gBase)}</td><td></td>
-      <td class="num">${fmtEur(gIva)}</td>
-      <td class="num">${fmtEur(gIrpf)}</td><td></td>
-      <td class="num">${fmtEur(gRet)}</td>
-      <td colspan="2"></td>
-    </tr>`;
-    tbody.innerHTML=rows;
-
+    tbody.innerHTML=html;
   } else {
-    // INGRESOS
-    thead.innerHTML=`<tr>
-      <th>Fecha</th><th>Cliente</th><th>Concepto</th><th>Nº Factura</th>
-      <th>Op.</th><th class="right">Bruto cobrado</th>
-      <th class="right">Base</th><th class="right">% IVA</th><th class="right">IVA</th>
-      <th class="right">% Ret.</th><th class="right">Retención</th><th></th>
-    </tr>`;
-
-    if(!facts.length){ tbody.innerHTML=`<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--text3);">Sin ingresos en este trimestre</td></tr>`; return; }
-
-    let rows='';
-    let gBruto=0,gBase=0,gIva=0,gRet=0;
+    if(!facts.length){ tbody.innerHTML='<div class="empty">Sin ingresos en este trimestre</div>'; return; }
+    let html='';
     facts.forEach(f=>{
-      const bruto=f.ingresos_brutos||f.base_iva||0, base=f.base_irpf||0, iva=f.cuota_iva||0, ret=f.retencion_importe||0;
-      gBruto+=bruto; gBase+=base; gIva+=iva; gRet+=ret;
-      rows+=`<tr onclick="openModal(${f._id})" style="cursor:pointer;">
-        <td class="date">${f.fecha||'—'}</td>
-        <td class="proveedor" title="${f.proveedor_cliente||''}">${f.proveedor_cliente||'—'}</td>
-        <td class="concepto" title="${f.concepto||''}">${f.concepto||'—'}</td>
-        <td class="date">${f.num_factura||'—'}</td>
-        <td><span class="op-badge op-${f.operacion||'INT'}">${f.operacion||'INT'}</span></td>
-        <td class="num" style="color:var(--green);font-weight:600">${fmtEur(bruto)}</td>
-        <td class="num">${fmtEur(base)}</td>
-        <td class="num">${f.pct_iva||0}%</td>
-        <td class="num" style="color:var(--amber)">${fmtEur(iva)}</td>
-        <td class="num">${f.retencion_pct||0}%</td>
-        <td class="num" style="color:${ret>0?'var(--red)':'var(--text-3)'}">${fmtEur(ret)}</td>
-        <td style="text-align:center;">${driveIcon(f)}<button class="reg-del" onclick="event.stopPropagation();delR(${f._id})" style="margin-left:4px;">✕</button></td>
-      </tr>`;
+      const bruto=f.ingresos_brutos||f.base_iva||0;
+      const ret=f.retencion_importe||0;
+      html+=`<div onclick="openModal(${f._id})" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
+        <div style="width:3px;height:32px;border-radius:2px;background:var(--green);flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
+          <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.concepto||''}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;min-width:72px;">
+          <div style="font-size:13px;font-weight:700;color:var(--green);">+${fmtEur(bruto)}</div>
+          <div style="font-size:10px;color:var(--text-3);">${f.fecha||''} ${driveIcon(f)}</div>
+        </div>
+      </div>`;
     });
-    rows+=`<tr class="total-row">
-      <td colspan="5">TOTAL</td>
-      <td class="num">${fmtEur(gBruto)}</td>
-      <td class="num">${fmtEur(gBase)}</td><td></td>
-      <td class="num">${fmtEur(gIva)}</td><td></td>
-      <td class="num">${fmtEur(gRet)}</td><td></td>
-    </tr>`;
-    tbody.innerHTML=rows;
+    tbody.innerHTML=html;
   }
 }
 function resetSheet(){ sheetId=null; saveCfg(); document.getElementById('sheet-id-display').textContent='Sin crear'; document.getElementById('sheets-dot').className='dot dot-off'; alert('Hoja reseteada. La próxima exportación creará una nueva dentro de la carpeta MiGestor.'); }

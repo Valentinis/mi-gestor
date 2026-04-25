@@ -117,10 +117,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .fact-amount{font-size:13px;font-weight:700;white-space:nowrap;}
 .fact-date{font-size:10px;color:var(–text-3);margin-top:1px;white-space:nowrap;}
 /* Filter bar */
-.filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-chip{flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
+.filter-chip{flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;white-space:nowrap;}
 .filter-chip.active{background:var(–accent);color:#fff;border-color:var(–accent);}
+#filter-proveedor,#filter-cliente{flex-shrink:0;max-width:140px;padding:5px 8px;font-size:12px;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
@@ -300,9 +301,8 @@ input[type=file]{display:none;}
 textarea.json-area{width:100%;min-height:80px;font-family:monospace;font-size:12px;padding:10px;border:0.5px solid var(–line-2);border-radius:var(–r-sm);background:var(–bg-input);color:var(–text);resize:vertical;}
 textarea.json-area:focus{outline:none;border-color:var(–accent);}
 
-- { max-width:100%; box-sizing:border-box; }
-  html,body { overflow-x:hidden; max-width:100vw; }
-
+html,body { overflow-x:hidden; max-width:100vw; }
+img,video,iframe,table { max-width:100%; }
 </style>
 
 </head>
@@ -320,7 +320,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.61</div>
+    <div class="login-version">v5.62</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -355,7 +355,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.61</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.62</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -394,7 +394,7 @@ textarea.json-area:focus{outline:none;border-color:var(–accent);}
         <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
         <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
       </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.61</span></span>
+      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.62</span></span>
     </div>
     <div class="top-right">
       <div class="status-row">

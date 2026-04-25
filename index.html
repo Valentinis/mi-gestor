@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.109</div>
+    <div class="login-version">v5.110</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.109</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.110</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.109</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.110</div>
       </div>
     </div>
     <div class="top-right">
@@ -1315,7 +1315,7 @@ function saveAnalysis(divId, count){
       if(created&&created.webViewLink){
         // Store link on all saved records
         savedItems.forEach(rec=>{
-          const inData=Object.values(data).flat().find(x=>x._id===rec._id);
+          const inData=Object.values(data).flat().find(x=>x._id==rec._id);
           if(inData){ inData._driveLink=created.webViewLink; }
         });
         saveLocal();
@@ -1371,7 +1371,7 @@ async function loadFromDrive(){
           const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`);
           const recs=await fr.json();
           if(!data[qn]) data[qn]=[];
-          recs.forEach(rec=>{if(!data[qn].find(x=>x._id===rec._id)) data[qn].push(rec);});
+          recs.forEach(rec=>{if(!data[qn].find(x=>x._id==rec._id)) data[qn].push(rec);});
         }catch(e){ console.warn('Error loading',f.name,e); }
       }
     }
@@ -1536,7 +1536,7 @@ async function deleteDriveFileIfOrphan(driveLink){
   try{ await driveReq('https://www.googleapis.com/drive/v3/files/'+df.id,{method:'DELETE'}); driveFiles=driveFiles.filter(f=>f.id!==df.id); }catch(e){}
 }
 function delR(id){
-  const f=(data[Q]||[]).find(x=>x._id===id);
+  const f=(data[Q]||[]).find(x=>x._id==id);
   const driveLink=f&&f._driveLink||null;
   data[Q]=(data[Q]||[]).filter(x=>x._id!==id);
   saveLocal(); renderAll();
@@ -1547,7 +1547,7 @@ function deleteFromModal(){
   if(!confirm('¿Eliminar este registro?')) return;
   const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id===modalFacturaId));
   if(q){
-    const f=data[q].find(x=>x._id===modalFacturaId);
+    const f=data[q].find(x=>x._id==modalFacturaId);
     const driveLink=f&&f._driveLink||null;
     data[q]=data[q].filter(x=>x._id!==modalFacturaId);
     saveLocal(); renderAll();
@@ -1862,7 +1862,7 @@ function renderList(){
 let modalFacturaId=null;
 function openModal(id){
   const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===id);
+  const f=all.find(x=>x._id==id);
   if(!f) return;
   modalFacturaId=id;
   document.getElementById('modal-title').textContent=(f.proveedor_cliente||'—')+' · '+(f.fecha||'—');
@@ -1943,7 +1943,7 @@ function closeModal(){ document.getElementById('factura-modal').style.display='n
 function quickUpload(id){
   if(!token){ alert('Inicia sesión primero.'); return; }
   const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===id);
+  const f=all.find(x=>x._id==id);
   if(!f) return;
   // Show mini action sheet
   const sheet=document.createElement('div');
@@ -1978,13 +1978,13 @@ function _quickUploadFile(id, mode){
     document.body.appendChild(loader);
     try{
       const all=Object.values(data).flat();
-      const f=all.find(x=>x._id===id);
+      const f=all.find(x=>x._id==id);
       if(!f||!facturasFId){ loader.remove(); return; }
       const fecha=(f.fecha||'').slice(0,10);
       const prov=(f.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
       const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
       const newName=[fecha,prov].filter(Boolean).join('_')+ext;
-      const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===id));
+      const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==id));
       const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q||Q).catch(()=>null);
       loader.remove();
       if(created&&created.webViewLink){
@@ -2010,7 +2010,7 @@ function uploadFromModal(){
     const file=e.target.files[0]; if(!file) return;
     if(token&&facturasFId){
       const all=Object.values(data).flat();
-      const f=all.find(x=>x._id===modalFacturaId);
+      const f=all.find(x=>x._id==modalFacturaId);
       const fecha=(f&&f.fecha||'').slice(0,10);
       const prov=((f&&f.proveedor_cliente)||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
       const numf=((f&&f.num_factura)||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
@@ -2045,11 +2045,11 @@ function saveJustification(){
   const other=document.getElementById('modal-just-other');
   const just=sel.value==='Otro (especificar)'?(other.value||sel.value):sel.value;
   const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===modalFacturaId);
+  const f=all.find(x=>x._id==modalFacturaId);
   if(f){
     f.justificacion=just;
     saveLocal(); renderAll();
-    const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===modalFacturaId));
+    const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId));
     if(token&&q) saveDataToDrive(q).catch(()=>{});
     // Update modal title area to reflect change
     document.getElementById('modal-just-btn').textContent='✏️ Justificación';
@@ -2068,7 +2068,7 @@ function toggleModalEdit(){
 function saveModalEdit(){
   if(!modalFacturaId) return;
   const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===modalFacturaId);
+  const f=all.find(x=>x._id==modalFacturaId);
   if(!f) return;
   // Collect changes
   const changes=[];
@@ -2093,7 +2093,7 @@ function saveModalEdit(){
   if(newPiva!==(f.pct_iva||0)){ f.pct_iva=newPiva; f.cuota_iva=Math.round((f.base_iva||0)*(newPiva/100)*100)/100; }
   if(newRet!==(f.retencion_pct||0)){ f.retencion_pct=newRet; f.retencion_importe=Math.round((f.base_iva||0)*(newRet/100)*100)/100; }
   if(newJust!==f.justificacion) f.justificacion=newJust;
-  const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===modalFacturaId));
+  const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId));
   saveLocal(); renderAll();
   if(token&&q) saveDataToDrive(q).catch(()=>{});
   openModal(modalFacturaId);
@@ -2105,8 +2105,8 @@ function saveJustification(){
   const other=document.getElementById('modal-just-other');
   const just=sel?.value==='Otro (especificar)'?(other?.value||sel.value):sel?.value||'';
   const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===modalFacturaId);
-  if(f){ f.justificacion=just; saveLocal(); renderAll(); const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===modalFacturaId)); if(token&&q) saveDataToDrive(q).catch(()=>{}); openModal(modalFacturaId); }
+  const f=all.find(x=>x._id==modalFacturaId);
+  if(f){ f.justificacion=just; saveLocal(); renderAll(); const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId)); if(token&&q) saveDataToDrive(q).catch(()=>{}); openModal(modalFacturaId); }
 }
 function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
 
@@ -2114,7 +2114,7 @@ async function reprocessFromModal(){
   if(!modalFacturaId) return;
   if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config.'); return; }
   const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===modalFacturaId);
+  const f=all.find(x=>x._id==modalFacturaId);
   // Check if there's a Drive file for this record
   const hasDrive=f&&(f._driveLink||(f.fecha&&driveFiles.some(df=>df.name&&df.name.startsWith((f.fecha||'').slice(0,10)))));
   if(hasDrive){
@@ -2153,7 +2153,7 @@ function restoreModalButtons(){
 async function reprocessFromDrive(){
   if(!modalFacturaId) return;
   const all=Object.values(data).flat();
-  const f=all.find(x=>x._id===modalFacturaId);
+  const f=all.find(x=>x._id==modalFacturaId);
   if(!f){ restoreModalButtons(); return; }
   let driveFile=null;
   if(f._driveLink){ driveFile=driveFiles.find(x=>x.link===f._driveLink)||{link:f._driveLink,id:null}; }

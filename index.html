@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.115</div>
+    <div class="login-version">v5.117</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.115</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.117</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.116</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.117</div>
       </div>
     </div>
     <div class="top-right">
@@ -613,9 +613,19 @@ img,video,iframe,table{max-width:100%;}
     <div class="val-result" id="val-res"></div>
   </div>
   <div id="tab-config" class="tab-pane">
+    <div class="section-label">Sincronización</div>
+    <div class="card">
+      <div class="config-row">
+        <div><div class="config-label">Firestore</div><div class="config-sub" id="fs-dot-label">Comprobando...</div></div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="dot dot-off" id="fs-dot"></div>
+          <button onclick="saveCfgToFirestore().then(()=>{})" class="btn-sec" style="font-size:12px;padding:5px 10px;">Forzar sync</button>
+        </div>
+      </div>
+    </div>
     <div class="section-label">Claude API</div>
     <div class="card">
-      <div class="config-row"><div><div class="config-label">API Key</div><div class="config-sub">Guardada solo en tu navegador</div></div><span class="status-pill pill-off" id="claude-key-status">No configurada</span></div>
+      <div class="config-row"><div><div class="config-label">API Key</div><div class="config-sub">Sincronizada con Firestore</div></div><span class="status-pill pill-off" id="claude-key-status">No configurada</span></div>
       <input type="password" class="config-input" id="claude-key-input" placeholder="sk-ant-api03-..." style="width:100%;margin-top:10px;" oninput="updateClaudeKey(this.value)"/>
       <div class="feedback" id="claude-key-fb"></div>
     </div>
@@ -648,46 +658,42 @@ img,video,iframe,table{max-width:100%;}
       </div>
     </div>
 
-```
-<!-- Analyze extracto button -->
-<button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-  Analizar extracto / pago
-</button>
+    <!-- Analyze extracto button -->
+    <button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Analizar extracto / pago
+    </button>
 
-<!-- Pending tickets section -->
-<div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-    <div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;">Por verificar</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="approveAllTickets()" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aprobar todos</button>
-      <button onclick="discardAllTickets()" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
+    <!-- Pending tickets section -->
+    <div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;">Por verificar</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="approveAllTickets()" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aprobar todos</button>
+          <button onclick="discardAllTickets()" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
+        </div>
+      </div>
+      <div id="tickets-pending-list"></div>
     </div>
-  </div>
-  <div id="tickets-pending-list"></div>
-</div>
 
-<!-- Firestore future section (kept for later) -->
-<div id="firestore-cfg-banner" style="display:none;background:var(--amber-bg);border:0.5px solid var(--amber-bd);border-radius:10px;padding:12px;margin-bottom:14px;">
-  <div style="font-size:13px;font-weight:600;color:var(--amber);">⚙️ Configura Firestore</div>
-  <div style="font-size:12px;color:var(--text-3);margin:4px 0 8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
-  <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" style="width:100%;padding:8px 10px;background:var(--bg-input);border:0.5px solid var(--line-2);border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;margin-bottom:8px;">
-  <button onclick="saveFirestoreConfig()" style="background:var(--amber);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Guardar y conectar</button>
-</div>
-<div id="tickets-list" style="display:none;"></div>
+    <!-- Firestore future section (kept for later) -->
+    <div id="firestore-cfg-banner" style="display:none;background:var(--amber-bg);border:0.5px solid var(--amber-bd);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:600;color:var(--amber);">⚙️ Configura Firestore</div>
+      <div style="font-size:12px;color:var(--text-3);margin:4px 0 8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
+      <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" style="width:100%;padding:8px 10px;background:var(--bg-input);border:0.5px solid var(--line-2);border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;margin-bottom:8px;">
+      <button onclick="saveFirestoreConfig()" style="background:var(--amber);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Guardar y conectar</button>
+    </div>
+    <div id="tickets-list" style="display:none;"></div>
 
-<!-- Empty state -->
-<div id="tickets-empty" style="padding:40px 0;text-align:center;color:var(--text-3);">
-  <div style="font-size:32px;margin-bottom:8px;">🎫</div>
-  <div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div>
-  <div style="font-size:12px;margin-top:4px;">Sube un extracto de SumUp, un Bizum o una transferencia</div>
-</div>
-```
-
+    <!-- Empty state -->
+    <div id="tickets-empty" style="padding:40px 0;text-align:center;color:var(--text-3);">
+      <div style="font-size:32px;margin-bottom:8px;">🎫</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div>
+      <div style="font-size:12px;margin-top:4px;">Sube un extracto de SumUp, un Bizum o una transferencia</div>
+    </div>
   </div>
 
   <!-- TICKET ANALYSIS MODAL -->
-
   <div id="ticket-modal" onclick="closeTicketModal(event)" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);">
     <div onclick="event.stopPropagation()" style="position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:28px 28px 0 0;padding:28px 24px;padding-bottom:calc(40px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;">
       <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 20px;"></div>
@@ -775,6 +781,8 @@ const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googlea
 const SCOPE_VERSION='v3';
 if(localStorage.getItem('_scope_v')!==SCOPE_VERSION){ localStorage.removeItem('migestor_auth'); localStorage.setItem('_scope_v',SCOPE_VERSION); }
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
+const FS_PROJECT='mi-gestor-3a992';
+const FS_URL=`https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databases/(default)/documents`;
 
 // Auto-detect current quarter
 function currentQuarter(){ const m=new Date().getMonth(); const q=m<3?'1T':m<6?'2T':m<9?'3T':'4T'; return q+' 2026'; }
@@ -822,8 +830,69 @@ function autoJust(f){
 }
 
 // ── CFG ──
-function loadCfg(){ try{ const c=JSON.parse(localStorage.getItem(LS_CFG)||'{}'); if(c.claudeKey) claudeKey=c.claudeKey; if(c.userPin) userPin=c.userPin; if(c.sheetId) sheetId=c.sheetId; }catch(e){} firestoreProjectId=localStorage.getItem('_fs_pid')||''; if(firestoreProjectId){const b=document.getElementById('firestore-cfg-banner');if(b)b.style.display='none';const i=document.getElementById('firestore-project-id');if(i)i.value=firestoreProjectId;} }
-function saveCfg(){ localStorage.setItem(LS_CFG,JSON.stringify({claudeKey,userPin,sheetId})); }
+function loadCfg(){
+  try{
+    const c=JSON.parse(localStorage.getItem(LS_CFG)||'{}');
+    if(c.claudeKey) claudeKey=c.claudeKey;
+    if(c.userPin) userPin=c.userPin;
+    if(c.sheetId) sheetId=c.sheetId;
+  }catch(e){}
+  firestoreProjectId=localStorage.getItem('_fs_pid')||'';
+  if(firestoreProjectId){const b=document.getElementById('firestore-cfg-banner');if(b)b.style.display='none';const i=document.getElementById('firestore-project-id');if(i)i.value=firestoreProjectId;}
+}
+
+function saveCfg(){
+  localStorage.setItem(LS_CFG,JSON.stringify({claudeKey,userPin,sheetId}));
+  if(token&&user&&user.id) saveCfgToFirestore().catch(()=>{});
+}
+
+async function saveCfgToFirestore(){
+  if(!token||!user||!user.id) return;
+  const uid=user.id;
+  const url=`${FS_URL}/users/${uid}/config/prefs`;
+  const body={fields:{
+    claudeKey:{stringValue:claudeKey||''},
+    userPin:{stringValue:userPin||'1234'},
+    sheetId:{stringValue:sheetId||''},
+    updatedAt:{stringValue:new Date().toISOString()}
+  }};
+  await fetch(url+'?currentDocument.exists=false', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)})
+    .catch(()=>{}); // doc may already exist, try PATCH
+  await fetch(url, {method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)});
+  setFsDot(true);
+}
+
+async function loadCfgFromFirestore(uid){
+  if(!token||!uid) return;
+  try{
+    const url=`${FS_URL}/users/${uid}/config/prefs`;
+    const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+    if(!r.ok){ setFsDot(false); return; }
+    const j=await r.json();
+    const f=j.fields||{};
+    const remoteKey=f.claudeKey?.stringValue||'';
+    const remotePin=f.userPin?.stringValue||'';
+    const remoteSheet=f.sheetId?.stringValue||'';
+    // Only overwrite if remote has values
+    if(remoteKey) claudeKey=remoteKey;
+    if(remotePin) userPin=remotePin;
+    if(remoteSheet) sheetId=remoteSheet;
+    // Persist back to localStorage
+    localStorage.setItem(LS_CFG,JSON.stringify({claudeKey,userPin,sheetId}));
+    setFsDot(true);
+    // Update UI if already rendered
+    const ki=document.getElementById('claude-key-input'); if(ki&&claudeKey) ki.value=claudeKey;
+    updateClaudeKey(claudeKey);
+    updateSheetDisplay();
+  }catch(e){ setFsDot(false); }
+}
+
+function setFsDot(ok){
+  const d=document.getElementById('fs-dot');
+  if(d) d.className='dot '+(ok?'dot-ok':'dot-err');
+  const l=document.getElementById('fs-dot-label');
+  if(l) l.textContent=ok?'Firestore ✓':'Firestore ✗';
+}
 function updateClaudeKey(val){
   claudeKey=val.trim(); saveCfg();
   const ok=claudeKey.startsWith('sk-ant-');
@@ -879,6 +948,8 @@ async function handleToken(access_token){
   user=await r.json();
   localStorage.setItem(LS_AUTH,JSON.stringify({token,user,ts:Date.now()}));
   updateUserHeader(user);
+  // Load config from Firestore (silently, before showing PIN)
+  await loadCfgFromFirestore(user.id).catch(()=>{});
   showPin();
 }
 
@@ -901,7 +972,11 @@ window.addEventListener('load',()=>{
   if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }
   try{
     const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
-    if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;updateUserHeader(user);showPin();return;}
+    if(s.token&&s.user&&(Date.now()-s.ts)<3500000){
+      token=s.token;user=s.user;updateUserHeader(user);
+      loadCfgFromFirestore(user.id).catch(()=>{});
+      showPin();return;
+    }
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
 });

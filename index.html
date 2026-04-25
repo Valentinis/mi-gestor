@@ -24,14 +24,14 @@
 }
 @media(prefers-color-scheme:dark){
   :root{
-    --bg:#111111;--bg-card:#1C1C1E;--bg-raised:#2C2C2E;--bg-input:#242426;
-    --text:#F2F2F7;--text-2:#AEAEB2;--text-3:#636366;
-    --line:rgba(255,255,255,0.08);--line-2:rgba(255,255,255,0.14);
-    --green:#30D158;--green-bg:rgba(48,209,88,0.12);--green-bd:rgba(48,209,88,0.25);
-    --red:#FF453A;--red-bg:rgba(255,69,58,0.12);--red-bd:rgba(255,69,58,0.25);
-    --blue:#0A84FF;--blue-bg:rgba(10,132,255,0.12);--blue-bd:rgba(10,132,255,0.25);
-    --amber:#FFD60A;--amber-bg:rgba(255,214,10,0.12);--amber-bd:rgba(255,214,10,0.25);
-    --accent-light:rgba(196,118,58,0.15);--accent-dim:rgba(196,118,58,0.10);
+    --bg:#111111;--bg-card:#1C1C1E;--bg-raised:#3A3A3C;--bg-input:#2C2C2E;
+    --text:#F2F2F7;--text-2:#E5E5EA;--text-3:#AEAEB2;
+    --line:rgba(255,255,255,0.12);--line-2:rgba(255,255,255,0.22);
+    --green:#30D158;--green-bg:rgba(48,209,88,0.15);--green-bd:rgba(48,209,88,0.3);
+    --red:#FF453A;--red-bg:rgba(255,69,58,0.15);--red-bd:rgba(255,69,58,0.3);
+    --blue:#409CFF;--blue-bg:rgba(64,156,255,0.15);--blue-bd:rgba(64,156,255,0.3);
+    --amber:#FFD60A;--amber-bg:rgba(255,214,10,0.15);--amber-bd:rgba(255,214,10,0.3);
+    --accent:#E8894A;--accent-light:rgba(232,137,74,0.15);--accent-dim:rgba(232,137,74,0.12);
   }
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
@@ -70,7 +70,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .btn-ghost{background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:20px;padding:7px 18px;font-size:13px;color:rgba(255,255,255,0.45);cursor:pointer;}
 
 /* MAIN */
-#main-screen{display:none;width:100%;overflow-x:hidden;}
+#main-screen{display:none;width:100%;overflow-x:hidden;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .top-bar{background:#FFFFFF;border-bottom:0.5px solid rgba(0,0,0,0.1);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;overflow:hidden;}
 @media (prefers-color-scheme:dark){.top-bar{background:#1C1C1E;border-bottom-color:rgba(255,255,255,0.08);}}
 .top-left{display:flex;align-items:center;gap:8px;flex-shrink:0;}
@@ -119,15 +119,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 /* Filter bar */
 .filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-chip{flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;white-space:nowrap;}
+.filter-chip{flex-shrink:0;padding:6px 14px;font-size:12px;font-weight:600;border:1.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;white-space:nowrap;}
 .filter-chip.active{background:var(–accent);color:#fff;border-color:var(–accent);}
-#filter-proveedor,#filter-cliente{flex-shrink:0;max-width:140px;padding:5px 8px;font-size:12px;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
+#filter-proveedor,#filter-cliente{flex-shrink:0;max-width:140px;padding:6px 10px;font-size:12px;font-weight:500;border:1.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
-.q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;border:0.5px solid var(–line);}
-.q-pill{flex:1;padding:7px 2px;font-size:11px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-3);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;white-space:nowrap;overflow:hidden;}
-.q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 8px rgba(196,118,58,0.35);}
+.q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;border:1.5px solid var(–line-2);}
+.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;white-space:nowrap;overflow:hidden;}
+.q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 8px rgba(196,118,58,0.4);}
 
 /* CARDS */
 .card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:16px;margin-bottom:12px;}
@@ -301,8 +301,8 @@ input[type=file]{display:none;}
 textarea.json-area{width:100%;min-height:80px;font-family:monospace;font-size:12px;padding:10px;border:0.5px solid var(–line-2);border-radius:var(–r-sm);background:var(–bg-input);color:var(–text);resize:vertical;}
 textarea.json-area:focus{outline:none;border-color:var(–accent);}
 
-html,body { overflow-x:hidden; max-width:100vw; }
-img,video,iframe,table { max-width:100%; }
+html,body{overflow:hidden;max-width:100vw;height:100%;}
+img,video,iframe,table{max-width:100%;}
 </style>
 
 </head>
@@ -320,7 +320,7 @@ img,video,iframe,table { max-width:100%; }
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.63</div>
+    <div class="login-version">v5.66</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -355,7 +355,7 @@ img,video,iframe,table { max-width:100%; }
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.63</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.66</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -388,22 +388,23 @@ img,video,iframe,table { max-width:100%; }
 <div id="main-screen">
   <div class="top-bar">
     <div class="top-left">
-      <svg width="28" height="28" viewBox="0 0 80 80" fill="none" style="border-radius:8px;flex-shrink:0;">
-        <rect width="80" height="80" rx="20" fill="url(#tg)"/>
-        <path d="M13 52V29h5.5l7.5 15 7.5-15H39v23h-5V39l-5.5 11h-5L18 39v13h-5z" fill="white"/>
-        <path d="M45 41v-3.5h13v11C55.5 51.5 51.5 53 47 53c-7.5 0-13-5.2-13-13s5.5-13 13-13c4.5 0 8 2 10 5l-4 2.5c-1.5-2-3.5-3-6-3-4.5 0-7.5 3.5-7.5 8.5s3 8.5 7.5 8.5c2.5 0 4.5-1 6-2.5V41H45z" fill="white"/>
-        <defs><linearGradient id="tg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4854A"/><stop offset="100%" stop-color="#7A3010"/></linearGradient></defs>
-      </svg>
-      <span class="top-title">MiGestor <span style="font-size:10px;font-weight:400;color:var(--text-3);letter-spacing:0.02em;">v5.63</span></span>
+      <div id="user-avatar" onclick="openConfigModal()" style="width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;">
+        <span id="user-initials" style="color:#fff;font-size:14px;font-weight:700;">VL</span>
+      </div>
+      <div>
+        <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.66</div>
+      </div>
     </div>
     <div class="top-right">
-      <div class="status-row">
-        <div class="dot dot-off" id="claude-dot"></div><span id="claude-lbl">Claude</span>
-        <div class="dot dot-off" id="drive-dot" style="margin-left:5px;"></div><span id="drive-lbl">Drive</span>
-        <div class="dot dot-off" id="sheets-dot" style="margin-left:5px;"></div><span id="sheets-lbl">Sheets</span>
+      <span class="q-badge" id="qbadge" style="font-size:11px;font-weight:600;">2T 2026</span>
+      <div style="display:flex;gap:4px;align-items:center;">
+        <div class="dot dot-off" id="claude-dot" title="Claude API"></div>
+        <div class="dot dot-off" id="drive-dot" title="Drive"></div>
       </div>
-      <span class="q-badge" id="qbadge">1T 2026</span>
-      <button class="btn-sm" onclick="signOut()">Salir</button>
+      <button onclick="openConfigModal()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:4px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
   </div>
   <div class="tabs">
@@ -424,9 +425,9 @@ img,video,iframe,table { max-width:100%; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span>Modelos</span>
     </button>
-    <button class="nav-btn" id="nav-config" onclick="switchNav('config',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span>Config</span>
+    <button class="nav-btn" id="nav-tickets" onclick="switchNav('tickets',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4V9z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+      <span>Tickets</span>
     </button>
   </nav>
   <!-- Solid block to prevent content bleeding under nav on iOS -->
@@ -652,6 +653,54 @@ img,video,iframe,table { max-width:100%; }
       <div class="feedback" id="pin-fb"></div>
     </div>
   </div>
+
+  <!-- TICKETS TAB -->
+
+  <div id="tab-tickets" class="tab-pane">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-size:17px;font-weight:700;color:var(--text);">Tickets de venta</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Clases y productos · Factura simplificada</div>
+      </div>
+      <button onclick="syncFromFirestore()" style="background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;">↻ Sincronizar</button>
+    </div>
+    <div id="firestore-cfg-banner" style="background:var(--amber-bg);border:0.5px solid var(--amber-bd);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:600;color:var(--amber);">⚙️ Configura Firestore</div>
+      <div style="font-size:12px;color:var(--text-3);margin:4px 0 8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
+      <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" style="width:100%;padding:8px 10px;background:var(--bg-input);border:0.5px solid var(--line-2);border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;margin-bottom:8px;">
+      <button onclick="saveFirestoreConfig()" style="background:var(--amber);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Guardar y conectar</button>
+    </div>
+    <div id="tickets-list">
+      <div style="padding:40px 0;text-align:center;color:var(--text-3);">
+        <div style="font-size:32px;margin-bottom:8px;">🎫</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div>
+        <div style="font-size:12px;margin-top:4px;">Los pagos de la app del taller aparecerán aquí</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CONFIG MODAL -->
+
+<div id="config-modal" style="display:none;position:fixed;inset:0;z-index:1001;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" onclick="closeConfigModal(event)">
+  <div style="position:absolute;top:0;left:0;right:0;background:var(--bg-card);border-radius:0 0 20px 20px;padding:20px 16px 28px;max-height:88vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="config-avatar" style="width:40px;height:40px;border-radius:50%;background:var(--accent);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <span id="config-initials" style="color:#fff;font-size:16px;font-weight:700;">VL</span>
+        </div>
+        <div>
+          <div id="config-name" style="font-size:15px;font-weight:700;color:var(--text);">Valentín López</div>
+          <div id="config-email" style="font-size:12px;color:var(--text-3);">valentinnlopez@gmail.com</div>
+        </div>
+      </div>
+      <button onclick="closeConfigModal()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-2);">✕</button>
+    </div>
+    <!-- Config content moved here from tab -->
+    <div id="config-modal-content"></div>
+    <button onclick="signOut()" style="width:100%;margin-top:16px;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">Cerrar sesión</button>
+  </div>
 </div>
 
 <script>
@@ -708,7 +757,7 @@ function autoJust(f){
 }
 
 // ── CFG ──
-function loadCfg(){ try{ const c=JSON.parse(localStorage.getItem(LS_CFG)||'{}'); if(c.claudeKey) claudeKey=c.claudeKey; if(c.userPin) userPin=c.userPin; if(c.sheetId) sheetId=c.sheetId; }catch(e){} }
+function loadCfg(){ try{ const c=JSON.parse(localStorage.getItem(LS_CFG)||'{}'); if(c.claudeKey) claudeKey=c.claudeKey; if(c.userPin) userPin=c.userPin; if(c.sheetId) sheetId=c.sheetId; }catch(e){} firestoreProjectId=localStorage.getItem('_fs_pid')||''; if(firestoreProjectId){const b=document.getElementById('firestore-cfg-banner');if(b)b.style.display='none';const i=document.getElementById('firestore-project-id');if(i)i.value=firestoreProjectId;} }
 function saveCfg(){ localStorage.setItem(LS_CFG,JSON.stringify({claudeKey,userPin,sheetId})); }
 function updateClaudeKey(val){
   claudeKey=val.trim(); saveCfg();
@@ -764,6 +813,7 @@ async function handleToken(access_token){
   const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}});
   user=await r.json();
   localStorage.setItem(LS_AUTH,JSON.stringify({token,user,ts:Date.now()}));
+  updateUserHeader(user);
   showPin();
 }
 
@@ -786,7 +836,7 @@ window.addEventListener('load',()=>{
   if(window.location.hash.includes('access_token')){ checkRedirectToken(); return; }
   try{
     const s=JSON.parse(localStorage.getItem(LS_AUTH)||'{}');
-    if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;showPin();return;}
+    if(s.token&&s.user&&(Date.now()-s.ts)<3500000){token=s.token;user=s.user;updateUserHeader(user);showPin();return;}
   }catch(e){}
   document.getElementById('login-screen').style.display='flex';
 });
@@ -1325,6 +1375,120 @@ function deleteFromModal(){
 }
 
 // ── RENDER ──
+function openConfigModal(){
+  // Move tab-config content into modal
+  const src=document.getElementById('tab-config');
+  const dst=document.getElementById('config-modal-content');
+  if(src&&dst&&!dst.children.length) dst.innerHTML=src.innerHTML;
+  document.getElementById('config-modal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeConfigModal(e){
+  if(!e||e.target===document.getElementById('config-modal')){
+    document.getElementById('config-modal').style.display='none';
+    document.body.style.overflow='';
+  }
+}
+// Update header with user info after login
+function updateUserHeader(u){
+  if(!u) return;
+  const name=(u.given_name||u.name||'Valentín').split(' ')[0];
+  const initials=((u.given_name||'V')[0]+(u.family_name||'L')[0]).toUpperCase();
+  const el=document.getElementById('user-name'); if(el) el.textContent=name;
+  const ei=document.getElementById('user-initials'); if(ei) ei.textContent=initials;
+  const ci=document.getElementById('config-initials'); if(ci) ci.textContent=initials;
+  const cn=document.getElementById('config-name'); if(cn) cn.textContent=u.name||'Valentín López';
+  const ce=document.getElementById('config-email'); if(ce) ce.textContent=u.email||'';
+  // Photo
+  if(u.picture){
+    ['user-avatar','config-avatar'].forEach(id=>{
+      const el=document.getElementById(id); if(!el) return;
+      el.innerHTML=`<img src="${u.picture}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=color:#fff;font-size:14px;font-weight:700>${initials}</span>'">`;
+    });
+  }
+}
+// Firestore tickets
+let firestoreProjectId=localStorage.getItem('_fs_pid')||'';
+function saveFirestoreConfig(){
+  const val=document.getElementById('firestore-project-id')?.value?.trim();
+  if(!val){ alert('Introduce el Project ID de Firebase'); return; }
+  firestoreProjectId=val;
+  localStorage.setItem('_fs_pid',val);
+  const banner=document.getElementById('firestore-cfg-banner');
+  if(banner) banner.style.display='none';
+  syncFromFirestore();
+}
+async function syncFromFirestore(){
+  if(!firestoreProjectId){ document.getElementById('firestore-cfg-banner').style.display='block'; return; }
+  if(!token){ alert('Inicia sesión primero'); return; }
+  const list=document.getElementById('tickets-list');
+  list.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3);">⏳ Cargando...</div>';
+  try{
+    const url=`https://firestore.googleapis.com/v1/projects/${firestoreProjectId}/databases/(default)/documents/payments?pageSize=50`;
+    const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+    const j=await r.json();
+    if(!j.documents||!j.documents.length){
+      list.innerHTML='<div style="padding:40px 0;text-align:center;color:var(--text-3);"><div style="font-size:32px;margin-bottom:8px;">🎫</div><div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div><div style="font-size:12px;margin-top:4px;">Los pagos de la app del taller aparecerán aquí</div></div>';
+      return;
+    }
+    renderTickets(j.documents);
+  }catch(e){ list.innerHTML=`<div style="padding:20px;color:var(--red);">Error: ${e.message}</div>`; }
+}
+function fsVal(f,k){ const v=f.fields?.[k]; return v?.stringValue||v?.integerValue||v?.doubleValue||v?.booleanValue||''; }
+function renderTickets(docs){
+  const list=document.getElementById('tickets-list');
+  list.innerHTML=docs.map(doc=>{
+    const f=doc;
+    const nombre=fsVal(f,'nombre')||fsVal(f,'alumno')||fsVal(f,'name')||'—';
+    const importe=parseFloat(fsVal(f,'importe')||fsVal(f,'amount')||0);
+    const fecha=fsVal(f,'fecha')||fsVal(f,'date')||'';
+    const metodo=fsVal(f,'metodo')||fsVal(f,'payment_method')||'';
+    const concepto=fsVal(f,'concepto')||fsVal(f,'description')||'Clase de cerámica';
+    const docId=doc.name?.split('/').pop()||'';
+    const generado=fsVal(f,'ticket_generado')==='true'||fsVal(f,'ticket_generado')===true;
+    return `<div style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${nombre}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--green);">+${fmt(importe)}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">${concepto} · ${fecha}${metodo?' · '+metodo:''}</div>
+      ${generado
+        ?'<div style="font-size:11px;color:var(--green);font-weight:600;">✓ Ticket generado</div>'
+        :`<button onclick="generateTicket('${docId}','${nombre}',${importe},'${fecha}','${concepto}','${metodo}')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;">Generar ticket</button>`
+      }
+    </div>`;
+  }).join('');
+}
+async function generateTicket(docId,nombre,importe,fecha,concepto,metodo){
+  if(!confirm(`Generar factura simplificada para:\n${nombre} · ${fmt(importe)} · ${fecha}\n\n¿Continuar?`)) return;
+  // Calculate IVA (21%)
+  const base=Math.round(importe/1.21*100)/100;
+  const iva=Math.round((importe-base)*100)/100;
+  // Register as ingreso in MiGestor
+  const rec={
+    tipo:'ingreso',proveedor_cliente:nombre,nif:'',fecha:fecha,
+    concepto:concepto,num_factura:'',operacion:'INT',
+    base_iva:base,pct_iva:21,cuota_iva:iva,base_irpf:base,
+    retencion_pct:0,retencion_importe:0,ingresos_brutos:importe,
+    notas:`Pago ${metodo}`,_id:Date.now()+Math.random()
+  };
+  classifyRecord(rec);
+  if(!data[Q]) data[Q]=[];
+  data[Q].push(rec);
+  saveLocal(); renderAll();
+  if(token) saveDataToDrive(Q).catch(()=>{});
+  // Mark as generated in Firestore
+  if(firestoreProjectId){
+    try{
+      await fetch(`https://firestore.googleapis.com/v1/projects/${firestoreProjectId}/databases/(default)/documents/payments/${docId}?updateMask.fieldPaths=ticket_generado`,{
+        method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({fields:{ticket_generado:{booleanValue:true}}})
+      });
+    }catch(e){}
+  }
+  alert(`✓ Ingreso registrado en ${rec._quarter||Q}`);
+  syncFromFirestore();
+}
 function switchNav(id,btn){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));

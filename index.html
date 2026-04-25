@@ -101,17 +101,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .tab-bar-top{display:none;}
 .tab-pane{display:none;padding:12px 12px 160px;width:100%;overflow-x:hidden;}
 .tab-pane.active{display:block;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(–bg-card);border-top:1px solid rgba(139,90,43,0.12);display:flex;align-items:center;justify-content:space-around;padding:8px 8px 20px;z-index:9999;box-shadow:0 -8px 24px rgba(0,0,0,0.15);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#1C1814;border-top:1px solid rgba(139,90,43,0.12);display:flex;align-items:center;justify-content:space-around;padding:8px 8px 20px;z-index:9999;box-shadow:0 -8px 24px rgba(0,0,0,0.15);}
 @media(prefers-color-scheme:dark){.bottom-nav{background:#1C1814 !important;border-top-color:rgba(240,132,74,0.15);}}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 2px;color:var(–text-3);transition:all .15s;min-height:48px;}
-.nav-btn.active{color:var(–accent);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 2px;color:#666;transition:all .15s;min-height:48px;}
+.nav-btn.active{color:#F0844A !important;}
 .nav-btn svg{width:22px;height:22px;flex-shrink:0;}
 .nav-btn span{font-size:10px;font-weight:500;line-height:1;}
 .nav-add{width:58px;height:58px;border-radius:50%;background:var(–accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(212,105,30,0.6);-webkit-tap-highlight-color:transparent;flex-shrink:0;margin-bottom:4px;}
 .nav-add svg{width:28px;height:28px;stroke-width:2.5;}
 /* Add invoice modal */
-#add-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;padding:24px;}
-#add-modal .add-sheet{background:var(–bg-card);border-radius:28px;padding:32px 24px 28px;width:100%;max-width:400px;position:relative;}
+#add-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:24px;}
+#add-modal .add-sheet{background:#1C1814;border-radius:28px;padding:32px 24px 28px;width:100%;max-width:400px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.8);}
 #add-modal .add-sheet h3{font-size:22px;font-weight:800;margin:0 0 6px;text-align:center;color:var(–text);}
 .add-sheet-handle{display:none;}
 .upload-zone{border:none;border-radius:16px;padding:22px 12px;text-align:center;cursor:pointer;background:var(–bg-raised);transition:all .15s;-webkit-tap-highlight-color:transparent;}
@@ -134,15 +134,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 /* Filter bar */
 .filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-chip{flex-shrink:0;padding:8px 16px;font-size:12px;font-weight:700;border:none;border-radius:10px;background:var(–bg-raised);color:var(–text);cursor:pointer;white-space:nowrap;}
-.filter-chip.active{background:var(–accent);color:#fff;}
+.filter-chip{flex-shrink:0;padding:8px 16px;font-size:12px;font-weight:700;border:none;border-radius:10px;background:#2C2520;color:#F5EDE0;cursor:pointer;white-space:nowrap;}
+.filter-chip.active{background:#F0844A !important;color:#fff !important;}
 #filter-proveedor,#filter-cliente{flex-shrink:0;max-width:140px;padding:6px 10px;font-size:12px;font-weight:500;border:1.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
 .q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;}
-.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;text-align:center;white-space:nowrap;overflow:hidden;}
-.q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 10px rgba(212,105,30,0.4);}
+.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:#C8A882;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;text-align:center;white-space:nowrap;overflow:hidden;}
+.q-pill.active{background:#F0844A !important;color:#fff !important;}
 
 /* CARDS */
 .card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:16px;margin-bottom:12px;}
@@ -335,7 +335,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.74</div>
+    <div class="login-version">v5.75</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -370,7 +370,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.74</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.75</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -408,7 +408,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.74</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.75</div>
       </div>
     </div>
     <div class="top-right">
@@ -1510,7 +1510,7 @@ function openAddModal(){
   if(!claudeKey.startsWith('sk-ant-')) document.getElementById('claude-no-key-add').style.display='block';
   const cq=currentQuarter();
   document.querySelectorAll('#qs-add .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===cq));
-  const am=document.getElementById('add-modal'); am.style.display='flex';
+  document.getElementById('add-modal').style.cssText='display:flex !important;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:24px;';
   document.body.style.overflow='hidden';
 }
 function closeAddModal(e){

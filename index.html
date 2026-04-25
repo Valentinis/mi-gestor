@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.104</div>
+    <div class="login-version">v5.106</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,28 +382,38 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.104</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.106</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
 
 <div id="factura-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.88);overflow-y:auto;padding:1rem;">
   <div style="background:var(--bg-card);border-radius:20px;max-width:480px;margin:2rem auto;padding:0;overflow:hidden;border:0.5px solid var(--line);">
+    <!-- Document preview -->
+    <div id="modal-doc-preview" style="display:none;background:#000;border-radius:20px 20px 0 0;overflow:hidden;max-height:220px;"></div>
     <div style="padding:16px;border-bottom:0.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:15px;font-weight:700;color:var(--text);" id="modal-title">Detalle factura</span>
-      <button onclick="closeModal()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-3);display:flex;align-items:center;justify-content:center;">✕</button>
+      <span style="font-size:15px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;" id="modal-title">Detalle factura</span>
+      <button onclick="closeModal()" style="background:var(--bg-raised);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;color:var(--text-3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
     </div>
     <div style="padding:16px;" id="modal-body"></div>
-    <!-- Edit justification -->
-    <div id="modal-just-section" style="padding:0 16px 12px;display:none;">
-      <div style="font-size:11px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Justificación</div>
-      <select id="modal-just-select" class="just-select" onchange="toggleModalJustOther(this)"></select>
-      <input id="modal-just-other" type="text" placeholder="Especifica el motivo..." style="display:none;margin-top:6px;width:100%;padding:8px 10px;background:var(--bg-input);border:0.5px solid var(--line-2);border-radius:var(--r-xs);font-size:13px;color:var(--text);box-sizing:border-box;">
-      <button onclick="saveJustification()" style="margin-top:8px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:9px;font-size:13px;font-weight:600;cursor:pointer;">Guardar justificación</button>
+    <!-- Edit section -->
+    <div id="modal-edit-section" style="padding:0 16px 12px;display:none;">
+      <div style="font-size:11px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Editar factura</div>
+      <div style="display:grid;gap:8px;">
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Concepto</div><input id="edit-concepto" type="text" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Fecha</div><input id="edit-fecha" type="date" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Base</div><input id="edit-base" type="number" step="0.01" style="width:100%;padding:8px 6px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></div>
+          <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">IVA %</div><input id="edit-piva" type="number" step="1" style="width:100%;padding:8px 6px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></div>
+          <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Ret. %</div><input id="edit-ret" type="number" step="1" style="width:100%;padding:8px 6px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></div>
+        </div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Justificación</div><select id="edit-just" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></select></div>
+      </div>
+      <button onclick="saveModalEdit()" style="margin-top:12px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Revisar cambios →</button>
     </div>
-    <div style="padding:12px 16px;border-top:0.5px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;">
+    <div style="padding:12px 16px;border-top:0.5px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;" id="modal-footer">
       <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">📂 Drive</button>
-      <button onclick="toggleJustEdit()" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;" id="modal-just-btn">✏️ Justificación</button>
+      <button onclick="toggleModalEdit()" id="modal-edit-btn" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">✏️ Editar</button>
       <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Reprocesar</button>
       <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Eliminar</button>
     </div>
@@ -420,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.104</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.106</div>
       </div>
     </div>
     <div class="top-right">
@@ -499,7 +509,7 @@ img,video,iframe,table{max-width:100%;}
 <div class="reg-panel">
   <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
 </div>
-<div class="storage-bar"><span class="storage-dot"></span><span id="si">Cargando...</span></div>
+<div class="storage-bar" style="opacity:0.6;"><span id="si"></span></div>
 ```
 
   </div>
@@ -1104,7 +1114,7 @@ async function handleClaudeFiles(files){
         return `<div class="factura-review" id="${divId}_r${i}" data-tipo="${f.tipo}" data-op="${f.operacion||'INT'}">
           <div class="factura-review-hdr">
             <input type="checkbox" checked onchange="toggleReview('${divId}_r${i}',this.checked)" />
-            <span class="factura-review-title">${f.proveedor_cliente||'—'} · ${f.fecha||'—'}</span>
+            <span class="factura-review-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;display:inline-block;vertical-align:middle;">${(f.proveedor_cliente||'—').split(' ').slice(0,3).join(' ')} · ${f.fecha||'—'}</span>
             <button type="button" onclick="previewFactura('${divId}')" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:3px 8px;font-size:11px;color:#F5EDE0;cursor:pointer;flex-shrink:0;">👁 Ver</button>
             <div style="text-align:right;">
               <div style="font-size:14px;font-weight:700;color:${isIng?'#30D158':'#FF5A48'}">${isIng?'+':'-'}${fmt(total)}</div>
@@ -1880,9 +1890,35 @@ function openModal(id){
     const valColor=k==='Cuota IVA'?'var(--amber)':k==='Retención'?'var(--red)':k==='Base IVA'||k==='Base IRPF'?'var(--blue)':k==='Ingresos brutos'?'var(--green)':'var(--text)';
     return `<div style="display:flex;justify-content:space-between;padding:${hl?'10px':'8px'} 0;border-bottom:0.5px solid var(--line);font-size:${hl?'14px':'13px'};gap:12px;${hl?'background:transparent;':''}"><span style="color:var(--text-3);font-weight:${hl?'600':'500'};flex-shrink:0;">${k}</span><span style="color:${valColor};text-align:right;font-weight:${hl?'700':'400'};">${v}</span></div>`;
   }).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
-  // Show Drive button if file link exists
-  // Use _driveLink stored on record first (most accurate)
-  let driveLink=f._driveLink||null;
+  // Document preview
+  const preview=document.getElementById('modal-doc-preview');
+  const driveLink2=f._driveLink||null;
+  const df2=driveFiles.find(df=>df.name&&df.name.startsWith((f.fecha||'').slice(0,10)));
+  const previewLink=driveLink2||(df2&&df2.link)||null;
+  if(previewLink){
+    preview.style.display='block';
+    const isImg=/\.(jpg|jpeg|png|webp)/i.test(previewLink);
+    preview.innerHTML=isImg
+      ?`<img src="${previewLink}" style="width:100%;max-height:220px;object-fit:contain;">`
+      :`<div style="display:flex;align-items:center;gap:8px;padding:12px 16px;"><span style="font-size:24px;">📄</span><div><div style="font-size:13px;font-weight:600;color:#F5EDE0;">${f.proveedor_cliente||'—'}</div><div style="font-size:11px;color:rgba(255,255,255,0.5);">Documento disponible en Drive</div></div><button onclick="openDriveFile()" style="margin-left:auto;background:#F0844A;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Ver →</button></div>`;
+  } else {
+    preview.style.display='none';
+  }
+  // Reset edit section
+  document.getElementById('modal-edit-section').style.display='none';
+  document.getElementById('modal-edit-btn').textContent='✏️ Editar';
+  // Populate edit fields
+  const ef=document.getElementById('edit-concepto'); if(ef) ef.value=f.concepto||'';
+  const fecha2=document.getElementById('edit-fecha'); if(fecha2) fecha2.value=f.fecha||'';
+  const base2=document.getElementById('edit-base'); if(base2) base2.value=(f.base_iva||0).toFixed(2);
+  const piva2=document.getElementById('edit-piva'); if(piva2) piva2.value=f.pct_iva||0;
+  const ret2=document.getElementById('edit-ret'); if(ret2) ret2.value=f.retencion_pct||0;
+  const just2=document.getElementById('edit-just');
+  if(just2){
+    const isIng2=f.tipo==='ingreso';
+    const opts2=isIng2?JUST_OPTIONS_ING:JUST_OPTIONS;
+    just2.innerHTML=opts2.map(o=>`<option value="${o}" ${o===(f.justificacion||'')?'selected':''}>${o===''?'— Seleccionar —':o}</option>`).join('');
+  }
   if(!driveLink&&f.num_factura){
     const df=driveFiles.find(df=>df.name&&df.name.includes(f.num_factura.replace(/[^a-zA-Z0-9]/g,'').slice(0,8)));
     if(df) driveLink=df.link;
@@ -1966,6 +2002,56 @@ function saveJustification(){
     // Re-open modal to refresh body
     openModal(modalFacturaId);
   }
+}
+function toggleModalEdit(){
+  const sec=document.getElementById('modal-edit-section');
+  const btn=document.getElementById('modal-edit-btn');
+  const showing=sec.style.display!=='none';
+  sec.style.display=showing?'none':'block';
+  btn.textContent=showing?'✏️ Editar':'✕ Cancelar';
+}
+function saveModalEdit(){
+  if(!modalFacturaId) return;
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===modalFacturaId);
+  if(!f) return;
+  // Collect changes
+  const changes=[];
+  const newConc=document.getElementById('edit-concepto')?.value||'';
+  const newFecha=document.getElementById('edit-fecha')?.value||'';
+  const newBase=parseFloat(document.getElementById('edit-base')?.value||0);
+  const newPiva=parseInt(document.getElementById('edit-piva')?.value||0);
+  const newRet=parseInt(document.getElementById('edit-ret')?.value||0);
+  const newJust=document.getElementById('edit-just')?.value||'';
+  if(newConc!==f.concepto) changes.push(`Concepto: "${f.concepto}" → "${newConc}"`);
+  if(newFecha!==f.fecha) changes.push(`Fecha: ${f.fecha} → ${newFecha}`);
+  if(Math.abs(newBase-(f.base_iva||0))>0.001) changes.push(`Base: ${fmt(f.base_iva||0)} → ${fmt(newBase)}`);
+  if(newPiva!==(f.pct_iva||0)) changes.push(`IVA%: ${f.pct_iva||0}% → ${newPiva}%`);
+  if(newRet!==(f.retencion_pct||0)) changes.push(`Retención%: ${f.retencion_pct||0}% → ${newRet}%`);
+  if(newJust!==f.justificacion) changes.push(`Justificación: "${f.justificacion||'—'}" → "${newJust}"`);
+  if(!changes.length){ alert('No hay cambios.'); return; }
+  if(!confirm('Cambios a aplicar:\n\n'+changes.join('\n')+'\n\n¿Confirmar?')) return;
+  // Apply
+  if(newConc!==f.concepto) f.concepto=newConc;
+  if(newFecha!==f.fecha) f.fecha=newFecha;
+  if(Math.abs(newBase-(f.base_iva||0))>0.001){ f.base_iva=newBase; f.base_irpf=newBase; f.cuota_iva=Math.round(newBase*(newPiva/100)*100)/100; }
+  if(newPiva!==(f.pct_iva||0)){ f.pct_iva=newPiva; f.cuota_iva=Math.round((f.base_iva||0)*(newPiva/100)*100)/100; }
+  if(newRet!==(f.retencion_pct||0)){ f.retencion_pct=newRet; f.retencion_importe=Math.round((f.base_iva||0)*(newRet/100)*100)/100; }
+  if(newJust!==f.justificacion) f.justificacion=newJust;
+  const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===modalFacturaId));
+  saveLocal(); renderAll();
+  if(token&&q) saveDataToDrive(q).catch(()=>{});
+  openModal(modalFacturaId);
+}
+function toggleJustEdit(){ toggleModalEdit(); }
+function saveJustification(){
+  if(!modalFacturaId) return;
+  const sel=document.getElementById('modal-just-select');
+  const other=document.getElementById('modal-just-other');
+  const just=sel?.value==='Otro (especificar)'?(other?.value||sel.value):sel?.value||'';
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===modalFacturaId);
+  if(f){ f.justificacion=just; saveLocal(); renderAll(); const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===modalFacturaId)); if(token&&q) saveDataToDrive(q).catch(()=>{}); openModal(modalFacturaId); }
 }
 function openDriveFile(){ const btn=document.getElementById('modal-drive-btn'); if(btn._link) window.open(btn._link,'_blank'); }
 

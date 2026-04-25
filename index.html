@@ -12,26 +12,31 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --accent:#C4763A;--accent-light:#F5EBE0;--accent-dark:#7A4520;--accent-dim:rgba(196,118,58,0.15);
-  --bg:#F7F5F2;--bg-card:#FFFFFF;--bg-raised:#EFEDE9;--bg-input:#F2F0ED;
-  --text:#111111;--text-2:#555555;--text-3:#999999;
-  --line:rgba(0,0,0,0.09);--line-2:rgba(0,0,0,0.16);
-  --green:#0F6E56;--green-bg:#E6F4EC;--green-bd:#A8D8BE;
-  --red:#C0392B;--red-bg:#FDECEC;--red-bd:#F5BABA;
-  --blue:#1A5FA8;--blue-bg:#E8F1FC;--blue-bd:#A8C8F5;
-  --amber:#7A4500;--amber-bg:#FDF0DC;--amber-bd:#F5C878;
+  /* Naranja principal */
+  --accent:#D4691E;--accent-2:#E8854A;--accent-light:#FDF0E6;--accent-dim:rgba(212,105,30,0.12);
+  /* Fondos */
+  --bg:#F8F5F1;--bg-card:#FFFFFF;--bg-raised:#F0EBE3;--bg-input:#EDE8E0;
+  /* Texto */
+  --text:#1A1208;--text-2:#5C4A32;--text-3:#9C8060;
+  /* Bordes */
+  --line:rgba(139,90,43,0.12);--line-2:rgba(139,90,43,0.22);
+  /* Semánticos */
+  --green:#1A7A4A;--green-bg:#E6F5EE;--green-bd:#7DCCA0;
+  --red:#C0321E;--red-bg:#FDE8E6;--red-bd:#F0A090;
+  --blue:#1A52A0;--blue-bg:#E6EEFA;--blue-bd:#8AB0E8;
+  --amber:#8A5A00;--amber-bg:#FDF2DC;--amber-bd:#E8C060;
   --r:14px;--r-sm:10px;--r-xs:7px;
 }
 @media(prefers-color-scheme:dark){
   :root{
-    --bg:#111111;--bg-card:#1C1C1E;--bg-raised:#3A3A3C;--bg-input:#2C2C2E;
-    --text:#F2F2F7;--text-2:#E5E5EA;--text-3:#AEAEB2;
-    --line:rgba(255,255,255,0.12);--line-2:rgba(255,255,255,0.22);
-    --green:#30D158;--green-bg:rgba(48,209,88,0.15);--green-bd:rgba(48,209,88,0.3);
-    --red:#FF453A;--red-bg:rgba(255,69,58,0.15);--red-bd:rgba(255,69,58,0.3);
-    --blue:#409CFF;--blue-bg:rgba(64,156,255,0.15);--blue-bd:rgba(64,156,255,0.3);
-    --amber:#FFD60A;--amber-bg:rgba(255,214,10,0.15);--amber-bd:rgba(255,214,10,0.3);
-    --accent:#E8894A;--accent-light:rgba(232,137,74,0.15);--accent-dim:rgba(232,137,74,0.12);
+    --accent:#F0844A;--accent-2:#FFB07A;--accent-light:rgba(240,132,74,0.18);--accent-dim:rgba(240,132,74,0.10);
+    --bg:#0E0C0A;--bg-card:#1C1814;--bg-raised:#2C2520;--bg-input:#241E18;
+    --text:#F5EDE0;--text-2:#C8A882;--text-3:#8A7060;
+    --line:rgba(240,132,74,0.12);--line-2:rgba(240,132,74,0.20);
+    --green:#34C870;--green-bg:rgba(52,200,112,0.12);--green-bd:rgba(52,200,112,0.28);
+    --red:#FF5A48;--red-bg:rgba(255,90,72,0.12);--red-bd:rgba(255,90,72,0.28);
+    --blue:#5AA0FF;--blue-bg:rgba(90,160,255,0.12);--blue-bd:rgba(90,160,255,0.28);
+    --amber:#FFD060;--amber-bg:rgba(255,208,96,0.12);--amber-bd:rgba(255,208,96,0.28);
   }
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
@@ -71,8 +76,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 /* MAIN */
 #main-screen{display:none;width:100%;overflow-x:hidden;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.top-bar{background:#FFFFFF;border-bottom:0.5px solid rgba(0,0,0,0.1);padding:14px 16px 10px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-@media (prefers-color-scheme:dark){.top-bar{background:#1C1C1E !important;border-bottom-color:rgba(255,255,255,0.08);}}
+.top-bar{background:#FFFFFF;border-bottom:1px solid var(–line);padding:16px 16px 12px;padding-top:calc(16px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+@media(prefers-color-scheme:dark){.top-bar{background:#1C1814 !important;border-bottom-color:rgba(240,132,74,0.15);}}
 .top-left{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .top-title{font-size:15px;font-weight:700;color:var(–text);}
 .top-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
@@ -92,9 +97,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .tab-bar-top{display:none;}
 .tab-pane{display:none;padding:12px 12px 160px;width:100%;overflow-x:hidden;}
 .tab-pane.active{display:block;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#FFFFFF;border-top:0.5px solid var(–line);display:flex;align-items:center;justify-content:space-around;padding:8px 8px 20px;z-index:9999;box-shadow:0 -8px 24px rgba(0,0,0,0.15);}
-@media (prefers-color-scheme:dark){.bottom-nav{background:#1C1C1E;box-shadow:0 -8px 24px rgba(0,0,0,0.6);}}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 2px;color:var(–text-3);transition:color .15s;min-height:48px;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#FFFFFF;border-top:1px solid rgba(139,90,43,0.12);display:flex;align-items:center;justify-content:space-around;padding:8px 8px 20px;z-index:9999;box-shadow:0 -8px 24px rgba(0,0,0,0.15);}
+@media(prefers-color-scheme:dark){.bottom-nav{background:#1C1814 !important;border-top-color:rgba(240,132,74,0.15);}}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 2px;color:var(–text-3);transition:all .15s;min-height:48px;}
 .nav-btn.active{color:var(–accent);}
 .nav-btn svg{width:22px;height:22px;flex-shrink:0;}
 .nav-btn span{font-size:10px;font-weight:500;line-height:1;}
@@ -125,15 +130,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 /* Filter bar */
 .filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-chip{flex-shrink:0;padding:7px 16px;font-size:12px;font-weight:700;border:2px solid var(–text-3);border-radius:20px;background:transparent;color:var(–text);cursor:pointer;white-space:nowrap;}
-.filter-chip.active{background:var(–accent);color:#fff;border-color:var(–accent);}
+.filter-chip{flex-shrink:0;padding:7px 16px;font-size:12px;font-weight:600;border:none;border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;white-space:nowrap;}
+.filter-chip.active{background:var(–accent);color:#fff;}
 #filter-proveedor,#filter-cliente{flex-shrink:0;max-width:140px;padding:6px 10px;font-size:12px;font-weight:500;border:1.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
 .q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;border:1.5px solid var(–line-2);}
-.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;text-align:center;white-space:nowrap;overflow:hidden;}
-.q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 8px rgba(196,118,58,0.4);}
+.q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;text-align:center;white-space:nowrap;overflow:hidden;}
+.q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 10px rgba(212,105,30,0.4);}
 
 /* CARDS */
 .card{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r);padding:16px;margin-bottom:12px;}
@@ -326,7 +331,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.68</div>
+    <div class="login-version">v5.69</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -361,7 +366,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.68</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.69</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -399,11 +404,11 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.68</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.69</div>
       </div>
     </div>
     <div class="top-right">
-      <select id="header-q-select" onchange="setQFromHeader(this.value)" style="font-size:12px;font-weight:700;border:2px solid var(--accent);border-radius:10px;background:var(--accent-dim);color:var(--accent);padding:5px 8px;cursor:pointer;-webkit-appearance:none;appearance:none;text-align:center;">
+      <select id="header-q-select" onchange="setQFromHeader(this.value)" style="font-size:13px;font-weight:700;border:none;border-radius:10px;background:var(--accent);color:#fff;padding:6px 12px;cursor:pointer;-webkit-appearance:none;appearance:none;">
         <option value="1T 2024">1T 2024</option><option value="2T 2024">2T 2024</option><option value="3T 2024">3T 2024</option><option value="4T 2024">4T 2024</option>
         <option value="1T 2025">1T 2025</option><option value="2T 2025">2T 2025</option><option value="3T 2025">3T 2025</option><option value="4T 2025">4T 2025</option>
         <option value="1T 2026">1T 2026</option><option value="2T 2026" selected>2T 2026</option><option value="3T 2026">3T 2026</option><option value="4T 2026">4T 2026</option>
@@ -442,8 +447,8 @@ img,video,iframe,table{max-width:100%;}
     </button>
   </nav>
   <!-- Solid block to prevent content bleeding under nav on iOS -->
-  <div style="position:fixed;bottom:0;left:0;right:0;height:20px;background:#FFFFFF;z-index:9998;"></div>
-  <style>@media(prefers-color-scheme:dark){div[style*='height:20px']{background:#1C1C1E!important;}}</style>
+  <div style="position:fixed;bottom:0;left:0;right:0;height:20px;background:#F8F5F1;z-index:9998;"></div>
+  <style>@media(prefers-color-scheme:dark){div[style*='height:20px']{background:#1C1814!important;}}</style>
 
   <!-- ADD INVOICE MODAL -->
 
@@ -516,45 +521,29 @@ img,video,iframe,table{max-width:100%;}
 
   </div>
   <div id="tab-registros" class="tab-pane">
-    <div class="section-label">Trimestre</div>
-    <div class="q-selector" id="qs-r">
-      <button class="q-pill active" onclick="setQReg('1T 2026',this)">1T 2026</button>
-      <button class="q-pill" onclick="setQReg('2T 2026',this)">2T 2026</button>
-      <button class="q-pill" onclick="setQReg('3T 2026',this)">3T 2026</button>
-      <button class="q-pill" onclick="setQReg('4T 2026',this)">4T 2026</button>
-      <button class="q-pill" onclick="setQReg('todos',this)">Todos</button>
-    </div>
-    <div class="view-toggle">
-      <button class="view-btn active" onclick="setView('gastos',this)">Gastos</button>
-      <button class="view-btn" onclick="setView('ingresos',this)">Ingresos</button>
-    </div>
-    <div class="totals-bar" id="reg-totals-bar"></div>
-    <div class="reg-table-wrap"><table class="reg-table"><thead id="reg-thead"></thead><tbody id="reg-tbody"></tbody></table></div>
+
+```
+<div class="view-toggle">
+  <button class="view-btn active" onclick="setView('gastos',this)">Gastos</button>
+  <button class="view-btn" onclick="setView('ingresos',this)">Ingresos</button>
+</div>
+<div class="totals-bar" id="reg-totals-bar"></div>
+<div class="reg-table-wrap"><table class="reg-table"><thead id="reg-thead"></thead><tbody id="reg-tbody"></tbody></table></div>
+```
+
   </div>
   <div id="tab-manual" class="tab-pane">
     <div class="tip-box"><h4>Importar JSON manualmente</h4><ol><li>Sube la factura al chat con Claude</li><li>Claude te devuelve un <code>JSON</code></li><li>Cópialo y pégalo aquí</li></ol></div>
-    <div class="section-label">Trimestre</div>
-    <!-- Year + Quarter selector for modelos -->
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-      <select id="year-m" onchange="updateYearQ('m')" style="padding:6px 10px;font-size:13px;font-weight:600;border:0.5px solid var(--line);border-radius:10px;background:var(--bg-raised);color:var(--text);cursor:pointer;">
-        <option value="2024">2024</option>
-        <option value="2025">2025</option>
-        <option value="2026" selected>2026</option>
-        <option value="2027">2027</option>
-      </select>
-      <div class="q-selector" id="qs-m" style="flex:1;margin-bottom:0;">
-        <button class="q-pill" onclick="setQY(1,this,'m')">1T</button>
-        <button class="q-pill" onclick="setQY(2,this,'m')">2T</button>
-        <button class="q-pill" onclick="setQY(3,this,'m')">3T</button>
-        <button class="q-pill" onclick="setQY(4,this,'m')">4T</button>
-      </div>
-    </div>
-    <div class="card">
-      <textarea class="json-area" id="json-in" placeholder='{"tipo":"gasto","proveedor_cliente":"..."}'></textarea>
-      <div class="btn-row"><button class="btn-sec" onclick="clearJ()">Limpiar</button><button class="btn-sec" onclick="loadDemo()">Demo 1T</button></div>
-      <button class="btn-primary" onclick="importJ()">Guardar</button>
-      <div class="feedback" id="imp-fb"></div>
-    </div>
+
+```
+<div class="card">
+  <textarea class="json-area" id="json-in" placeholder='{"tipo":"gasto","proveedor_cliente":"..."}'></textarea>
+  <div class="btn-row"><button class="btn-sec" onclick="clearJ()">Limpiar</button><button class="btn-sec" onclick="loadDemo()">Demo 1T</button></div>
+  <button class="btn-primary" onclick="importJ()">Guardar</button>
+  <div class="feedback" id="imp-fb"></div>
+</div>
+```
+
   </div>
   <div id="tab-modelos" class="tab-pane">
     <div class="summary-grid">

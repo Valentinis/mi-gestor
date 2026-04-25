@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.118</div>
+    <div class="login-version">v5.119</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.118</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.119</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.118</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.119</div>
       </div>
     </div>
     <div class="top-right">
@@ -847,8 +847,8 @@ function saveCfg(){
 }
 
 async function saveCfgToFirestore(){
-  if(!token||!user||!user.id) return;
-  const uid=user.id;
+  if(!token||!user||!user.email) return;
+  const uid=user.email.replace(/[^a-zA-Z0-9]/g,'_');
   const url=`${FS_URL}/users/${uid}/config/prefs`;
   const body={fields:{
     claudeKey:{stringValue:claudeKey||''},
@@ -862,9 +862,10 @@ async function saveCfgToFirestore(){
 }
 
 async function loadCfgFromFirestore(uid){
-  if(!token||!uid) return;
+  if(!token||!user||!user.email) return;
+  const safeUid=user.email.replace(/[^a-zA-Z0-9]/g,'_');
   try{
-    const url=`${FS_URL}/users/${uid}/config/prefs`;
+    const url=`${FS_URL}/users/${safeUid}/config/prefs`;
     const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
     if(!r.ok){ setFsDot(false); return; }
     const j=await r.json();
@@ -872,14 +873,11 @@ async function loadCfgFromFirestore(uid){
     const remoteKey=f.claudeKey?.stringValue||'';
     const remotePin=f.userPin?.stringValue||'';
     const remoteSheet=f.sheetId?.stringValue||'';
-    // Only overwrite if remote has values
     if(remoteKey) claudeKey=remoteKey;
     if(remotePin) userPin=remotePin;
     if(remoteSheet) sheetId=remoteSheet;
-    // Persist back to localStorage
     localStorage.setItem(LS_CFG,JSON.stringify({claudeKey,userPin,sheetId}));
     setFsDot(true);
-    // Update UI if already rendered
     const ki=document.getElementById('claude-key-input'); if(ki&&claudeKey) ki.value=claudeKey;
     updateClaudeKey(claudeKey);
     updateSheetDisplay();

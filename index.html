@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.110</div>
+    <div class="login-version">v5.112</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.110</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.112</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.110</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.112</div>
       </div>
     </div>
     <div class="top-right">
@@ -1844,7 +1844,8 @@ function renderList(){
   list.innerHTML=[...fs].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")).map(f=>{
     const isIng=f.tipo==='ingreso';
     const amount=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0));
-    return `<div class="fact-item" onclick="openModal(${f._id})" style="cursor:pointer;">
+    const fid=String(f._id);
+    return `<div class="fact-item" onclick="openModal('${fid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);">
       <div class="fact-color-bar ${f.tipo||'gasto'}"></div>
       <div class="fact-main">
         <div class="fact-name">${f.proveedor_cliente||'—'}</div>
@@ -1852,8 +1853,9 @@ function renderList(){
       </div>
       <div class="fact-right">
         <div class="fact-amount" style="color:${isIng?'var(--green)':'var(--red)'};font-weight:700;">${isIng?'+':'−'}${fmt(amount)}</div>
-        <div class="fact-date">${f.fecha||''} ${driveIcon(f)}</div>
+        <div class="fact-date">${f.fecha||''}</div>
       </div>
+      <div style="flex-shrink:0;" onclick="event.stopPropagation()">${driveIcon(f)}</div>
     </div>`;
   }).join('');
 }
@@ -1863,7 +1865,7 @@ let modalFacturaId=null;
 function openModal(id){
   const all=Object.values(data).flat();
   const f=all.find(x=>x._id==id);
-  if(!f) return;
+  if(!f){ alert('DEBUG: no se encontró registro con id='+id+' total='+all.length); return; }
   modalFacturaId=id;
   document.getElementById('modal-title').textContent=(f.proveedor_cliente||'—')+' · '+(f.fecha||'—');
   const rows=[
@@ -1922,20 +1924,6 @@ function openModal(id){
   const driveBtn=document.getElementById('modal-drive-btn');
   if(previewLink){ driveBtn.style.display='flex'; driveBtn._link=previewLink; driveBtn.textContent='📂 Ver en Drive'; driveBtn.onclick=()=>openDriveFile(); }
   else{ driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='☁️ Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); }
-  // Populate justification select
-  const justSec=document.getElementById('modal-just-section');
-  justSec.style.display='none';
-  document.getElementById('modal-just-btn').textContent='✏️ Justificación';
-  const justSel=document.getElementById('modal-just-select');
-  const isIngM=f.tipo==='ingreso';
-  const optsM=isIngM?JUST_OPTIONS_ING:JUST_OPTIONS;
-  const suggestedM=f.justificacion||autoJust(f);
-  justSel.innerHTML=optsM.map(o=>`<option value="${o}" ${o===suggestedM?'selected':o===''&&!suggestedM?'selected':''}>${o===''?'— Seleccionar justificación —':o}</option>`).join('');
-  const justOther=document.getElementById('modal-just-other');
-  justOther.style.display='none';
-  if(f.justificacion&&!JUST_OPTIONS.includes(f.justificacion)){
-    justSel.value='Otro (especificar)'; justOther.style.display='block'; justOther.value=f.justificacion;
-  }
   document.getElementById('factura-modal').style.display='block';
   document.body.style.overflow='hidden';
 }
@@ -2231,7 +2219,7 @@ function hasDriveBackup(f){
 }
 function driveIcon(f){ return hasDriveBackup(f)
   ?'<span title="Copia en Drive" style="font-size:13px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:1px 4px;font-weight:700;">✓</span>'
-  :`<span style="display:inline-flex;align-items:center;gap:3px;"><span title="Sin copia en Drive" style="font-size:13px;background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 4px;font-weight:700;">!</span><button onclick="event.stopPropagation();quickUpload(${f._id})" title="Subir a Drive" style="font-size:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:1px 5px;cursor:pointer;font-weight:700;line-height:1.4;">↑</button></span>`; }
+  :`<span style="display:inline-flex;align-items:center;gap:3px;"><span title="Sin copia en Drive" style="font-size:13px;background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 4px;font-weight:700;">!</span><button onclick="event.stopPropagation();quickUpload('${f._id}')" title="Subir a Drive" style="font-size:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:1px 5px;cursor:pointer;font-weight:700;line-height:1.4;">↑</button></span>`; }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──
@@ -2382,7 +2370,7 @@ function renderRegistros(){
       items.forEach(f=>{
         const total=(f.base_iva||0)+(f.cuota_iva||0);
         const ret=f.retencion_importe||0;
-        html+=`<div onclick="openModal(${f._id})" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
+        html+=`<div onclick="openModal(''+f._id+'') style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
           <div style="width:3px;height:32px;border-radius:2px;background:var(--red);flex-shrink:0;"></div>
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
@@ -2402,7 +2390,7 @@ function renderRegistros(){
     facts.forEach(f=>{
       const bruto=f.ingresos_brutos||f.base_iva||0;
       const ret=f.retencion_importe||0;
-      html+=`<div onclick="openModal(${f._id})" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
+      html+=`<div onclick="openModal(''+f._id+'') style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
         <div style="width:3px;height:32px;border-radius:2px;background:var(--green);flex-shrink:0;"></div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>

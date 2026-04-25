@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.107</div>
+    <div class="login-version">v5.109</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.107</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.109</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.107</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.109</div>
       </div>
     </div>
     <div class="top-right">
@@ -1919,17 +1919,8 @@ function openModal(id){
     const opts2=isIng2?JUST_OPTIONS_ING:JUST_OPTIONS;
     just2.innerHTML=opts2.map(o=>`<option value="${o}" ${o===(f.justificacion||'')?'selected':''}>${o===''?'— Seleccionar —':o}</option>`).join('');
   }
-  if(!driveLink&&f.num_factura){
-    const df=driveFiles.find(df=>df.name&&df.name.includes(f.num_factura.replace(/[^a-zA-Z0-9]/g,'').slice(0,8)));
-    if(df) driveLink=df.link;
-  }
-  if(!driveLink&&f.fecha&&f.proveedor_cliente){
-    const pNorm=(f.proveedor_cliente||'').toLowerCase().replace(/[^a-z]/g,'').slice(0,8);
-    const df=driveFiles.find(df=>df.name&&df.name.includes((f.fecha||'').slice(0,10))&&df.name.toLowerCase().replace(/[^a-z]/g,'').includes(pNorm));
-    if(df) driveLink=df.link;
-  }
   const driveBtn=document.getElementById('modal-drive-btn');
-  if(driveLink){ driveBtn.style.display='flex'; driveBtn._link=driveLink; driveBtn.textContent='📂 Ver en Drive'; driveBtn.onclick=()=>openDriveFile(); }
+  if(previewLink){ driveBtn.style.display='flex'; driveBtn._link=previewLink; driveBtn.textContent='📂 Ver en Drive'; driveBtn.onclick=()=>openDriveFile(); }
   else{ driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='☁️ Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); }
   // Populate justification select
   const justSec=document.getElementById('modal-just-section');
@@ -1977,21 +1968,39 @@ function _quickUploadFile(id, mode){
   if(mode==='camera') input.capture='environment';
   input.onchange=async function(){
     const file=input.files[0]; if(!file) return;
-    const all=Object.values(data).flat();
-    const f=all.find(x=>x._id===id);
-    if(!f||!facturasFId) return;
-    const fecha=(f.fecha||'').slice(0,10);
-    const prov=(f.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
-    const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
-    const newName=[fecha,prov].filter(Boolean).join('_')+ext;
-    const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===id));
-    const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q||Q).catch(()=>null);
-    if(created&&created.webViewLink){
-      f._driveLink=created.webViewLink;
-      driveFiles.push({id:created.id,name:newName,link:created.webViewLink});
-      saveLocal(); renderAll();
-      alert('✓ Archivo subido a Drive');
-    } else { alert('Error al subir el archivo.'); }
+    // Show loading overlay
+    const loader=document.createElement('div');
+    loader.style.cssText='position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+    loader.innerHTML=`
+      <div style="width:44px;height:44px;border:3px solid rgba(255,255,255,0.2);border-top-color:#F0844A;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+      <div style="color:#F5EDE0;font-size:14px;font-weight:600;">Subiendo a Drive...</div>
+      <div style="color:rgba(255,255,255,0.4);font-size:12px;">${file.name}</div>`;
+    document.body.appendChild(loader);
+    try{
+      const all=Object.values(data).flat();
+      const f=all.find(x=>x._id===id);
+      if(!f||!facturasFId){ loader.remove(); return; }
+      const fecha=(f.fecha||'').slice(0,10);
+      const prov=(f.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
+      const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
+      const newName=[fecha,prov].filter(Boolean).join('_')+ext;
+      const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===id));
+      const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q||Q).catch(()=>null);
+      loader.remove();
+      if(created&&created.webViewLink){
+        f._driveLink=created.webViewLink;
+        driveFiles.push({id:created.id,name:newName,link:created.webViewLink});
+        saveLocal(); renderAll();
+        // Brief success toast
+        const toast=document.createElement('div');
+        toast.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#30D158;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:10002;white-space:nowrap;';
+        toast.textContent='✓ Subido a Drive';
+        document.body.appendChild(toast);
+        setTimeout(()=>toast.remove(),2000);
+      } else {
+        alert('Error al subir el archivo.');
+      }
+    } catch(e){ loader.remove(); alert('Error: '+e.message); }
   };
   input.click();
 }

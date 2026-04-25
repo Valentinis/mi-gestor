@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.106</div>
+    <div class="login-version">v5.107</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.106</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.107</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.106</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.107</div>
       </div>
     </div>
     <div class="top-right">
@@ -1949,6 +1949,52 @@ function openModal(id){
   document.body.style.overflow='hidden';
 }
 function closeModal(){ document.getElementById('factura-modal').style.display='none'; document.body.style.overflow=''; modalFacturaId=null; }
+function quickUpload(id){
+  if(!token){ alert('Inicia sesión primero.'); return; }
+  const all=Object.values(data).flat();
+  const f=all.find(x=>x._id===id);
+  if(!f) return;
+  // Show mini action sheet
+  const sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;';
+  sheet.innerHTML=`
+    <div style="background:var(--bg-card);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;" onclick="event.stopPropagation()">
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">${f.proveedor_cliente||'—'}</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;">${f.fecha||''} · Sin copia en Drive</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <button onclick="this.closest('div[style*=z-index]').remove();_quickUploadFile(${id},'file')" style="background:var(--bg-raised);color:var(--text);border:none;border-radius:12px;padding:14px 8px;font-size:13px;font-weight:600;cursor:pointer;">📁 Seleccionar archivo</button>
+        <button onclick="this.closest('div[style*=z-index]').remove();_quickUploadFile(${id},'camera')" style="background:var(--bg-raised);color:var(--text);border:none;border-radius:12px;padding:14px 8px;font-size:13px;font-weight:600;cursor:pointer;">📷 Tomar foto</button>
+      </div>
+      <button onclick="this.closest('div[style*=z-index]').remove()" style="width:100%;background:var(--red-bg);color:var(--red);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
+    </div>`;
+  sheet.addEventListener('click',()=>sheet.remove());
+  document.body.appendChild(sheet);
+}
+function _quickUploadFile(id, mode){
+  const input=document.createElement('input');
+  input.type='file';
+  input.accept='image/*,.pdf';
+  if(mode==='camera') input.capture='environment';
+  input.onchange=async function(){
+    const file=input.files[0]; if(!file) return;
+    const all=Object.values(data).flat();
+    const f=all.find(x=>x._id===id);
+    if(!f||!facturasFId) return;
+    const fecha=(f.fecha||'').slice(0,10);
+    const prov=(f.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
+    const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
+    const newName=[fecha,prov].filter(Boolean).join('_')+ext;
+    const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id===id));
+    const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q||Q).catch(()=>null);
+    if(created&&created.webViewLink){
+      f._driveLink=created.webViewLink;
+      driveFiles.push({id:created.id,name:newName,link:created.webViewLink});
+      saveLocal(); renderAll();
+      alert('✓ Archivo subido a Drive');
+    } else { alert('Error al subir el archivo.'); }
+  };
+  input.click();
+}
 function uploadFromModal(){
   if(!modalFacturaId) return;
   document.getElementById('file-reprocess').onchange=async function(e){
@@ -2176,7 +2222,7 @@ function hasDriveBackup(f){
 }
 function driveIcon(f){ return hasDriveBackup(f)
   ?'<span title="Copia en Drive" style="font-size:13px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:1px 4px;font-weight:700;">✓</span>'
-  :'<span title="Sin copia en Drive" style="font-size:13px;background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 4px;font-weight:700;">!</span>'; }
+  :`<span style="display:inline-flex;align-items:center;gap:3px;"><span title="Sin copia en Drive" style="font-size:13px;background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 4px;font-weight:700;">!</span><button onclick="event.stopPropagation();quickUpload(${f._id})" title="Subir a Drive" style="font-size:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:1px 5px;cursor:pointer;font-weight:700;line-height:1.4;">↑</button></span>`; }
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──

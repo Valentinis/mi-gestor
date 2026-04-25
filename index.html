@@ -76,7 +76,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 /* MAIN */
 #main-screen{display:none;width:100%;overflow-x:hidden;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.top-bar{background:var(–bg-card);border-bottom:1px solid var(–line);padding:16px 16px 12px;padding-top:calc(16px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.top-bar{background:var(–bg-card);border-bottom:1px solid var(–line);padding:12px 16px 12px;padding-top:max(52px, calc(12px + env(safe-area-inset-top)));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 @media(prefers-color-scheme:dark){.top-bar,.bottom-nav{background:var(–bg-card) !important;}}
 .top-left{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .top-title{font-size:15px;font-weight:700;color:var(–text);}
@@ -110,8 +110,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .nav-add{width:50px;height:50px;border-radius:50%;background:var(–accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(196,118,58,0.5);-webkit-tap-highlight-color:transparent;flex-shrink:0;margin-bottom:env(safe-area-inset-bottom);}
 .nav-add svg{width:24px;height:24px;}
 /* Add invoice modal */
-#add-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.88);}
-#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:var(–bg-card);border-radius:28px 28px 0 0;padding:24px 20px 40px;max-height:88vh;overflow-y:auto;}
+#add-modal{display:none;position:fixed;inset:0;z-index:1000;background:#000000;}
+#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;top:auto;background:var(–bg-card);border-radius:28px 28px 0 0;padding:24px 20px 48px;}
 #add-modal .add-sheet h3{font-size:18px;font-weight:700;margin:0;text-align:center;color:var(–text);}
 .add-sheet-handle{width:36px;height:4px;border-radius:2px;background:var(–line-2);margin:0 auto 20px;}
 .upload-zone{border:none;border-radius:16px;padding:20px 12px;text-align:center;cursor:pointer;background:var(–bg-raised);transition:all .2s;-webkit-tap-highlight-color:transparent;}
@@ -134,13 +134,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 /* Filter bar */
 .filter-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
 .filter-bar::-webkit-scrollbar{display:none;}
-.filter-chip{flex-shrink:0;padding:7px 16px;font-size:12px;font-weight:600;border:none;border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;white-space:nowrap;}
+.filter-chip{flex-shrink:0;padding:8px 16px;font-size:12px;font-weight:700;border:none;border-radius:10px;background:var(–bg-raised);color:var(–text);cursor:pointer;white-space:nowrap;}
 .filter-chip.active{background:var(–accent);color:#fff;}
 #filter-proveedor,#filter-cliente{flex-shrink:0;max-width:140px;padding:6px 10px;font-size:12px;font-weight:500;border:1.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;}
 .tab-pane.active{display:block;}
 
 .section-label{font-size:11px;font-weight:600;color:var(–text-3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
-.q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;border:1.5px solid var(–line-2);}
+.q-selector{display:flex;gap:0;margin-bottom:16px;background:var(–bg-raised);border-radius:12px;padding:3px;}
 .q-pill{flex:1;padding:8px 4px;font-size:12px;font-weight:600;border:none;border-radius:9px;background:transparent;color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;text-align:center;white-space:nowrap;overflow:hidden;}
 .q-pill.active{background:var(–accent);color:#fff;box-shadow:0 2px 10px rgba(212,105,30,0.4);}
 
@@ -182,8 +182,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .just-input:focus{outline:none;border-color:var(–accent);}
 
 /* BUTTONS */
-.btn-primary{display:block;width:100%;background:var(–accent);color:#fff;border:none;border-radius:var(–r-sm);padding:13px 16px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
-.btn-primary:active{opacity:0.85;}
+.btn-primary{display:block;width:100%;background:var(–accent);color:#fff;border:none;border-radius:10px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.btn-primary:active{opacity:0.8;}
 .btn-sec{background:var(–bg-raised);color:var(–text);border:0.5px solid var(–line-2);border-radius:var(–r-sm);padding:9px 14px;font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .btn-save-analysis{display:block;width:100%;background:var(–accent);color:#fff;border:none;border-radius:var(–r-sm);padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;}
 .btn-save-analysis:disabled{opacity:0.45;cursor:not-allowed;}
@@ -276,8 +276,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 /* REGISTROS */
 .view-toggle{display:flex;gap:6px;margin-bottom:12px;}
-.view-btn{padding:7px 16px;font-size:13px;font-weight:500;border:0.5px solid var(–line-2);border-radius:20px;background:var(–bg-raised);color:var(–text-2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.view-btn.active{background:var(–accent);color:#fff;border-color:var(–accent);}
+.view-btn{padding:9px 20px;font-size:13px;font-weight:700;border:none;border-radius:10px;background:var(–bg-raised);color:var(–text);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.view-btn.active{background:var(–accent);color:#fff;box-shadow:0 2px 8px rgba(212,105,30,0.4);}
 .totals-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px;}
 .total-box{background:var(–bg-card);border:0.5px solid var(–line);border-radius:var(–r-sm);padding:11px 12px;}
 .total-box-label{font-size:10px;color:var(–text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
@@ -335,7 +335,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.70</div>
+    <div class="login-version">v5.71</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -370,7 +370,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.70</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.71</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -408,7 +408,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.70</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.71</div>
       </div>
     </div>
     <div class="top-right">

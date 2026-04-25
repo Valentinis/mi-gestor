@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.103</div>
+    <div class="login-version">v5.104</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.103</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.104</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -420,7 +420,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.103</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.104</div>
       </div>
     </div>
     <div class="top-right">
@@ -741,7 +741,7 @@ function autoJust(f){
     if(conc.includes('encàrrec')||conc.includes('encargo')) return 'Encargo personalizado de cerámica';
     return 'Venta de cerámica';
   }
-  if(op==='ALQUILER') return 'Alquiler local de actividad';
+  if(op==='ALQUILER'||(f.concepto||'').toLowerCase().includes('arrendamiento')) return 'Alquiler local de actividad';
   if(op==='PROF') return 'Servicios profesionales externos (autónomo con retención 15%)';
   if(op==='INTRA_S') return 'Servicio digital para la actividad';
   if(prov.includes('endesa')||prov.includes('naturgy')||prov.includes('iberdrola')||conc.includes('llum')||conc.includes('luz')||conc.includes('elèctri')) return 'Suministros del local (luz, agua, gas)';
@@ -960,7 +960,8 @@ function classifyRecord(f){
     if(f.fecha){ const m=parseInt((f.fecha||'').slice(5,7)); const y=(f.fecha||'').slice(0,4); f.trimestre=(m<=3?'1T':m<=6?'2T':m<=9?'3T':'4T')+' '+y; f._quarter=f.trimestre; }
     return f;
   }
-  if(name.includes('alibau')){
+  if(name.includes('alibau')||name.includes('fincas gual')||name.includes('arrendamiento')||
+    (f.concepto||'').toLowerCase().includes('arrendamiento')||(f.concepto||'').toLowerCase().includes('alquiler local')){
     f.operacion='ALQUILER';
     f.base_iva=900; f.pct_iva=21; f.cuota_iva=189;
     f.base_irpf=900; f.retencion_pct=19; f.retencion_importe=171;
@@ -1085,6 +1086,7 @@ async function handleClaudeFiles(files){
     div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-analyzing"><span class="spin" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>Analizando...</span></div>`;
     list.prepend(div);
     try{
+      window['_file_'+divId]=file;
       const result=await analyzeWithClaude(file);
       const items=Array.isArray(result)?result:[result];
       // Build review UI with checkboxes and justification
@@ -1103,6 +1105,7 @@ async function handleClaudeFiles(files){
           <div class="factura-review-hdr">
             <input type="checkbox" checked onchange="toggleReview('${divId}_r${i}',this.checked)" />
             <span class="factura-review-title">${f.proveedor_cliente||'—'} · ${f.fecha||'—'}</span>
+            <button type="button" onclick="previewFactura('${divId}')" style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;padding:3px 8px;font-size:11px;color:#F5EDE0;cursor:pointer;flex-shrink:0;">👁 Ver</button>
             <div style="text-align:right;">
               <div style="font-size:14px;font-weight:700;color:${isIng?'#30D158':'#FF5A48'}">${isIng?'+':'-'}${fmt(total)}</div>
               <div style="font-size:10px;color:rgba(255,255,255,0.4);">Base ${fmt(f.base_iva||0)} + IVA ${fmt(f.cuota_iva||0)}</div>
@@ -1673,6 +1676,31 @@ function openAddModal(){
   document.querySelectorAll('#qs-add .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===cq));
   document.getElementById('add-modal').style.display='block';
   document.body.style.overflow='hidden';
+}
+function previewFactura(divId){
+  const file=window['_file_'+divId];
+  if(!file){ alert('Archivo no disponible'); return; }
+  const url=URL.createObjectURL(file);
+  const isPDF=file.type==='application/pdf';
+  // Create overlay
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;';
+  const bar=document.createElement('div');
+  bar.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#1C1814;flex-shrink:0;';
+  bar.innerHTML=`<span style="color:#F5EDE0;font-size:14px;font-weight:600;">${file.name}</span><button onclick="this.closest('div[style*=z-index]').remove();URL.revokeObjectURL('${url}')" style="background:rgba(255,255,255,0.15);border:none;border-radius:20px;padding:6px 14px;color:#F5EDE0;cursor:pointer;font-size:13px;">✕ Cerrar</button>`;
+  const content=document.createElement('div');
+  content.style.cssText='flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;';
+  if(isPDF){
+    const iframe=document.createElement('iframe');
+    iframe.src=url; iframe.style.cssText='width:100%;height:100%;border:none;';
+    content.appendChild(iframe);
+  } else {
+    const img=document.createElement('img');
+    img.src=url; img.style.cssText='max-width:100%;max-height:100%;object-fit:contain;';
+    content.appendChild(img);
+  }
+  overlay.appendChild(bar); overlay.appendChild(content);
+  document.body.appendChild(overlay);
 }
 function closeAddModal(e){
   if(!e||e.target===document.getElementById('add-modal')||e.target===undefined){

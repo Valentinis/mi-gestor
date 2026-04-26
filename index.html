@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.142</div>
+    <div class="login-version">v5.144</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.142</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.144</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.142</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.144</div>
       </div>
     </div>
     <div class="top-right">
@@ -1159,7 +1159,7 @@ async function analyzeWithClaude(file){
   const content=isPDF
     ?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Lee TODAS las páginas de este documento completo. Busca el resumen final (BASE IMPONIBLE, IVA, Retención, TOTAL) que suele estar en la última página. Extrae los datos fiscales siguiendo exactamente las reglas del sistema. Si hay retención en el resumen final, debes incluirla aunque no aparezca en cada línea de concepto.'}]
     :[{type:'image',source:{type:'base64',media_type:mt,data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales siguiendo exactamente las reglas del sistema.'}];
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-beta':'pdfs-2024-09-25','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-beta':'pdfs-2024-09-25,interleaved-thinking-2025-05-14','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:8000,thinking:{type:'enabled',budget_tokens:5000},system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
   const d=await resp.json();
   if(d.error) throw new Error(d.error.message);
   const raw=d.content.find(b=>b.type==='text')?.text||'{}';
@@ -2113,18 +2113,52 @@ function previewFactura(divId){
   bar.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#1C1814;flex-shrink:0;';
   bar.innerHTML=`<span style="color:#F5EDE0;font-size:14px;font-weight:600;">${file.name}</span><button onclick="document.getElementById('_preview_overlay').remove();URL.revokeObjectURL('${url}')" style="background:rgba(255,255,255,0.15);border:none;border-radius:20px;padding:6px 14px;color:#F5EDE0;cursor:pointer;font-size:13px;">✕ Cerrar</button>`;
   const content=document.createElement('div');
-  content.style.cssText='flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;';
+  content.style.cssText='flex:1;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:12px;gap:12px;';
   if(isPDF){
-    const iframe=document.createElement('iframe');
-    iframe.src=url; iframe.style.cssText='width:100%;height:100%;border:none;';
-    content.appendChild(iframe);
+    // Render all PDF pages as images using PDF.js
+    content.innerHTML='<div style="color:rgba(255,255,255,0.5);font-size:13px;padding:20px;">Cargando páginas...</div>';
+    overlay.appendChild(bar); overlay.appendChild(content);
+    document.body.appendChild(overlay);
+    renderPDFPages(file, content, url);
+    return;
   } else {
     const img=document.createElement('img');
-    img.src=url; img.style.cssText='max-width:100%;max-height:100%;object-fit:contain;';
+    img.src=url; img.style.cssText='max-width:100%;object-fit:contain;';
     content.appendChild(img);
   }
   overlay.appendChild(bar); overlay.appendChild(content);
   document.body.appendChild(overlay);
+}
+
+async function renderPDFPages(file, container, blobUrl){
+  try{
+    // Load PDF.js from CDN if not already loaded
+    if(!window.pdfjsLib){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        s.onload=res; s.onerror=rej;
+        document.head.appendChild(s);
+      });
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    const arrayBuffer=await file.arrayBuffer();
+    const pdf=await window.pdfjsLib.getDocument({data:arrayBuffer}).promise;
+    container.innerHTML='';
+    for(let i=1;i<=pdf.numPages;i++){
+      const page=await pdf.getPage(i);
+      const viewport=page.getViewport({scale:window.devicePixelRatio||2});
+      const canvas=document.createElement('canvas');
+      canvas.width=viewport.width;
+      canvas.height=viewport.height;
+      canvas.style.cssText=`width:100%;max-width:600px;border-radius:8px;box-shadow:0 2px 16px rgba(0,0,0,0.5);`;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+      container.appendChild(canvas);
+    }
+    URL.revokeObjectURL(blobUrl);
+  }catch(e){
+    container.innerHTML=`<div style="color:rgba(255,255,255,0.5);font-size:13px;padding:20px;">Error cargando PDF: ${e.message}</div>`;
+  }
 }
 function closeAddModal(e){
   if(document.getElementById('_preview_overlay')) return; // preview open, don't close

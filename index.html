@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.122</div>
+    <div class="login-version">v5.123</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.122</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.123</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.122</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.123</div>
       </div>
     </div>
     <div class="top-right">
@@ -718,6 +718,10 @@ img,video,iframe,table{max-width:100%;}
         <div class="upload-icon">📋</div>
         <div class="upload-title">Pegar imagen</div>
         <div class="upload-sub">Desde portapapeles</div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <textarea id="ticket-text-input" placeholder="O pega aquí el texto del extracto (SumUp, Bizum, transferencia...)" style="width:100%;min-height:100px;padding:10px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.15);border-radius:12px;font-size:13px;color:#F5EDE0;resize:vertical;box-sizing:border-box;font-family:inherit;" oninput="document.getElementById('ticket-analyze-text-btn').style.display=this.value.trim()?'block':'none'"></textarea>
+        <button id="ticket-analyze-text-btn" onclick="handleTicketText()" style="display:none;width:100%;margin-top:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;">Analizar texto →</button>
       </div>
       <input type="file" id="file-ticket" accept="image/*,.pdf" onchange="handleTicketFile(this.files[0])" style="display:none;"/>
       <input type="file" id="file-ticket-camera" accept="image/*" capture="environment" onchange="handleTicketFile(this.files[0])" style="display:none;"/>
@@ -2923,6 +2927,9 @@ function closeTicketModal(e){
     document.body.style.overflow='';
     document.getElementById('file-ticket').value='';
     document.getElementById('file-ticket-camera').value='';
+    document.getElementById('ticket-text-input').value='';
+    document.getElementById('ticket-analyze-text-btn').style.display='none';
+    document.getElementById('ticket-analysis-status').textContent='';
   }
 }
 function triggerTicketUpload(){ document.getElementById('file-ticket').click(); }
@@ -2959,8 +2966,77 @@ function pasteTicketFromClipboard(){
   document.addEventListener('paste',onPaste,{once:true});
 }
 
+async function handleTicketText(){
+  const text=document.getElementById('ticket-text-input').value.trim();
+  if(!text) return;
+  if(!claudeKey||!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
+  const status=document.getElementById('ticket-analysis-status');
+  status.textContent='⏳ Analizando con Claude...';
+  try{
+    const extracted=await analyzeTicketText(text);
+    if(!extracted||!extracted.length){status.textContent='⚠️ No se encontraron transacciones.';return;}
+    const seen=new Set();
+    const deduped=[];
+    for(const t of extracted){
+      const key=(t.fecha||'')+'|'+(t.hora||'')+'|'+(t.importe||0);
+      if(seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(t);
+    }
+    deduped.sort((a,b)=>((b.fecha||'')+' '+(b.hora||'')).localeCompare((a.fecha||'')+' '+(a.hora||'')));
+    const existing=getF(Q);
+    deduped.forEach(t=>{ t._dup=existing.some(f=>f.doc_type==='ticket'&&f.fecha===t.fecha&&Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01); });
+    ticketsPendientes=[...ticketsPendientes,...deduped];
+    const pendingSeen=new Set();
+    ticketsPendientes=ticketsPendientes.filter(t=>{
+      const key=(t.fecha||'')+'|'+(t.hora||'')+'|'+(t.importe||0);
+      if(pendingSeen.has(key)) return false;
+      pendingSeen.add(key);
+      return true;
+    });
+    await saveTicketsPending();
+    status.textContent='';
+    closeTicketModal();
+    renderTicketsPendientes();
+  }catch(e){
+    status.textContent='❌ Error: '+e.message;
+  }
+}
+
+async function analyzeTicketText(text){
+  const prompt=`Eres un extractor de datos de pagos para un autónomo ceramista en Barcelona.
+Analiza el siguiente texto y extrae TODAS las transacciones de ingreso que aparezcan.
+
+Fuentes posibles:
+- SumUp (extracto de ventas): cada transacción tiene fecha de encabezado de día, hora, importe, tipo de tarjeta (Visa/Mastercard). Sin nombre de cliente.
+- Imagin Bizum recibido: tipo "Bizum recibido", importe con +, fecha y hora, nombre del ordenante, concepto informado por el ordenante.
+- Imagin Transferencia: tipo "Transfer inmediata", importe con +, fecha y hora, nombre del remitente, concepto de la transferencia.
+
+Para cada transacción devuelve un objeto JSON con:
+- fecha: "YYYY-MM-DD"
+- hora: "HH:MM" (si está disponible, si no "")
+- importe: número decimal (el importe bruto recibido, positivo)
+- concepto: para SumUp: "Venta tarjeta [Visa/Mastercard]". Para Bizum: "[Nombre] — [concepto]". Para transferencia: "[Nombre] — [concepto]".
+- metodo: "sumup", "bizum" o "transferencia"
+- cliente: nombre del pagador si existe, "" si no
+
+Devuelve SOLO un array JSON válido, sin texto adicional, sin markdown.
+
+TEXTO:
+${text}`;
+
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+  });
+  if(!resp.ok) throw new Error('Claude API error '+resp.status);
+  const j=await resp.json();
+  const txt=(j.content||[]).map(c=>c.text||'').join('');
+  return JSON.parse(txt.replace(/```json|```/g,'').trim());
+}
+
 async function handleTicketFile(file){
-  if(!file) return;
   if(!claudeKey||!claudeKey.startsWith('sk-ant-')){
     alert('Configura la API key de Claude en Config primero.');
     return;

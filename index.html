@@ -43,7 +43,7 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
 
 /* LOGIN */
-#login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;background:linear-gradient(160deg,#0D0D1A 0%,#111827 60%,#0F2040 100%);gap:2rem;}
+#login-screen{position:fixed;inset:0;z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;background:linear-gradient(160deg,#0D0D1A 0%,#111827 60%,#0F2040 100%);gap:2rem;}
 .login-logo-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;}
 .login-logo-svg{filter:drop-shadow(0 8px 24px rgba(196,118,58,0.35));}
 .login-app-name{font-size:30px;font-weight:700;color:#fff;letter-spacing:-0.5px;}
@@ -122,6 +122,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 #add-modal .add-sheet .just-select, #add-modal .add-sheet .just-input{color:#F5EDE0;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);}
 @media(min-width:600px){#add-modal .add-sheet{bottom:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:520px;border-radius:24px;max-height:88vh;padding-bottom:28px;}}
 @keyframes spin{to{transform:rotate(360deg);}}
+@media(min-width:600px){#refresh-btn{display:flex !important;align-items:center;}}
 #ptr-indicator{position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-60px);z-index:9999;background:var(--accent);color:#fff;border-radius:0 0 20px 20px;padding:6px 20px;font-size:13px;font-weight:600;transition:transform .25s ease;pointer-events:none;}
 #ptr-indicator.visible{transform:translateX(-50%) translateY(0);}
 #add-modal .add-sheet h3{font-size:22px;font-weight:800;margin:0;text-align:center;color:#F5EDE0;letter-spacing:-0.3px;}
@@ -349,7 +350,7 @@ img,video,iframe,table{max-width:100%;}
 
 <!-- LOGIN -->
 
-<div id="login-screen">
+<div id="login-screen" style="display:none;">
   <div class="login-logo-wrap">
     <svg class="login-logo-svg" width="80" height="80" viewBox="0 0 80 80" fill="none">
       <rect width="80" height="80" rx="20" fill="url(#lg)"/>
@@ -359,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.154</div>
+    <div class="login-version">v5.156</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -422,7 +423,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.154</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.156</div>
       </div>
     </div>
     <div class="top-right">
@@ -967,7 +968,15 @@ function showPin(){
   renderAll(); updateSI(); showSyncBanner();
   initDrive();
 }
-function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);updateDots(); document.getElementById('main-screen').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
+function signOut(){ 
+  token=null; user=null; localStorage.removeItem(LS_AUTH); updateDots();
+  document.getElementById('main-screen').style.display='none';
+  document.getElementById('pin-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-screen').style.zIndex='99999';
+  document.getElementById('login-screen').style.position='fixed';
+  document.getElementById('login-screen').style.inset='0';
+}
 window.addEventListener('load',()=>{
   loadLocal(); loadCfg();
   // Check if returning from OAuth redirect
@@ -980,6 +989,7 @@ window.addEventListener('load',()=>{
       showPin();return;
     }
   }catch(e){}
+  document.getElementById('main-screen').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 });
 
@@ -3565,8 +3575,10 @@ async function refreshFromDrive(){
   if(icon) icon.style.animation='spin 1s linear infinite';
   if(btn) btn.disabled=true;
   setDS('sync','Actualizando...');
+  showSyncBanner();
+  data={};
+  renderAll(); // shows empty/skeleton state immediately
   try{
-    data={};
     await Promise.all([
       loadFromDrive(),
       loadTicketsPending(),
@@ -3574,6 +3586,7 @@ async function refreshFromDrive(){
     ]);
     setDS('ok','Drive OK');
   }catch(e){ setDS('err','Error'); }
+  hideSyncBanner();
   if(icon) icon.style.animation='';
   if(btn) btn.disabled=false;
 }

@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.124</div>
+    <div class="login-version">v5.125</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.124</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.125</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.124</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.125</div>
       </div>
     </div>
     <div class="top-right">
@@ -2081,7 +2081,6 @@ function switchNav(id,btn){
   if(id==='drive') renderDriveTab();
   if(id==='registros') renderRegistros();
   if(id==='tickets') renderTicketsPendientes();
-  if(id==='tickets') renderPendingTickets();
 }
 function switchTab(id,btn){ switchNav(id,btn); }
 function openAddModal(){
@@ -2301,12 +2300,16 @@ function openModal(id){
   const preview=document.getElementById('modal-doc-preview');
   preview.style.display='none';
   preview.innerHTML='';
-  // Find drive file ID — check by _driveLink first, then by date
+  // Find drive file ID — check by _driveLink first, then by date, then by _driveFileId
   let driveFileId=null;
   let driveFileName=null;
   if(f._driveLink){
     const df=driveFiles.find(x=>x.link===f._driveLink);
     if(df){ driveFileId=df.id; driveFileName=df.name; }
+  }
+  if(!driveFileId&&f._driveFileId){
+    driveFileId=f._driveFileId;
+    driveFileName=f.num_factura?f.num_factura+'.html':null;
   }
   if(!driveFileId&&f.fecha){
     const df=driveFiles.find(df=>df.name&&df.name.startsWith((f.fecha||'').slice(0,10)));
@@ -2320,6 +2323,7 @@ function openModal(id){
       const blob=await r.blob();
       const url=URL.createObjectURL(blob);
       const isPDF=blob.type.includes('pdf')||(driveFileName||'').toLowerCase().endsWith('.pdf');
+      const isHTML=blob.type.includes('html')||(driveFileName||'').toLowerCase().endsWith('.html');
       preview.style.cssText='display:block;background:#000;border-radius:20px 20px 0 0;overflow:hidden;max-height:260px;';
       if(isPDF){
         preview.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#1C1814;">
@@ -2327,6 +2331,15 @@ function openModal(id){
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:600;color:#F5EDE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${driveFileName||f.proveedor_cliente||'—'}</div>
             <div style="font-size:11px;color:rgba(255,255,255,0.4);">PDF · Toca para ver</div>
+          </div>
+          <button onclick="window.open('${url}')" style="background:#F0844A;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">Ver →</button>
+        </div>`;
+      } else if(isHTML){
+        preview.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#1C1814;">
+          <span style="font-size:28px;">🎫</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:#F5EDE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.num_factura||driveFileName||'Ticket'}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);">Factura simplificada · Toca para ver</div>
           </div>
           <button onclick="window.open('${url}')" style="background:#F0844A;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">Ver →</button>
         </div>`;
@@ -2351,8 +2364,17 @@ function openModal(id){
     just2.innerHTML=opts2.map(o=>`<option value="${o}" ${o===(f.justificacion||'')?'selected':''}>${o===''?'— Seleccionar —':o}</option>`).join('');
   }
   const driveBtn=document.getElementById('modal-drive-btn');
-  if(driveFileId){ driveBtn.style.display='flex'; driveBtn.textContent='📂 Ver en Drive'; driveBtn.onclick=()=>openDriveFile(); }
-  else{ driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='☁️ Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); }
+  if(driveFileId){ 
+    driveBtn.style.display='flex'; driveBtn.textContent='📂 Ver en Drive'; 
+    driveBtn._link=driveFiles.find(x=>x.id===driveFileId)?.link||f._driveLink||null;
+    driveBtn.onclick=()=>openDriveFile(); 
+  } else if(f._driveLink){
+    driveBtn.style.display='flex'; driveBtn.textContent='📂 Ver en Drive';
+    driveBtn._link=f._driveLink;
+    driveBtn.onclick=()=>openDriveFile();
+  } else { 
+    driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='☁️ Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); 
+  }
   document.getElementById('factura-modal').style.display='block';
   document.body.style.overflow='hidden';
 }

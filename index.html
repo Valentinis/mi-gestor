@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.134</div>
+    <div class="login-version">v5.135</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.134</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.135</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.134</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.135</div>
       </div>
     </div>
     <div class="top-right">
@@ -688,7 +688,7 @@ img,video,iframe,table{max-width:100%;}
       <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 20px;"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
         <h3 style="font-size:20px;font-weight:800;color:#F5EDE0;margin:0;">Analizar extracto</h3>
-        <button onclick="closeTicketModal()" style="background:rgba(255,255,255,0.12);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#F5EDE0;display:flex;align-items:center;justify-content:center;">×</button>
+        <button id="ticket-modal-close-btn" onclick="closeTicketModal()" style="background:rgba(255,255,255,0.12);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#F5EDE0;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
       <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0 0 16px;">SumUp · Bizum · Transferencia Imagin</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
@@ -750,7 +750,7 @@ img,video,iframe,table{max-width:100%;}
       <div style="text-align:center;margin-bottom:24px;position:relative;">
         <h3>Añadir factura</h3>
         <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:5px 0 0;">Claude analiza la factura automáticamente</p>
-        <button onclick="closeAddModal()" style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.12);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#F5EDE0;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+        <button id="add-modal-close-btn" onclick="closeAddModal()" style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.12);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#F5EDE0;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
       </div>
       <div id="claude-no-key-add" class="tip-box" style="display:none;">Ve a <strong>Config</strong> e introduce tu API key.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
@@ -2078,6 +2078,14 @@ function openAddModal(){
   document.querySelectorAll('#qs-add .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===cq));
   document.getElementById('add-modal').style.display='block';
   document.body.style.overflow='hidden';
+  const sheet=document.querySelector('#add-modal .add-sheet');
+  const closeBtn=document.getElementById('add-modal-close-btn');
+  if(isTouchDevice()){
+    if(closeBtn) closeBtn.style.display='none';
+    addSwipeToClose(sheet, closeAddModal);
+  } else {
+    if(closeBtn) closeBtn.style.display='flex';
+  }
 }
 function previewFactura(divId){
   const file=window['_file_'+divId];
@@ -2871,7 +2879,37 @@ function renderRegistros(){
   });
   tbody.innerHTML=html;
 }
-// ── TICKETS ──
+// ── SWIPE TO CLOSE ──
+const isTouchDevice=()=>window.matchMedia('(hover:none)').matches||('ontouchstart' in window);
+
+function addSwipeToClose(sheetEl, closeFn){
+  if(!isTouchDevice()) return; // desktop: keep X button
+  let startY=0, currentY=0, dragging=false;
+  sheetEl.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1) return;
+    startY=e.touches[0].clientY;
+    dragging=true;
+    sheetEl.style.transition='none';
+  },{passive:true});
+  sheetEl.addEventListener('touchmove',e=>{
+    if(!dragging) return;
+    currentY=e.touches[0].clientY;
+    const dy=Math.max(0,currentY-startY);
+    sheetEl.style.transform=`translateY(${dy}px)`;
+  },{passive:true});
+  sheetEl.addEventListener('touchend',()=>{
+    if(!dragging) return;
+    dragging=false;
+    sheetEl.style.transition='transform .25s ease';
+    const dy=currentY-startY;
+    if(dy>80){
+      sheetEl.style.transform=`translateY(100%)`;
+      setTimeout(()=>{ sheetEl.style.transform=''; closeFn(); },220);
+    } else {
+      sheetEl.style.transform='';
+    }
+  });
+}
 const LS_TICK='migestor_tickets_pending';
 let ticketsPendientes=[];
 
@@ -2957,6 +2995,14 @@ function openTicketModal(){
   document.getElementById('ticket-modal').style.display='block';
   document.body.style.overflow='hidden';
   document.getElementById('ticket-analysis-status').textContent='';
+  const sheet=document.querySelector('#ticket-modal > div');
+  const closeBtn=document.getElementById('ticket-modal-close-btn');
+  if(isTouchDevice()){
+    if(closeBtn) closeBtn.style.display='none';
+    addSwipeToClose(sheet, closeTicketModal);
+  } else {
+    if(closeBtn) closeBtn.style.display='flex';
+  }
 }
 function closeTicketModal(e){
   if(!e||e.target===document.getElementById('ticket-modal')||e.target===undefined){

@@ -359,7 +359,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.152</div>
+    <div class="login-version">v5.153</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -373,29 +373,8 @@ img,video,iframe,table{max-width:100%;}
 
 <!-- PIN -->
 
-<div id="pin-screen">
-  <div class="pin-user-wrap">
-    <img class="avatar-img" id="avatar-img" src="" alt="" onerror="this.style.display='none'"/>
-    <div class="avatar-name" id="avatar-name">—</div>
-    <div class="avatar-email" id="avatar-email">—</div>
-  </div>
-  <div class="pin-label">Introduce tu PIN</div>
-  <div class="pin-card">
-    <div class="pin-dots">
-      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-    </div>
-    <div class="pin-grid">
-      <button class="pin-btn" onclick="pp('1')">1</button><button class="pin-btn" onclick="pp('2')">2</button><button class="pin-btn" onclick="pp('3')">3</button>
-      <button class="pin-btn" onclick="pp('4')">4</button><button class="pin-btn" onclick="pp('5')">5</button><button class="pin-btn" onclick="pp('6')">6</button>
-      <button class="pin-btn" onclick="pp('7')">7</button><button class="pin-btn" onclick="pp('8')">8</button><button class="pin-btn" onclick="pp('9')">9</button>
-      <button class="pin-btn del" onclick="pd()">&#x232B;</button><button class="pin-btn" onclick="pp('0')">0</button><button class="pin-btn enter" onclick="pe()">OK</button>
-    </div>
-    <div class="pin-error" id="pin-error"></div>
-  </div>
-  <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.152</div>
-</div>
+<!-- PIN screen removed - login goes directly to main -->
+<div id="pin-screen" style="display:none;"></div>
 
 <!-- MODAL DETALLE FACTURA -->
 
@@ -443,7 +422,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.152</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.153</div>
       </div>
     </div>
     <div class="top-right">
@@ -643,12 +622,6 @@ img,video,iframe,table{max-width:100%;}
     </div>
     <div class="section-label">Google Sheets</div>
     <div class="card"><div class="config-row"><div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div><button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear</button></div></div>
-    <div class="section-label">PIN</div>
-    <div class="card">
-      <div class="config-row"><div><div class="config-label">Cambiar PIN</div><div class="config-sub">4 dígitos</div></div><input type="password" class="config-input" id="new-pin-input" placeholder="1234" maxlength="4" style="width:90px;"/></div>
-      <button class="btn-primary" onclick="changePin()">Guardar PIN</button>
-      <div class="feedback" id="pin-fb"></div>
-    </div>
   </div>
 
   <!-- TICKETS TAB -->
@@ -969,8 +942,32 @@ function checkRedirectToken(){
     handleToken(access_token).then(()=>{ showPin(); });
   }
 }
-function showPin(){ document.getElementById('login-screen').style.display='none'; document.getElementById('pin-screen').style.display='flex'; if(user){ document.getElementById('avatar-name').textContent=user.name||''; document.getElementById('avatar-email').textContent=user.email||''; const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';} document.getElementById('drive-user-name').textContent=user.name||''; document.getElementById('drive-user-email').textContent=user.email||''; } }
-function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);pin='';updateDots(); ['main-screen','pin-screen'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById('login-screen').style.display='flex'; }
+function showPin(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('pin-screen').style.display='none';
+  document.getElementById('main-screen').style.display='block';
+  if(user){
+    document.getElementById('avatar-name').textContent=user.name||'';
+    document.getElementById('avatar-email').textContent=user.email||'';
+    const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';}
+    document.getElementById('drive-user-name').textContent=user.name||'';
+    document.getElementById('drive-user-email').textContent=user.email||'';
+  }
+  if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);}
+  else{document.getElementById('claude-no-key').style.display='block';}
+  updateSheetDisplay();
+  const cq=currentQuarter();
+  Q=cq; regQ=cq;
+  const hs=document.getElementById('header-q-select'); if(hs) hs.value=cq;
+  ['qs-f','qs-m','qs-r'].forEach(id=>{ document.querySelectorAll('#'+id+' .q-pill').forEach(b=>{ b.classList.toggle('active', b.textContent.trim()===cq); }); });
+  const qb=document.getElementById('qbadge'); if(qb) qb.textContent=cq;
+  driveLoaded=false;
+  window._syncStart=Date.now();
+  loadTicketsPending();
+  renderAll(); updateSI(); showSyncBanner();
+  initDrive();
+}
+function signOut(){ token=null;user=null;localStorage.removeItem(LS_AUTH);updateDots(); document.getElementById('main-screen').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
 window.addEventListener('load',()=>{
   loadLocal(); loadCfg();
   // Check if returning from OAuth redirect

@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="MiGestor">
 <meta name="theme-color" content="#0D0D1A">
 <title>MiGestor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -347,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.125</div>
+    <div class="login-version">v5.127</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.125</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.127</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.125</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.127</div>
       </div>
     </div>
     <div class="top-right">
@@ -3223,59 +3224,112 @@ async function getNextTicketNum(){
   return 'FS-'+year+'-'+String(num).padStart(3,'0');
 }
 
-function generateTicketHTML(rec){
-  const base=(rec.base_iva||0).toFixed(2).replace('.',',');
-  const iva=(rec.cuota_iva||0).toFixed(2).replace('.',',');
-  const total=(rec.ingresos_brutos||0).toFixed(2).replace('.',',');
+function generateTicketPDF(rec){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm',format:'a4'});
+  const W=210, mg=20;
+  const base=(rec.base_iva||0).toFixed(2);
+  const iva=(rec.cuota_iva||0).toFixed(2);
+  const total=(rec.ingresos_brutos||0).toFixed(2);
   const cliente=rec.proveedor_cliente&&rec.proveedor_cliente!=='Venta directa'?rec.proveedor_cliente:'';
-  return `<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Factura ${rec.num_factura}</title>
-<style>
-  body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;padding:20px;color:#111;}
-  .header{border-bottom:2px solid #D4691E;padding-bottom:16px;margin-bottom:24px;}
-  .emisor{font-size:13px;line-height:1.6;}
-  .emisor strong{font-size:16px;display:block;margin-bottom:4px;}
-  .num{font-size:22px;font-weight:700;color:#D4691E;margin-bottom:4px;}
-  .meta{font-size:12px;color:#666;margin-bottom:24px;}
-  .cliente-box{background:#f8f5f1;border-radius:8px;padding:12px;margin-bottom:24px;font-size:13px;}
-  table{width:100%;border-collapse:collapse;margin-bottom:24px;}
-  th{background:#D4691E;color:#fff;padding:8px 12px;text-align:left;font-size:12px;}
-  td{padding:8px 12px;font-size:13px;border-bottom:1px solid #eee;}
-  .totals{text-align:right;font-size:13px;line-height:2;}
-  .total-final{font-size:18px;font-weight:700;color:#D4691E;}
-  .footer{margin-top:32px;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:12px;text-align:center;}
-  .metodo-badge{display:inline-block;background:#f0ebe3;border-radius:4px;padding:2px 8px;font-size:11px;color:#5C4A32;}
-</style>
-</head>
-<body>
-  <div class="header">
-    <div class="emisor">
-      <strong>Valentín López Pérez</strong>
-      NIF: 48220739C<br>
-      Badajoz 95 LOC 1, 08005 Barcelona<br>
-      valentinnlopez@gmail.com · 686 544 922<br>
-      Epígrafe IAE: 86.2 Ceramista
-    </div>
-  </div>
-  <div class="num">Factura simplificada ${rec.num_factura}</div>
-  <div class="meta">Fecha: ${rec.fecha||'—'} &nbsp;|&nbsp; <span class="metodo-badge">${rec.notas||''}</span></div>
-  ${cliente?`<div class="cliente-box"><strong>Cliente:</strong> ${cliente}</div>`:''}
-  <table>
-    <tr><th>Concepto</th><th>Importe</th></tr>
-    <tr><td>Taller de cerámica</td><td>${base} €</td></tr>
-  </table>
-  <div class="totals">
-    Base imponible: <strong>${base} €</strong><br>
-    IVA (21%): <strong>${iva} €</strong><br>
-    <span class="total-final">TOTAL: ${total} €</span>
-  </div>
-  <div class="footer">
-    Factura simplificada emitida conforme al art. 7.1 del RD 1619/2012<br>
-    Régimen especial de estimación directa simplificada
-  </div>
-</body>
-</html>`;
+
+  // Header bar
+  doc.setFillColor(212,105,30);
+  doc.rect(0,0,W,18,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(13);
+  doc.text('FACTURA SIMPLIFICADA',mg,12);
+  doc.setFontSize(11);
+  doc.text(rec.num_factura||'',W-mg,12,{align:'right'});
+
+  // Emisor
+  doc.setTextColor(30,30,30);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.text('Valentín López Pérez',mg,30);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.setTextColor(80,80,80);
+  doc.text('NIF: 48220739C',mg,36);
+  doc.text('Badajoz 95 LOC 1, 08005 Barcelona',mg,41);
+  doc.text('valentinnlopez@gmail.com  ·  686 544 922',mg,46);
+
+  // Meta
+  doc.setDrawColor(212,105,30);
+  doc.setLineWidth(0.4);
+  doc.line(mg,52,W-mg,52);
+  doc.setTextColor(80,80,80);
+  doc.setFontSize(9);
+  doc.text('Fecha de expedición: '+(rec.fecha||'—'),mg,58);
+  doc.text('Método de pago: '+(rec.notas||'—'),mg,63);
+
+  // Cliente
+  let y=72;
+  if(cliente){
+    doc.setFillColor(248,245,241);
+    doc.roundedRect(mg,y-5,W-mg*2,14,2,2,'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9);
+    doc.setTextColor(30,30,30);
+    doc.text('Cliente:',mg+3,y+2);
+    doc.setFont('helvetica','normal');
+    doc.text(cliente,mg+22,y+2);
+    y+=18;
+  }
+
+  // Table header
+  doc.setFillColor(212,105,30);
+  doc.rect(mg,y,W-mg*2,8,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(9);
+  doc.text('Concepto',mg+3,y+5.5);
+  doc.text('Importe',W-mg-3,y+5.5,{align:'right'});
+
+  // Table row
+  y+=8;
+  doc.setFillColor(252,252,252);
+  doc.rect(mg,y,W-mg*2,9,'F');
+  doc.setDrawColor(220,220,220);
+  doc.rect(mg,y,W-mg*2,9,'S');
+  doc.setTextColor(30,30,30);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.text('Venta / servicio de cerámica',mg+3,y+6);
+  doc.text(base+' €',W-mg-3,y+6,{align:'right'});
+
+  // Totals
+  y+=18;
+  doc.setFontSize(9);
+  doc.setTextColor(80,80,80);
+  doc.text('Base imponible:',W-mg-50,y);
+  doc.setTextColor(30,30,30);
+  doc.text(base+' €',W-mg,y,{align:'right'});
+  y+=6;
+  doc.setTextColor(80,80,80);
+  doc.text('IVA (21%):',W-mg-50,y);
+  doc.setTextColor(30,30,30);
+  doc.text(iva+' €',W-mg,y,{align:'right'});
+  y+=2;
+  doc.setDrawColor(212,105,30);
+  doc.line(W-mg-50,y+1,W-mg,y+1);
+  y+=5;
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.setTextColor(212,105,30);
+  doc.text('TOTAL:',W-mg-50,y);
+  doc.text(total+' €',W-mg,y,{align:'right'});
+
+  // Footer
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(150,150,150);
+  doc.line(mg,275,W-mg,275);
+  doc.text('Factura simplificada emitida conforme al art. 7.1 del RD 1619/2012',W/2,280,{align:'center'});
+  doc.text('Régimen de estimación directa simplificada',W/2,284,{align:'center'});
+
+  return doc.output('arraybuffer');
 }
 
 async function approveTicketWithDrive(t){
@@ -3289,7 +3343,7 @@ async function approveTicketWithDrive(t){
     proveedor_cliente:t.cliente||'Venta directa',
     nif:'',
     fecha:t.fecha||'',
-    concepto:'Taller de cerámica',
+    concepto:'Venta / servicio de cerámica',
     num_factura:numFact,
     operacion:'INT',
     base_iva:base,
@@ -3303,13 +3357,13 @@ async function approveTicketWithDrive(t){
     _id:Date.now()+Math.random()
   };
   classifyRecord(rec);
-  // Generate HTML ticket and upload to Drive
+  // Generate PDF and upload to Drive
   if(token&&ticketsFId){
     try{
-      const html=generateTicketHTML(rec);
-      const blob=new Blob([html],{type:'text/html'});
-      const fileName=numFact+'_'+(rec.fecha||'').replace(/-/g,'')+'_'+(t.cliente||'venta').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20)+'.html';
-      const file=new File([blob],fileName,{type:'text/html'});
+      const pdfBuffer=generateTicketPDF(rec);
+      const blob=new Blob([pdfBuffer],{type:'application/pdf'});
+      const fileName=numFact+'_'+(rec.fecha||'').replace(/-/g,'')+'_'+(t.cliente||'venta').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20)+'.pdf';
+      const file=new File([blob],fileName,{type:'application/pdf'});
       const meta=JSON.stringify({name:fileName,parents:[ticketsFId]});
       const form=new FormData();
       form.append('metadata',new Blob([meta],{type:'application/json'}));
@@ -3334,7 +3388,7 @@ function ticketToRecord(t){
     proveedor_cliente:t.cliente||'Venta directa',
     nif:'',
     fecha:t.fecha||'',
-    concepto:'Taller de cerámica',
+    concepto:'Venta / servicio de cerámica',
     num_factura:'',
     operacion:'INT',
     base_iva:base,

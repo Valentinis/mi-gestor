@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.136</div>
+    <div class="login-version">v5.137</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.136</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.137</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.136</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.137</div>
       </div>
     </div>
     <div class="top-right">
@@ -1147,7 +1147,7 @@ async function analyzeWithClaude(file){
   const isPDF=file.type==='application/pdf';
   const mt=isPDF?'application/pdf':(file.type||'image/jpeg');
   const content=isPDF?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales siguiendo exactamente las reglas del sistema.'}]:[{type:'image',source:{type:'base64',media_type:mt,data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales siguiendo exactamente las reglas del sistema.'}];
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-beta':'pdfs-2024-09-25','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
   const d=await resp.json();
   if(d.error) throw new Error(d.error.message);
   const raw=d.content.find(b=>b.type==='text')?.text||'{}';

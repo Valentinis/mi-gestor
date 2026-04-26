@@ -77,8 +77,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 /* MAIN */
 #main-screen{display:none;position:fixed;top:0;left:0;right:0;bottom:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(–bg);}
-.top-bar{background:var(–bg-card);border-bottom:1px solid var(–line);padding:12px 16px 12px;padding-top:max(52px, calc(12px + env(safe-area-inset-top)));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-@media(prefers-color-scheme:dark){.top-bar,.bottom-nav{background:var(–bg-card) !important;}}
+.top-bar{background:var(–bg-card);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid var(–line);padding:12px 16px 12px;padding-top:max(52px, calc(12px + env(safe-area-inset-top)));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+@media(prefers-color-scheme:dark){.top-bar{background:#1C1814 !important;}.bottom-nav{background:#1C1814 !important;}}
 .top-left{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .top-title{font-size:15px;font-weight:700;color:var(–text);}
 .top-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.130</div>
+    <div class="login-version">v5.133</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.130</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.133</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.130</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.133</div>
       </div>
     </div>
     <div class="top-right">
@@ -541,7 +541,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b111')"><div class="mod-left"><span class="mod-code">111</span><span class="mod-name">Retenciones profesionales</span></div><div class="mod-res pagar" id="r111">—</div></div><div class="mod-body" id="b111"><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Nº perceptores</span><span class="cas-base"></span><span class="cas-cuota" id="m111-n">—</span></div><div class="cas-row"><span class="cas-num">04</span><span class="cas-desc">Base retenciones PROF</span><span class="cas-base"></span><span class="cas-cuota" id="m111-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">06</span><span class="cas-desc">Retenciones 15%</span><span class="cas-base"></span><span class="cas-cuota" id="m111-c">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')""><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
-    <button class="btn-primary" onclick="recalc()" style="width:100%;margin-bottom:8px;">Recalcular modelos</button>
+    <button class="btn-accent" onclick="recalc()" style="margin-bottom:8px;">Recalcular modelos</button>
     <div class="mod-card" style="margin-top:12px;">
       <div class="mod-hdr" onclick="tog('b-anual')">
         <div class="mod-left"><span class="mod-code" style="font-size:11px;background:var(--text-3);">AÑO</span><span class="mod-name">Resumen anual estimado</span></div>
@@ -640,12 +640,14 @@ img,video,iframe,table{max-width:100%;}
   <!-- TICKETS TAB -->
 
   <div id="tab-tickets" class="tab-pane">
+    <div style="margin-bottom:16px;">
+      <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">Tickets de venta</div>
+      <div style="font-size:13px;color:var(--text-3);margin-top:3px;">SumUp · Bizum · Transferencia</div>
+    </div>
 
 ```
-<div class="section-label" style="margin-bottom:10px;">Tickets de venta · SumUp · Bizum · Transferencia</div>
-
-<button onclick="openTicketModal()" class="btn-accent" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+<button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
   Analizar extracto / pago
 </button>
 
@@ -670,10 +672,10 @@ img,video,iframe,table{max-width:100%;}
 <div id="tickets-list" style="display:none;"></div>
 
 <!-- Empty state -->
-<div id="tickets-empty" style="padding:32px 0;text-align:center;">
-  <div style="font-size:24px;margin-bottom:8px;">🎫</div>
-  <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">Sin tickets pendientes</div>
-  <div style="font-size:12px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
+<div id="tickets-empty" style="padding:48px 0;text-align:center;">
+  <div style="font-size:36px;margin-bottom:12px;">🎫</div>
+  <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin tickets pendientes</div>
+  <div style="font-size:13px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
 </div>
 ```
 
@@ -2749,8 +2751,8 @@ function fmt(n){ if(!n&&n!==0||isNaN(n)) return '—'; return n.toFixed(2).repla
 function fmtN(n){ return n.toFixed(2).replace('.',',')+' €'; }
 
 // ── REGISTROS ──
-function setQReg(q,btn){ regQ=q; document.querySelectorAll('#qs-r .q-pill').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
-function setView(v,btn){ regView=v; document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
+function setQReg(q,btn){ regQ=q; document.querySelectorAll('#qs-r .filter-chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
+function setView(v,btn){ regView=v; document.querySelectorAll('#reg-header .filter-chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderRegistros(); }
 
 function getRegFacts(){
   if(regQ==='todos') return Object.values(data).flat();
@@ -2760,20 +2762,26 @@ function getRegFacts(){
 function fmtEur(n){ if(!n||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
 
 function renderRegistros(){
-  const all=getRegFacts();
   const isGastos=regView==='gastos';
-  const facts=all.filter(f=>f.tipo===(isGastos?'gasto':'ingreso'));
+  const curMonth=new Date().toISOString().slice(0,7);
+  let facts=getRegFacts();
+  if(regView==='gastos') facts=facts.filter(f=>f.tipo==='gasto');
+  else if(regView==='ingresos') facts=facts.filter(f=>f.tipo==='ingreso');
+  else if(regView==='mes') facts=facts.filter(f=>(f.fecha||'').startsWith(curMonth));
+  // 'todos' shows all
 
   // Header with toggle + quarter selector
   const hdr=document.getElementById('reg-header');
   const quarters=['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026'];
   hdr.innerHTML=`
     <div class="filter-bar" style="margin-bottom:10px;">
-      <button onclick="setView('gastos',this)" class="filter-chip${isGastos?' active':''}">Gastos</button>
-      <button onclick="setView('ingresos',this)" class="filter-chip${!isGastos?' active':''}">Ingresos</button>
+      <button onclick="setView('todos',this)" class="filter-chip${regView==='todos'?' active':''}">Todos</button>
+      <button onclick="setView('gastos',this)" class="filter-chip${regView==='gastos'?' active':''}">Gastos</button>
+      <button onclick="setView('ingresos',this)" class="filter-chip${regView==='ingresos'?' active':''}">Ingresos</button>
+      <button onclick="setView('mes',this)" class="filter-chip${regView==='mes'?' active':''}">Este mes</button>
     </div>
-    <div class="q-selector" id="qs-r" style="overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-      ${quarters.map(q=>`<button class="q-pill${regQ===q?' active':''}" onclick="setQReg('${q}',this)">${q}</button>`).join('')}
+    <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;">
+      ${quarters.map(q=>`<button class="filter-chip${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;white-space:nowrap;">${q}</button>`).join('')}
     </div>`;
 
   // Totals
@@ -2818,7 +2826,7 @@ function renderRegistros(){
 
   // Records grouped by operacion
   const tbody=document.getElementById('reg-tbody');
-  if(!facts.length){ tbody.innerHTML=`<div style="padding:40px 0;text-align:center;color:var(--text-3);font-size:14px;">${isGastos?'Sin gastos':'Sin ingresos'} en ${regQ}</div>`; return; }
+  if(!facts.length){ tbody.innerHTML=`<div style="padding:40px 0;text-align:center;color:var(--text-3);font-size:14px;">Sin registros en ${regQ}</div>`; return; }
 
   const groupLabels={ ALQUILER:'Alquiler · 115', INTRA_S:'Intracomunitario · 349', INT:'Interior con IVA', EXENTO:'Exento / Sin IVA', PROF:'Profesional · 111', otros:'Otros' };
   const groupColors={ ALQUILER:'var(--blue)', INTRA_S:'var(--amber)', INT:isGastos?'var(--red)':'var(--green)', EXENTO:'var(--text-3)', PROF:'var(--blue)', otros:'var(--text-3)' };
@@ -2830,25 +2838,31 @@ function renderRegistros(){
   let html='';
   Object.entries(groups).forEach(([op,items])=>{
     if(!items.length) return;
-    const subtotal=isGastos
-      ?items.reduce((a,f)=>a+(f.base_iva||0)+(f.cuota_iva||0),0)
-      :items.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+    const subtotal=items.reduce((a,f)=>{
+      if(f.tipo==='ingreso') return a+(f.ingresos_brutos||f.base_iva||0);
+      return a+(f.base_iva||0)+(f.cuota_iva||0);
+    },0);
+    const hasGastos=items.some(f=>f.tipo==='gasto');
+    const hasIngresos=items.some(f=>f.tipo==='ingreso');
+    const groupAccent=hasGastos&&!hasIngresos?'var(--red)':hasIngresos&&!hasGastos?'var(--green)':'var(--text-2)';
     html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 6px;">
       <div style="font-size:11px;font-weight:700;color:${groupColors[op]};text-transform:uppercase;letter-spacing:.06em;">${groupLabels[op]} · ${items.length}</div>
-      <div style="font-size:12px;font-weight:700;color:${groupColors[op]};">${isGastos?'−':'+'} ${fmtEur(subtotal)}</div>
+      <div style="font-size:12px;font-weight:700;color:${groupAccent};">${subtotal>=0?'+':''} ${fmtEur(Math.abs(subtotal))}</div>
     </div>`;
     items.forEach(f=>{
-      const amount=isGastos?(f.base_iva||0)+(f.cuota_iva||0):(f.ingresos_brutos||f.base_iva||0);
+      const isGasto=f.tipo==='gasto';
+      const amount=isGasto?(f.base_iva||0)+(f.cuota_iva||0):(f.ingresos_brutos||f.base_iva||0);
+      const rowColor=isGasto?'var(--red)':'var(--green)';
       const ret=f.retencion_importe||0;
       const hasDrive=f._driveLink||f._driveFileId||driveFiles.some(d=>d.name&&f.fecha&&d.name.startsWith(f.fecha.slice(0,10)));
       html+=`<div onclick="openModal('${f._id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
-        <div style="width:3px;min-height:36px;border-radius:2px;background:${accentColor};flex-shrink:0;align-self:stretch;"></div>
+        <div style="width:3px;min-height:36px;border-radius:2px;background:${rowColor};flex-shrink:0;align-self:stretch;"></div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
           <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${f.concepto||''}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
         </div>
         <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:13px;font-weight:800;color:${accentColor};">${isGastos?'−':'+'} ${fmtEur(amount)}</div>
+          <div style="font-size:13px;font-weight:800;color:${rowColor};">${isGasto?'−':'+'} ${fmtEur(amount)}</div>
           <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${f.fecha||''} ${hasDrive?'<span style="color:var(--green)">✓</span>':'<span style="color:var(--red)">!</span>'}</div>
         </div>
       </div>`;

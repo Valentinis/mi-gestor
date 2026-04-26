@@ -347,7 +347,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.119</div>
+    <div class="login-version">v5.122</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -382,7 +382,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.119</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.122</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -430,7 +430,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.119</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.122</div>
       </div>
     </div>
     <div class="top-right">
@@ -702,7 +702,7 @@ img,video,iframe,table{max-width:100%;}
         <button onclick="closeTicketModal()" style="background:rgba(255,255,255,0.12);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#F5EDE0;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
       <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0 0 16px;">SumUp · Bizum · Transferencia Imagin</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
         <div class="upload-zone" onclick="triggerTicketUpload()" style="margin-bottom:0;">
           <div class="upload-icon">📁</div>
           <div class="upload-title">Seleccionar</div>
@@ -713,6 +713,11 @@ img,video,iframe,table{max-width:100%;}
           <div class="upload-title">Cámara</div>
           <div class="upload-sub">Fotografiar</div>
         </div>
+      </div>
+      <div class="upload-zone" onclick="pasteTicketFromClipboard()" style="margin-bottom:8px;">
+        <div class="upload-icon">📋</div>
+        <div class="upload-title">Pegar imagen</div>
+        <div class="upload-sub">Desde portapapeles</div>
       </div>
       <input type="file" id="file-ticket" accept="image/*,.pdf" onchange="handleTicketFile(this.files[0])" style="display:none;"/>
       <input type="file" id="file-ticket-camera" accept="image/*" capture="environment" onchange="handleTicketFile(this.files[0])" style="display:none;"/>
@@ -995,6 +1000,7 @@ function pe(){ if(pin===userPin){
   const qb=document.getElementById('qbadge'); if(qb) qb.textContent=cq;
   driveLoaded=false;
   window._syncStart=Date.now();
+  loadTicketsPending(); // async, renders when ready
   renderAll(); updateSI(); showSyncBanner();
   initDrive();
 } else { document.getElementById('pin-error').textContent='PIN incorrecto'; pin='';updateDots(); setTimeout(()=>document.getElementById('pin-error').textContent='',2000); } }
@@ -2070,6 +2076,7 @@ function switchNav(id,btn){
   if(btn) btn.classList.add('active');
   if(id==='drive') renderDriveTab();
   if(id==='registros') renderRegistros();
+  if(id==='tickets') renderTicketsPendientes();
   if(id==='tickets') renderPendingTickets();
 }
 function switchTab(id,btn){ switchNav(id,btn); }
@@ -2824,7 +2831,86 @@ function renderRegistros(){
   }
 }
 // ── TICKETS ──
+const LS_TICK='migestor_tickets_pending';
 let ticketsPendientes=[];
+
+function fsTicketUrl(safeUid){ return `${FS_URL}/users/${safeUid}/tickets_pending`; }
+function getSafeUid(){ return user&&user.email?user.email.replace(/[^a-zA-Z0-9]/g,'_'):null; }
+
+async function saveTicketsPending(){
+  // Always save to localStorage as fallback
+  localStorage.setItem(LS_TICK,JSON.stringify(ticketsPendientes));
+  if(!token||!getSafeUid()) return;
+  const safeUid=getSafeUid();
+  // Write all pending tickets to Firestore (overwrite approach: delete all then write)
+  // Simpler: write each ticket as a document keyed by a stable id
+  try{
+    // First delete existing docs, then write current state
+    await deleteAllFsTickets(safeUid);
+    for(const t of ticketsPendientes){
+      const docId='t_'+(t._fsId||Date.now()+'_'+Math.random().toString(36).slice(2));
+      t._fsId=docId;
+      const url=`${FS_URL}/users/${safeUid}/tickets_pending/${docId}`;
+      const fields={};
+      Object.entries(t).forEach(([k,v])=>{
+        if(typeof v==='number') fields[k]={doubleValue:v};
+        else if(typeof v==='boolean') fields[k]={booleanValue:v};
+        else fields[k]={stringValue:String(v??'')};
+      });
+      await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({fields})}).catch(()=>{});
+    }
+  }catch(e){}
+}
+
+async function deleteAllFsTickets(safeUid){
+  if(!token||!safeUid) return;
+  try{
+    const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
+    const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+    if(!r.ok) return;
+    const j=await r.json();
+    if(!j.documents) return;
+    for(const doc of j.documents){
+      await fetch(`https://firestore.googleapis.com/v1/${doc.name}`,{method:'DELETE',headers:{Authorization:'Bearer '+token}}).catch(()=>{});
+    }
+  }catch(e){}
+}
+
+async function loadTicketsPending(){
+  // Try Firestore first, fall back to localStorage
+  if(token&&getSafeUid()){
+    try{
+      const safeUid=getSafeUid();
+      const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+      if(r.ok){
+        const j=await r.json();
+        if(j.documents&&j.documents.length){
+          ticketsPendientes=j.documents.map(doc=>{
+            const f=doc.fields||{};
+            const t={};
+            Object.entries(f).forEach(([k,v])=>{
+              if(v.doubleValue!==undefined) t[k]=v.doubleValue;
+              else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
+              else t[k]=v.stringValue||'';
+            });
+            return t;
+          });
+          localStorage.setItem(LS_TICK,JSON.stringify(ticketsPendientes));
+          renderTicketsPendientes();
+          return;
+        } else {
+          ticketsPendientes=[];
+          renderTicketsPendientes();
+          return;
+        }
+      }
+    }catch(e){}
+  }
+  // Fallback: localStorage
+  try{ ticketsPendientes=JSON.parse(localStorage.getItem(LS_TICK)||'[]'); }catch(e){ ticketsPendientes=[]; }
+  renderTicketsPendientes();
+}
 
 function openTicketModal(){
   document.getElementById('ticket-modal').style.display='block';
@@ -2841,6 +2927,37 @@ function closeTicketModal(e){
 }
 function triggerTicketUpload(){ document.getElementById('file-ticket').click(); }
 function triggerTicketCamera(){ document.getElementById('file-ticket-camera').click(); }
+
+function pasteTicketFromClipboard(){
+  if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
+  const st=document.getElementById('ticket-analysis-status');
+  let trap=document.getElementById('_paste_trap_ticket');
+  if(!trap){
+    trap=document.createElement('div');
+    trap.id='_paste_trap_ticket';
+    trap.contentEditable='true';
+    trap.style.cssText='position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;overflow:hidden;z-index:9999;';
+    document.body.appendChild(trap);
+    trap.addEventListener('paste',function(e){
+      e.preventDefault();
+      const items=[...(e.clipboardData?.items||[])];
+      const img=items.find(i=>i.type.startsWith('image/'));
+      if(img){const f=img.getAsFile();if(f){st.textContent='';handleTicketFile(f);trap.blur();return;}}
+      st.textContent='No se detectó imagen.';trap.blur();
+    });
+  }
+  st.textContent='📋 Mantén pulsado → Pegar...';
+  trap.focus();
+  const onPaste=function(e){
+    e.preventDefault();
+    document.removeEventListener('paste',onPaste);
+    const items=[...(e.clipboardData?.items||[])];
+    const img=items.find(i=>i.type.startsWith('image/'));
+    if(img){const f=img.getAsFile();if(f){st.textContent='';handleTicketFile(f);return;}}
+    st.textContent='No se detectó imagen.';
+  };
+  document.addEventListener('paste',onPaste,{once:true});
+}
 
 async function handleTicketFile(file){
   if(!file) return;
@@ -2886,6 +3003,7 @@ async function handleTicketFile(file){
       pendingSeen.add(key);
       return true;
     });
+    saveTicketsPending();
     status.textContent='';
     closeTicketModal();
     renderTicketsPendientes();
@@ -3012,11 +3130,13 @@ function approveTicket(i){
   saveLocal(); renderAll();
   if(token) saveDataToDrive(Q).catch(()=>{});
   ticketsPendientes.splice(i,1);
+  saveTicketsPending();
   renderTicketsPendientes();
 }
 
 function discardTicket(i){
   ticketsPendientes.splice(i,1);
+  saveTicketsPending();
   renderTicketsPendientes();
 }
 
@@ -3027,11 +3147,13 @@ function approveAllTickets(){
   saveLocal(); renderAll();
   if(token) saveDataToDrive(Q).catch(()=>{});
   ticketsPendientes=[];
+  saveTicketsPending();
   renderTicketsPendientes();
 }
 
 function discardAllTickets(){
   ticketsPendientes=[];
+  saveTicketsPending();
   renderTicketsPendientes();
 }
 

@@ -112,7 +112,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .nav-add svg{width:28px;height:28px;stroke-width:2.5;}
 /* Add invoice modal */
 #add-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);}
-#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:28px 28px 0 0;padding:28px 24px;padding-bottom:calc(120px + env(safe-area-inset-bottom));max-height:96vh;overflow-y:auto;}
+#add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:28px 28px 0 0;padding:28px 24px;padding-bottom:calc(120px + env(safe-area-inset-bottom));max-height:96vh;overflow-y:auto;color:#F5EDE0;}
+#add-modal .add-sheet p{color:rgba(245,237,224,0.5) !important;}
+#add-modal .add-sheet .analysis-filename{color:#F5EDE0;}
+#add-modal .add-sheet .analysis-badge{opacity:1;}
+#add-modal .add-sheet .factura-review-title{color:#F5EDE0;}
+#add-modal .add-sheet .factura-review-detail{color:rgba(245,237,224,0.6);}
+#add-modal .add-sheet .just-label{color:rgba(245,237,224,0.45);}
+#add-modal .add-sheet .just-select, #add-modal .add-sheet .just-input{color:#F5EDE0;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);}
+@media(min-width:600px){#add-modal .add-sheet{bottom:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:520px;border-radius:24px;max-height:88vh;padding-bottom:28px;}}
 @keyframes spin{to{transform:rotate(360deg);}}
 #ptr-indicator{position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-60px);z-index:9999;background:var(--accent);color:#fff;border-radius:0 0 20px 20px;padding:6px 20px;font-size:13px;font-weight:600;transition:transform .25s ease;pointer-events:none;}
 #ptr-indicator.visible{transform:translateX(-50%) translateY(0);}
@@ -351,7 +359,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.151</div>
+    <div class="login-version">v5.152</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -386,7 +394,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.151</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.152</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -435,7 +443,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.151</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.152</div>
       </div>
     </div>
     <div class="top-right">

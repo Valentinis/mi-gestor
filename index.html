@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.141</div>
+    <div class="login-version">v5.142</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.141</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.142</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.141</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.142</div>
       </div>
     </div>
     <div class="top-right">
@@ -1059,8 +1059,8 @@ EXTRAE EXACTAMENTE:
 - base_iva: base imponible (antes de IVA). En catalán=Base, inglés=subtotal/net, alemán=Nettobetrag
 - pct_iva: porcentaje de IVA (0, 4, 10 o 21)
 - cuota_iva: importe del IVA
-- retencion_pct: porcentaje de retención SOLO si aparece explícitamente (línea IRPF/Retención/Ret./Retenció). Si no → 0
-- retencion_importe: importe de retención SOLO si aparece explícitamente. Si no → 0
+- retencion_pct: porcentaje de retención. Busca en todas las páginas. Si base+IVA ≠ TOTAL, calcula la diferencia como retención.
+- retencion_importe: importe de retención. Si base+IVA ≠ TOTAL, calcula: retencion_importe = base+IVA - TOTAL.
 - ingresos_brutos: total a cobrar incluyendo IVA (solo para ingresos)
 - notas: Si algún artículo supera 300€ individualmente añade "⚠️ Posible amortización"
 

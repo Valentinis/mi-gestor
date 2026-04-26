@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.133</div>
+    <div class="login-version">v5.134</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.133</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.134</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.133</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.134</div>
       </div>
     </div>
     <div class="top-right">
@@ -2766,23 +2766,24 @@ function renderRegistros(){
   const curMonth=new Date().toISOString().slice(0,7);
   let facts=getRegFacts();
   if(regView==='gastos') facts=facts.filter(f=>f.tipo==='gasto');
-  else if(regView==='ingresos') facts=facts.filter(f=>f.tipo==='ingreso');
-  else if(regView==='mes') facts=facts.filter(f=>(f.fecha||'').startsWith(curMonth));
-  // 'todos' shows all
+  else facts=facts.filter(f=>f.tipo==='ingreso');
 
   // Header with toggle + quarter selector
   const hdr=document.getElementById('reg-header');
   const quarters=['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026'];
   hdr.innerHTML=`
     <div class="filter-bar" style="margin-bottom:10px;">
-      <button onclick="setView('todos',this)" class="filter-chip${regView==='todos'?' active':''}">Todos</button>
       <button onclick="setView('gastos',this)" class="filter-chip${regView==='gastos'?' active':''}">Gastos</button>
       <button onclick="setView('ingresos',this)" class="filter-chip${regView==='ingresos'?' active':''}">Ingresos</button>
-      <button onclick="setView('mes',this)" class="filter-chip${regView==='mes'?' active':''}">Este mes</button>
     </div>
     <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;">
-      ${quarters.map(q=>`<button class="filter-chip${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;white-space:nowrap;">${q}</button>`).join('')}
+      ${quarters.map(q=>`<button id="qr-${q.replace(' ','_')}" class="filter-chip${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;white-space:nowrap;">${q}</button>`).join('')}
     </div>`;
+  // Scroll active quarter into view
+  requestAnimationFrame(()=>{
+    const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
+    if(activeBtn) activeBtn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  });
 
   // Totals
   const totBar=document.getElementById('reg-totals-bar');

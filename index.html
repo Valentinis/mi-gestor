@@ -123,7 +123,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 @media(min-width:600px){#add-modal .add-sheet{bottom:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:520px;border-radius:24px;max-height:88vh;padding-bottom:28px;}}
 @keyframes spin{to{transform:rotate(360deg);}}
 @media(min-width:600px){#refresh-btn{display:flex !important;align-items:center;}}
-#ptr-indicator{position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-60px);z-index:9999;background:var(--accent);color:#fff;border-radius:0 0 20px 20px;padding:6px 20px;font-size:13px;font-weight:600;transition:transform .25s ease;pointer-events:none;}
+#ptr-indicator{position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-60px);z-index:9999;background:var(–accent);color:#fff;border-radius:0 0 20px 20px;padding:6px 20px;font-size:13px;font-weight:600;transition:transform .25s ease;pointer-events:none;}
 #ptr-indicator.visible{transform:translateX(-50%) translateY(0);}
 #add-modal .add-sheet h3{font-size:22px;font-weight:800;margin:0;text-align:center;color:#F5EDE0;letter-spacing:-0.3px;}
 .add-sheet-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 20px;}
@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.156</div>
+    <div class="login-version">v5.160</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -375,6 +375,7 @@ img,video,iframe,table{max-width:100%;}
 <!-- PIN -->
 
 <!-- PIN screen removed - login goes directly to main -->
+
 <div id="pin-screen" style="display:none;"></div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -423,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.156</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.160</div>
       </div>
     </div>
     <div class="top-right">
@@ -456,8 +457,9 @@ img,video,iframe,table{max-width:100%;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       <span>Registros</span>
     </button>
-    <button class="nav-add" onclick="openAddModal()">
+    <button class="nav-add" onclick="openAddModal()" style="position:relative;">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="add-modal-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#E53935;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;align-items:center;justify-content:center;line-height:1;pointer-events:none;"></span>
     </button>
     <button class="nav-btn" id="nav-modelos" onclick="switchNav('modelos',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -477,6 +479,7 @@ img,video,iframe,table{max-width:100%;}
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
 
 <!-- Filter bar -->
+
 <div class="filter-bar" id="filter-bar">
   <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
   <button class="filter-chip" onclick="setFilter('ingreso',this)">Ingresos</button>
@@ -626,46 +629,51 @@ img,video,iframe,table{max-width:100%;}
   </div>
 
   <!-- TICKETS TAB -->
+
   <div id="tab-tickets" class="tab-pane">
     <div style="margin-bottom:16px;">
       <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">Tickets de venta</div>
       <div style="font-size:13px;color:var(--text-3);margin-top:3px;">SumUp · Bizum · Transferencia</div>
     </div>
 
-    <button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Analizar extracto / pago
-    </button>
+```
+<button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  Analizar extracto / pago
+</button>
 
-    <!-- Pending tickets section -->
-    <div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="section-label" style="margin:0;">Por verificar</div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="approveAllTickets()" class="btn-sec" style="background:var(--green-bg);color:var(--green);border-color:var(--green-bd);">✓ Aprobar todos</button>
-          <button onclick="discardAllTickets()" class="btn-sec" style="background:var(--red-bg);color:var(--red);border-color:var(--red-bd);">✕</button>
-        </div>
-      </div>
-      <div id="tickets-pending-list"></div>
+<!-- Pending tickets section -->
+<div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div class="section-label" style="margin:0;">Por verificar</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="approveAllTickets()" class="btn-sec" style="background:var(--green-bg);color:var(--green);border-color:var(--green-bd);">✓ Aprobar todos</button>
+      <button onclick="discardAllTickets()" class="btn-sec" style="background:var(--red-bg);color:var(--red);border-color:var(--red-bd);">✕</button>
     </div>
+  </div>
+  <div id="tickets-pending-list"></div>
+</div>
 
-    <div id="firestore-cfg-banner" style="display:none;" class="card">
-      <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px;">⚙️ Configura Firestore</div>
-      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
-      <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" class="just-input" style="margin-bottom:8px;">
-      <button onclick="saveFirestoreConfig()" class="btn-accent">Guardar y conectar</button>
-    </div>
-    <div id="tickets-list" style="display:none;"></div>
+<div id="firestore-cfg-banner" style="display:none;" class="card">
+  <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px;">⚙️ Configura Firestore</div>
+  <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
+  <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" class="just-input" style="margin-bottom:8px;">
+  <button onclick="saveFirestoreConfig()" class="btn-accent">Guardar y conectar</button>
+</div>
+<div id="tickets-list" style="display:none;"></div>
 
-    <!-- Empty state -->
-    <div id="tickets-empty" style="padding:48px 0;text-align:center;">
-      <div style="font-size:36px;margin-bottom:12px;">🎫</div>
-      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin tickets pendientes</div>
-      <div style="font-size:13px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
-    </div>
+<!-- Empty state -->
+<div id="tickets-empty" style="padding:48px 0;text-align:center;">
+  <div style="font-size:36px;margin-bottom:12px;">🎫</div>
+  <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin tickets pendientes</div>
+  <div style="font-size:13px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
+</div>
+```
+
   </div>
 
   <!-- TICKET ANALYSIS MODAL -->
+
   <div id="ticket-modal" onclick="closeTicketModal(event)" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);">
     <div onclick="event.stopPropagation()" style="position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:28px 28px 0 0;padding:28px 24px;padding-bottom:calc(40px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;">
       <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 20px;"></div>
@@ -734,6 +742,7 @@ img,video,iframe,table{max-width:100%;}
         <h3>Añadir factura</h3>
         <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:5px 0 0;">Claude analiza la factura automáticamente</p>
         <button id="add-modal-close-btn" onclick="closeAddModal()" style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.12);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#F5EDE0;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+        <button onclick="cancelAddModal()" style="position:absolute;top:0;left:0;background:rgba(255,255,255,0.08);border:none;border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;color:rgba(245,237,224,0.5);">Cancelar</button>
       </div>
       <div id="claude-no-key-add" class="tip-box" style="display:none;">Ve a <strong>Config</strong> e introduce tu API key.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
@@ -1745,29 +1754,45 @@ function saveAnalysis(divId, count){
   }
   if(saved===0){ alert('No hay facturas seleccionadas.'); return; }
   saveLocal(); renderAll();
-  if(token) saveDataToDrive(Q).catch(()=>{});
-  // Upload file to Drive NOW (after records are saved) and store link
-  const savedFile=window['_file_'+divId];
-  const savedItems=window['_analysis_'+divId];
-  if(token&&facturasFId&&savedFile&&savedItems){
-    const f0=savedItems[0]||{};
-    const fecha=(f0.fecha||'').slice(0,10);
-    const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
-    const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
-    const ext=savedFile.name.includes('.')?'.'+savedFile.name.split('.').pop().toLowerCase():'.jpg';
-    const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
-    uploadFileToDrive(new File([savedFile],newName,{type:savedFile.type}),Q).then(created=>{
-      if(created&&created.webViewLink){
-        // Store link on all saved records
-        savedItems.forEach(rec=>{
-          const inData=Object.values(data).flat().find(x=>x._id==rec._id);
-          if(inData){ inData._driveLink=created.webViewLink; }
-        });
-        saveLocal();
-        saveDataToDrive(Q).catch(()=>{});
+  // Show saving indicator
+  const saveBtn=document.querySelector(`[onclick="saveAnalysis('${divId}',${count})"]`);
+  if(saveBtn){ saveBtn.textContent='Guardando...'; saveBtn.disabled=true; }
+  // Save to Drive and wait before uploading file
+  if(token){
+    saveDataToDrive(Q).then(()=>{
+      if(saveBtn){ saveBtn.textContent='✓ Guardado'; }
+      // Clear modal state after successful save
+      setTimeout(()=>{
+        document.getElementById('analysis-list').innerHTML='';
+        document.getElementById('paste-status').textContent='';
+        updateAddModalBadge();
+        closeAddModal();
+      }, 800);
+      // Upload PDF/image after data is saved
+      const savedFile=window['_file_'+divId];
+      const savedItems=window['_analysis_'+divId];
+      if(token&&facturasFId&&savedFile&&savedItems){
+        const f0=savedItems[0]||{};
+        const fecha=(f0.fecha||'').slice(0,10);
+        const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30);
+        const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
+        const ext=savedFile.name.includes('.')?'.'+savedFile.name.split('.').pop().toLowerCase():'.jpg';
+        const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
+        uploadFileToDrive(new File([savedFile],newName,{type:savedFile.type}),Q).then(created=>{
+          if(created&&created.webViewLink){
+            savedItems.forEach(rec=>{
+              const inData=Object.values(data).flat().find(x=>x._id==rec._id);
+              if(inData){ inData._driveLink=created.webViewLink; }
+            });
+            saveDataToDrive(Q).catch(()=>{});
+          }
+        }).catch(()=>{});
+        delete window['_file_'+divId];
       }
-    }).catch(()=>{});
-    delete window['_file_'+divId];
+    }).catch(e=>{ 
+      console.error('Error guardando en Drive:', e);
+      if(saveBtn){ saveBtn.textContent='⚠ Error - reintenta'; saveBtn.disabled=false; }
+    });
   }
   const btn=document.querySelector('#'+divId+' .btn-save-analysis');
   if(btn){btn.textContent='✓ '+saved+' guardada(s)';btn.disabled=true;}
@@ -2204,14 +2229,32 @@ async function renderPDFPages(file, container, blobUrl){
     container.innerHTML=`<div style="color:rgba(255,255,255,0.5);font-size:13px;padding:20px;">Error cargando PDF: ${e.message}</div>`;
   }
 }
+function updateAddModalBadge(){
+  const list=document.getElementById('analysis-list');
+  const count=list?list.querySelectorAll('.analysis-result-div').length:0;
+  const badge=document.getElementById('add-modal-badge');
+  if(!badge) return;
+  if(count>0){
+    badge.textContent=count;
+    badge.style.display='flex';
+  } else {
+    badge.style.display='none';
+  }
+}
 function closeAddModal(e){
-  if(document.getElementById('_preview_overlay')) return; // preview open, don't close
+  if(document.getElementById('_preview_overlay')) return;
   if(!e||e.target===document.getElementById('add-modal')||e.target===undefined){
     document.getElementById('add-modal').style.display='none';
     document.body.style.overflow='';
-    document.getElementById('analysis-list').innerHTML='';
-    document.getElementById('paste-status').textContent='';
+    updateAddModalBadge();
   }
+}
+function cancelAddModal(){
+  document.getElementById('add-modal').style.display='none';
+  document.body.style.overflow='';
+  document.getElementById('analysis-list').innerHTML='';
+  document.getElementById('paste-status').textContent='';
+  updateAddModalBadge();
 }
 let factFilter='todos';
 function normName(s){

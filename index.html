@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.127</div>
+    <div class="login-version">v5.129</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.127</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.129</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.127</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.129</div>
       </div>
     </div>
     <div class="top-right">
@@ -481,8 +481,8 @@ img,video,iframe,table{max-width:100%;}
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
 
-```
 <!-- Filter bar -->
+
 <div class="filter-bar" id="filter-bar">
   <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
   <button class="filter-chip" onclick="setFilter('ingreso',this)">Ingresos</button>
@@ -512,33 +512,21 @@ img,video,iframe,table{max-width:100%;}
   <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
 </div>
 <div class="storage-bar" style="opacity:0.6;"><span id="si"></span></div>
-```
 
   </div>
   <div id="tab-registros" class="tab-pane">
-
-```
-<div class="view-toggle">
-  <button class="view-btn active" onclick="setView('gastos',this)">Gastos</button>
-  <button class="view-btn" onclick="setView('ingresos',this)">Ingresos</button>
-</div>
-<div class="totals-bar" id="reg-totals-bar"></div>
-<div class="reg-table-wrap"><table class="reg-table"><thead id="reg-thead"></thead><tbody id="reg-tbody"></tbody></table></div>
-```
-
+    <div id="reg-header"></div>
+    <div id="reg-totals-bar"></div>
+    <div id="reg-tbody"></div>
   </div>
   <div id="tab-manual" class="tab-pane">
     <div class="tip-box"><h4>Importar JSON manualmente</h4><ol><li>Sube la factura al chat con Claude</li><li>Claude te devuelve un <code>JSON</code></li><li>Cópialo y pégalo aquí</li></ol></div>
-
-```
 <div class="card">
   <textarea class="json-area" id="json-in" placeholder='{"tipo":"gasto","proveedor_cliente":"..."}'></textarea>
   <div class="btn-row"><button class="btn-sec" onclick="clearJ()">Limpiar</button><button class="btn-sec" onclick="loadDemo()">Demo 1T</button></div>
   <button class="btn-primary" onclick="importJ()">Guardar</button>
   <div class="feedback" id="imp-fb"></div>
 </div>
-```
-
   </div>
   <div id="tab-modelos" class="tab-pane">
     <div class="summary-grid">
@@ -659,42 +647,46 @@ img,video,iframe,table{max-width:100%;}
       </div>
     </div>
 
-    <!-- Analyze extracto button -->
-    <button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Analizar extracto / pago
-    </button>
+```
+<!-- Analyze extracto button -->
+<button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  Analizar extracto / pago
+</button>
 
-    <!-- Pending tickets section -->
-    <div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;">Por verificar</div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="approveAllTickets()" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aprobar todos</button>
-          <button onclick="discardAllTickets()" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
-        </div>
-      </div>
-      <div id="tickets-pending-list"></div>
+<!-- Pending tickets section -->
+<div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;">Por verificar</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="approveAllTickets()" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aprobar todos</button>
+      <button onclick="discardAllTickets()" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
     </div>
+  </div>
+  <div id="tickets-pending-list"></div>
+</div>
 
-    <!-- Firestore future section (kept for later) -->
-    <div id="firestore-cfg-banner" style="display:none;background:var(--amber-bg);border:0.5px solid var(--amber-bd);border-radius:10px;padding:12px;margin-bottom:14px;">
-      <div style="font-size:13px;font-weight:600;color:var(--amber);">⚙️ Configura Firestore</div>
-      <div style="font-size:12px;color:var(--text-3);margin:4px 0 8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
-      <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" style="width:100%;padding:8px 10px;background:var(--bg-input);border:0.5px solid var(--line-2);border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;margin-bottom:8px;">
-      <button onclick="saveFirestoreConfig()" style="background:var(--amber);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Guardar y conectar</button>
-    </div>
-    <div id="tickets-list" style="display:none;"></div>
+<!-- Firestore future section (kept for later) -->
+<div id="firestore-cfg-banner" style="display:none;background:var(--amber-bg);border:0.5px solid var(--amber-bd);border-radius:10px;padding:12px;margin-bottom:14px;">
+  <div style="font-size:13px;font-weight:600;color:var(--amber);">⚙️ Configura Firestore</div>
+  <div style="font-size:12px;color:var(--text-3);margin:4px 0 8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
+  <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" style="width:100%;padding:8px 10px;background:var(--bg-input);border:0.5px solid var(--line-2);border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;margin-bottom:8px;">
+  <button onclick="saveFirestoreConfig()" style="background:var(--amber);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Guardar y conectar</button>
+</div>
+<div id="tickets-list" style="display:none;"></div>
 
-    <!-- Empty state -->
-    <div id="tickets-empty" style="padding:40px 0;text-align:center;color:var(--text-3);">
-      <div style="font-size:32px;margin-bottom:8px;">🎫</div>
-      <div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div>
-      <div style="font-size:12px;margin-top:4px;">Sube un extracto de SumUp, un Bizum o una transferencia</div>
-    </div>
+<!-- Empty state -->
+<div id="tickets-empty" style="padding:40px 0;text-align:center;color:var(--text-3);">
+  <div style="font-size:32px;margin-bottom:8px;">🎫</div>
+  <div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div>
+  <div style="font-size:12px;margin-top:4px;">Sube un extracto de SumUp, un Bizum o una transferencia</div>
+</div>
+```
+
   </div>
 
   <!-- TICKET ANALYSIS MODAL -->
+
   <div id="ticket-modal" onclick="closeTicketModal(event)" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);">
     <div onclick="event.stopPropagation()" style="position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:28px 28px 0 0;padding:28px 24px;padding-bottom:calc(40px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;">
       <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 20px;"></div>
@@ -2775,87 +2767,99 @@ function fmtEur(n){ if(!n||isNaN(n)) return '—'; return n.toFixed(2).replace('
 
 function renderRegistros(){
   const all=getRegFacts();
-  const facts=all.filter(f=>f.tipo===(regView==='gastos'?'gasto':'ingreso'));
+  const isGastos=regView==='gastos';
+  const facts=all.filter(f=>f.tipo===(isGastos?'gasto':'ingreso'));
 
-  // Totales bar
+  // Header with toggle + quarter selector
+  const hdr=document.getElementById('reg-header');
+  hdr.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <button onclick="setView('gastos',this)" class="reg-toggle-btn${isGastos?' active':''}" style="flex:1;padding:9px;border-radius:10px;border:0.5px solid var(--line);background:${isGastos?'var(--red)':'var(--bg-card)'};color:${isGastos?'#fff':'var(--text-3)'};font-size:13px;font-weight:600;cursor:pointer;">Gastos</button>
+      <button onclick="setView('ingresos',this)" class="reg-toggle-btn${!isGastos?' active':''}" style="flex:1;padding:9px;border-radius:10px;border:0.5px solid var(--line);background:${!isGastos?'var(--green)':'var(--bg-card)'};color:${!isGastos?'#fff':'var(--text-3)'};font-size:13px;font-weight:600;cursor:pointer;">Ingresos</button>
+    </div>
+    <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;">
+      ${['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026'].map(q=>`<button class="q-pill${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;padding:5px 12px;border-radius:20px;border:0.5px solid var(--line);background:${regQ===q?'var(--accent)':'var(--bg-card)'};color:${regQ===q?'#fff':'var(--text-3)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">${q}</button>`).join('')}
+    </div>`;
+
+  // Totals
   const totBar=document.getElementById('reg-totals-bar');
-  if(regView==='gastos'){
+  if(isGastos){
     const tBase=facts.reduce((a,f)=>a+(f.base_iva||0),0);
     const tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0);
     const tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0);
-    const tIrpf=facts.reduce((a,f)=>a+(f.base_irpf||f.base_iva||0),0);
-    totBar.innerHTML=`
-      <div class="total-box"><div class="total-box-label">Base imponible</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div>
-      <div class="total-box"><div class="total-box-label">IVA soportado</div><div class="total-box-val green">${fmtEur(tIva)}</div></div>
-      <div class="total-box"><div class="total-box-label">Retenciones pagadas</div><div class="total-box-val amber">${fmtEur(tRet)}</div></div>
-      <div class="total-box"><div class="total-box-label">Base IRPF (gasto)</div><div class="total-box-val red">${fmtEur(tIrpf)}</div></div>
-      <div class="total-box"><div class="total-box-label">Nº facturas</div><div class="total-box-val blue">${facts.length}</div></div>`;
+    totBar.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Base</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);">${fmtEur(tBase)}</div>
+      </div>
+      <div style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">IVA</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);">${fmtEur(tIva)}</div>
+      </div>
+      <div style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Retenc.</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);">${fmtEur(tRet)}</div>
+      </div>
+    </div>`;
   } else {
+    const tBruto=facts.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
     const tBase=facts.reduce((a,f)=>a+(f.base_irpf||0),0);
     const tIva=facts.reduce((a,f)=>a+(f.cuota_iva||0),0);
-    const tRet=facts.reduce((a,f)=>a+(f.retencion_importe||0),0);
-    const tBruto=facts.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
-    totBar.innerHTML=`
-      <div class="total-box"><div class="total-box-label">Ingresos brutos</div><div class="total-box-val green">${fmtEur(tBruto)}</div></div>
-      <div class="total-box"><div class="total-box-label">Base imponible</div><div class="total-box-val blue">${fmtEur(tBase)}</div></div>
-      <div class="total-box"><div class="total-box-label">IVA repercutido</div><div class="total-box-val amber">${fmtEur(tIva)}</div></div>
-      <div class="total-box"><div class="total-box-label">Retenciones soportadas</div><div class="total-box-val red">${fmtEur(tRet)}</div></div>
-      <div class="total-box"><div class="total-box-label">Nº facturas</div><div class="total-box-val blue">${facts.length}</div></div>`;
+    totBar.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Bruto</div>
+        <div style="font-size:15px;font-weight:800;color:var(--green);">${fmtEur(tBruto)}</div>
+      </div>
+      <div style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Base</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);">${fmtEur(tBase)}</div>
+      </div>
+      <div style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">IVA</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);">${fmtEur(tIva)}</div>
+      </div>
+    </div>`;
   }
 
-  // Card-based layout (no table)
+  // Records grouped by operacion
   const tbody=document.getElementById('reg-tbody');
-  const thead=document.getElementById('reg-thead');
-  if(thead) thead.innerHTML='';
+  if(!facts.length){ tbody.innerHTML=`<div style="padding:40px 0;text-align:center;color:var(--text-3);font-size:14px;">${isGastos?'Sin gastos':'Sin ingresos'} en ${regQ}</div>`; return; }
 
-  const groupLabels={ ALQUILER:'Alquiler (→ 115)', INTRA_S:'Intracomunitario (→ 349)', INT:'Interior con IVA', EXENTO:'Exento', PROF:'Profesional (→ 111)', otros:'Otros' };
-  const groupColors={ ALQUILER:'var(--blue)', INTRA_S:'var(--amber)', INT:'var(--green)', EXENTO:'var(--text-3)', PROF:'var(--blue)', otros:'var(--text-3)' };
+  const groupLabels={ ALQUILER:'Alquiler · 115', INTRA_S:'Intracomunitario · 349', INT:'Interior con IVA', EXENTO:'Exento / Sin IVA', PROF:'Profesional · 111', otros:'Otros' };
+  const groupColors={ ALQUILER:'var(--blue)', INTRA_S:'var(--amber)', INT:isGastos?'var(--red)':'var(--green)', EXENTO:'var(--text-3)', PROF:'var(--blue)', otros:'var(--text-3)' };
+  const accentColor=isGastos?'var(--red)':'var(--green)';
 
-  if(regView==='gastos'){
-    if(!facts.length){ tbody.innerHTML='<div class="empty">Sin gastos en este trimestre</div>'; return; }
-    const groups={ ALQUILER:[], INTRA_S:[], INT:[], EXENTO:[], PROF:[], otros:[] };
-    facts.forEach(f=>{ const g=groups[f.operacion]||groups.otros; g.push(f); });
-    let html='';
-    Object.entries(groups).forEach(([op,items])=>{
-      if(!items.length) return;
-      html+=`<div style="font-size:10px;font-weight:700;color:${groupColors[op]};text-transform:uppercase;letter-spacing:.06em;padding:8px 0 4px;border-top:0.5px solid var(--line);margin-top:4px;">${groupLabels[op]} · ${items.length}</div>`;
-      items.forEach(f=>{
-        const total=(f.base_iva||0)+(f.cuota_iva||0);
-        const ret=f.retencion_importe||0;
-        html+=`<div onclick="openModal(''+f._id+'') style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
-          <div style="width:3px;height:32px;border-radius:2px;background:var(--red);flex-shrink:0;"></div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
-            <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.concepto||''}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
-          </div>
-          <div style="text-align:right;flex-shrink:0;min-width:72px;">
-            <div style="font-size:13px;font-weight:700;color:var(--red);">−${fmtEur(total)}</div>
-            <div style="font-size:10px;color:var(--text-3);">${f.fecha||''} ${driveIcon(f)}</div>
-          </div>
-        </div>`;
-      });
-    });
-    tbody.innerHTML=html;
-  } else {
-    if(!facts.length){ tbody.innerHTML='<div class="empty">Sin ingresos en este trimestre</div>'; return; }
-    let html='';
-    facts.forEach(f=>{
-      const bruto=f.ingresos_brutos||f.base_iva||0;
+  const groups={ ALQUILER:[], INTRA_S:[], INT:[], EXENTO:[], PROF:[], otros:[] };
+  facts.forEach(f=>{ (groups[f.operacion]||groups.otros).push(f); });
+
+  let html='';
+  Object.entries(groups).forEach(([op,items])=>{
+    if(!items.length) return;
+    const subtotal=isGastos
+      ?items.reduce((a,f)=>a+(f.base_iva||0)+(f.cuota_iva||0),0)
+      :items.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+    html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0 6px;">
+      <div style="font-size:11px;font-weight:700;color:${groupColors[op]};text-transform:uppercase;letter-spacing:.06em;">${groupLabels[op]} · ${items.length}</div>
+      <div style="font-size:12px;font-weight:700;color:${groupColors[op]};">${isGastos?'−':'+'} ${fmtEur(subtotal)}</div>
+    </div>`;
+    items.forEach(f=>{
+      const amount=isGastos?(f.base_iva||0)+(f.cuota_iva||0):(f.ingresos_brutos||f.base_iva||0);
       const ret=f.retencion_importe||0;
-      html+=`<div onclick="openModal(''+f._id+'') style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
-        <div style="width:3px;height:32px;border-radius:2px;background:var(--green);flex-shrink:0;"></div>
+      const hasDrive=f._driveLink||f._driveFileId||driveFiles.some(d=>d.name&&f.fecha&&d.name.startsWith(f.fecha.slice(0,10)));
+      html+=`<div onclick="openModal('${f._id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
+        <div style="width:3px;min-height:36px;border-radius:2px;background:${accentColor};flex-shrink:0;align-self:stretch;"></div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
-          <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.concepto||''}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
+          <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${f.concepto||''}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
         </div>
-        <div style="text-align:right;flex-shrink:0;min-width:72px;">
-          <div style="font-size:13px;font-weight:700;color:var(--green);">+${fmtEur(bruto)}</div>
-          <div style="font-size:10px;color:var(--text-3);">${f.fecha||''} ${driveIcon(f)}</div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:13px;font-weight:800;color:${accentColor};">${isGastos?'−':'+'} ${fmtEur(amount)}</div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${f.fecha||''} ${hasDrive?'<span style="color:var(--green)">✓</span>':'<span style="color:var(--red)">!</span>'}</div>
         </div>
       </div>`;
     });
-    tbody.innerHTML=html;
-  }
+  });
+  tbody.innerHTML=html;
 }
 // ── TICKETS ──
 const LS_TICK='migestor_tickets_pending';

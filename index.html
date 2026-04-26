@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.144</div>
+    <div class="login-version">v5.145</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.144</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.145</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.144</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.145</div>
       </div>
     </div>
     <div class="top-right">
@@ -482,6 +482,7 @@ img,video,iframe,table{max-width:100%;}
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
 
 <!-- Filter bar -->
+
 <div class="filter-bar" id="filter-bar">
   <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
   <button class="filter-chip" onclick="setFilter('ingreso',this)">Ingresos</button>
@@ -637,46 +638,51 @@ img,video,iframe,table{max-width:100%;}
   </div>
 
   <!-- TICKETS TAB -->
+
   <div id="tab-tickets" class="tab-pane">
     <div style="margin-bottom:16px;">
       <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">Tickets de venta</div>
       <div style="font-size:13px;color:var(--text-3);margin-top:3px;">SumUp · Bizum · Transferencia</div>
     </div>
 
-    <button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Analizar extracto / pago
-    </button>
+```
+<button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  Analizar extracto / pago
+</button>
 
-    <!-- Pending tickets section -->
-    <div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="section-label" style="margin:0;">Por verificar</div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="approveAllTickets()" class="btn-sec" style="background:var(--green-bg);color:var(--green);border-color:var(--green-bd);">✓ Aprobar todos</button>
-          <button onclick="discardAllTickets()" class="btn-sec" style="background:var(--red-bg);color:var(--red);border-color:var(--red-bd);">✕</button>
-        </div>
-      </div>
-      <div id="tickets-pending-list"></div>
+<!-- Pending tickets section -->
+<div id="tickets-pending-wrap" style="display:none;margin-bottom:16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div class="section-label" style="margin:0;">Por verificar</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="approveAllTickets()" class="btn-sec" style="background:var(--green-bg);color:var(--green);border-color:var(--green-bd);">✓ Aprobar todos</button>
+      <button onclick="discardAllTickets()" class="btn-sec" style="background:var(--red-bg);color:var(--red);border-color:var(--red-bd);">✕</button>
     </div>
+  </div>
+  <div id="tickets-pending-list"></div>
+</div>
 
-    <div id="firestore-cfg-banner" style="display:none;" class="card">
-      <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px;">⚙️ Configura Firestore</div>
-      <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
-      <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" class="just-input" style="margin-bottom:8px;">
-      <button onclick="saveFirestoreConfig()" class="btn-accent">Guardar y conectar</button>
-    </div>
-    <div id="tickets-list" style="display:none;"></div>
+<div id="firestore-cfg-banner" style="display:none;" class="card">
+  <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px;">⚙️ Configura Firestore</div>
+  <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">Introduce el Project ID de Firebase para conectar con la app del taller</div>
+  <input id="firestore-project-id" type="text" placeholder="mi-gestor-xxxxx" class="just-input" style="margin-bottom:8px;">
+  <button onclick="saveFirestoreConfig()" class="btn-accent">Guardar y conectar</button>
+</div>
+<div id="tickets-list" style="display:none;"></div>
 
-    <!-- Empty state -->
-    <div id="tickets-empty" style="padding:48px 0;text-align:center;">
-      <div style="font-size:36px;margin-bottom:12px;">🎫</div>
-      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin tickets pendientes</div>
-      <div style="font-size:13px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
-    </div>
+<!-- Empty state -->
+<div id="tickets-empty" style="padding:48px 0;text-align:center;">
+  <div style="font-size:36px;margin-bottom:12px;">🎫</div>
+  <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin tickets pendientes</div>
+  <div style="font-size:13px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
+</div>
+```
+
   </div>
 
   <!-- TICKET ANALYSIS MODAL -->
+
   <div id="ticket-modal" onclick="closeTicketModal(event)" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);">
     <div onclick="event.stopPropagation()" style="position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:28px 28px 0 0;padding:28px 24px;padding-bottom:calc(40px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;">
       <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:0 auto 20px;"></div>
@@ -1079,6 +1085,26 @@ function classifyRecord(f){
   const name=(f.proveedor_cliente||'').toLowerCase();
   const nif=(f.nif||'').toUpperCase();
 
+  // ── Auto-detect retención por aritmética ──
+  // Si base+IVA ≠ ingresos_brutos y no hay retención declarada → calcularla
+  if(f.tipo==='ingreso' && (f.retencion_importe||0)===0 && (f.ingresos_brutos||0)>0){
+    const esperado=Math.round(((f.base_iva||0)+(f.cuota_iva||0))*100)/100;
+    const real=Math.round((f.ingresos_brutos||0)*100)/100;
+    const diff=Math.round((esperado-real)*100)/100;
+    if(diff>0.5){ // más de 50 céntimos de diferencia → hay retención
+      f.retencion_importe=diff;
+      f.retencion_pct=Math.round(diff/(f.base_iva||1)*100);
+    }
+  }
+  // Mismo para gastos
+  if(f.tipo==='gasto' && (f.retencion_importe||0)===0 && (f.base_iva||0)>0 && (f.cuota_iva||0)>0){
+    // Para gastos no tenemos "total pagado" directamente, no podemos calcularlo
+    // pero si retencion_pct > 0 y retencion_importe = 0 → calcularlo
+    if((f.retencion_pct||0)>0){
+      f.retencion_importe=Math.round(f.base_iva*(f.retencion_pct/100)*100)/100;
+    }
+  }
+
   // ── Determinar trimestre ──
   if(f.fecha){
     const m=parseInt((f.fecha||'').slice(5,7));
@@ -1137,10 +1163,12 @@ function classifyRecord(f){
   }
 
   // ── Default: INT ──
-  // Reset any bad PROF the AI might have set
   f.operacion='INT';
-  f.retencion_pct=0;
-  f.retencion_importe=0;
+  // Only reset retention if not already detected by arithmetic
+  if(!(f.retencion_importe>0)){
+    f.retencion_pct=0;
+    f.retencion_importe=0;
+  }
   return f;
 }
 

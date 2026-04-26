@@ -348,7 +348,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.145</div>
+    <div class="login-version">v5.148</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -383,7 +383,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="pin-error" id="pin-error"></div>
   </div>
   <button class="btn-ghost" onclick="signOut()">Cambiar cuenta</button>
-  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.145</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);">v5.148</div>
 </div>
 
 <!-- MODAL DETALLE FACTURA -->
@@ -431,7 +431,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.145</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.148</div>
       </div>
     </div>
     <div class="top-right">
@@ -779,6 +779,8 @@ const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googlea
 const SCOPE_VERSION='v4';
 if(localStorage.getItem('_scope_v')!==SCOPE_VERSION){ localStorage.removeItem('migestor_auth'); localStorage.setItem('_scope_v',SCOPE_VERSION); }
 const LS='migestor_v4', LS_AUTH='migestor_auth', LS_CFG='migestor_cfg';
+// Clean up old data from localStorage - Drive is the source of truth
+['migestor_v4','migestor_v3','migestor_v2','migestor_v1','migestor_tickets_pending','gf_v4','gestor_fiscal_v2','gestor_fiscal_v3'].forEach(k=>localStorage.removeItem(k));
 const FS_PROJECT='mi-gestor-3a992';
 const FS_URL=`https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databases/(default)/documents`;
 
@@ -900,9 +902,8 @@ function updateClaudeKey(val){
 function changePin(){ const np=document.getElementById('new-pin-input').value.trim(); const fb=document.getElementById('pin-fb'); if(!/^\d{4}$/.test(np)){fb.textContent='El PIN debe ser 4 dígitos.';fb.className='feedback err';return;} userPin=np; saveCfg(); fb.textContent='✓ PIN actualizado.'; fb.className='feedback ok'; document.getElementById('new-pin-input').value=''; setTimeout(()=>fb.textContent='',3000); }
 
 // ── DATA ──
-function loadLocal(){ try{ data=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){ data={}; } migrar(); }
+function loadLocal(){ data={}; } // Data comes from Drive only, never from localStorage
 function cleanData(){
-  // Remove exact duplicates (same _id) and records with missing critical fields
   Object.keys(data).forEach(q=>{
     if(!Array.isArray(data[q])) { data[q]=[]; return; }
     const seen=new Set();
@@ -915,10 +916,10 @@ function cleanData(){
     });
   });
 }
-function saveLocal(){ cleanData(); localStorage.setItem(LS,JSON.stringify(data)); updateSI(); }
+function saveLocal(){ cleanData(); updateSI(); } // No longer saves to localStorage
 function updateSI(){ const t=Object.values(data).reduce((a,b)=>a+(b||[]).length,0); const e=document.getElementById('si'); if(e) e.textContent=t+' registros · '+Q; }
 function getF(q){ if(!data[q]) data[q]=[]; return data[q]; }
-function migrar(){ ['gestor_fiscal_v2','gestor_fiscal_v3','gf_v4','migestor_v1','migestor_v2','migestor_v3'].forEach(k=>{ try{ const o=JSON.parse(localStorage.getItem(k)||'{}'); Object.entries(o).forEach(([q,fs])=>{ if(!data[q]) data[q]=[]; (fs||[]).forEach(f=>{ if(!data[q].find(x=>x._id===f._id)) data[q].push(f); }); }); }catch(e){} }); }
+function migrar(){} // No longer needed
 
 // ── AUTH ──
 function doLogin(e){
@@ -1091,9 +1092,10 @@ function classifyRecord(f){
     const esperado=Math.round(((f.base_iva||0)+(f.cuota_iva||0))*100)/100;
     const real=Math.round((f.ingresos_brutos||0)*100)/100;
     const diff=Math.round((esperado-real)*100)/100;
-    if(diff>0.5){ // más de 50 céntimos de diferencia → hay retención
+    if(diff>0.5){
       f.retencion_importe=diff;
       f.retencion_pct=Math.round(diff/(f.base_iva||1)*100);
+      f.operacion='PROF'; // ingreso con retención → factura profesional
     }
   }
   // Mismo para gastos
@@ -1792,18 +1794,17 @@ async function loadFromDrive(){
     const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`);
     const j=await r.json();
     if(j.files&&j.files.length){
+      // Drive always wins — overwrite local data completely for each quarter found
       for(const f of j.files){
         const qn=f.name.replace('.json','').replace(/_/g,' ');
         try{
           const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`);
           const recs=await fr.json();
-          if(!data[qn]) data[qn]=[];
-          recs.forEach(rec=>{if(!data[qn].find(x=>x._id==rec._id)) data[qn].push(rec);});
+          data[qn]=Array.isArray(recs)?recs:[];
         }catch(e){ console.warn('Error loading',f.name,e); }
       }
     }
   }catch(e){ console.error('loadFromDrive error:',e); }
-  // Always update UI regardless of errors
   saveLocal();
   const cq2=currentQuarter();
   Q=cq2; regQ=cq2;
@@ -2988,14 +2989,9 @@ function fsTicketUrl(safeUid){ return `${FS_URL}/users/${safeUid}/tickets_pendin
 function getSafeUid(){ return user&&user.email?user.email.replace(/[^a-zA-Z0-9]/g,'_'):null; }
 
 async function saveTicketsPending(){
-  // Always save to localStorage as fallback
-  localStorage.setItem(LS_TICK,JSON.stringify(ticketsPendientes));
   if(!token||!getSafeUid()) return;
   const safeUid=getSafeUid();
-  // Write all pending tickets to Firestore (overwrite approach: delete all then write)
-  // Simpler: write each ticket as a document keyed by a stable id
   try{
-    // First delete existing docs, then write current state
     await deleteAllFsTickets(safeUid);
     for(const t of ticketsPendientes){
       const docId='t_'+(t._fsId||Date.now()+'_'+Math.random().toString(36).slice(2));
@@ -3009,56 +3005,35 @@ async function saveTicketsPending(){
       });
       await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({fields})}).catch(()=>{});
     }
-  }catch(e){}
-}
-
-async function deleteAllFsTickets(safeUid){
-  if(!token||!safeUid) return;
-  try{
-    const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
-    const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
-    if(!r.ok) return;
-    const j=await r.json();
-    if(!j.documents) return;
-    for(const doc of j.documents){
-      await fetch(`https://firestore.googleapis.com/v1/${doc.name}`,{method:'DELETE',headers:{Authorization:'Bearer '+token}}).catch(()=>{});
-    }
-  }catch(e){}
+  }catch(e){ console.warn('saveTicketsPending error:',e); }
 }
 
 async function loadTicketsPending(){
-  // Try Firestore first, fall back to localStorage
-  if(token&&getSafeUid()){
-    try{
-      const safeUid=getSafeUid();
-      const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
-      if(r.ok){
-        const j=await r.json();
-        if(j.documents&&j.documents.length){
-          ticketsPendientes=j.documents.map(doc=>{
-            const f=doc.fields||{};
-            const t={};
-            Object.entries(f).forEach(([k,v])=>{
-              if(v.doubleValue!==undefined) t[k]=v.doubleValue;
-              else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
-              else t[k]=v.stringValue||'';
-            });
-            return t;
+  if(!token||!getSafeUid()){ ticketsPendientes=[]; renderTicketsPendientes(); return; }
+  try{
+    const safeUid=getSafeUid();
+    const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
+    const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+    if(r.ok){
+      const j=await r.json();
+      if(j.documents&&j.documents.length){
+        ticketsPendientes=j.documents.map(doc=>{
+          const f=doc.fields||{};
+          const t={};
+          Object.entries(f).forEach(([k,v])=>{
+            if(v.doubleValue!==undefined) t[k]=v.doubleValue;
+            else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
+            else t[k]=v.stringValue||'';
           });
-          localStorage.setItem(LS_TICK,JSON.stringify(ticketsPendientes));
-          renderTicketsPendientes();
-          return;
-        } else {
-          ticketsPendientes=[];
-          renderTicketsPendientes();
-          return;
-        }
+          return t;
+        });
+      } else {
+        ticketsPendientes=[];
       }
-    }catch(e){}
-  }
-  // Fallback: localStorage
-  try{ ticketsPendientes=JSON.parse(localStorage.getItem(LS_TICK)||'[]'); }catch(e){ ticketsPendientes=[]; }
+    } else {
+      ticketsPendientes=[];
+    }
+  }catch(e){ ticketsPendientes=[]; }
   renderTicketsPendientes();
 }
 

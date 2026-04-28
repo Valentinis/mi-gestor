@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.196</div>
+    <div class="login-version">v5.197</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px 10px;gap:8px;padding-top:calc(14px + env(safe-area-inset-top))">
     <!-- Left: version + debug only -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.196</div>
+      <div style="font-size:10px;color:var(--text-3);">v5.197</div>
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -492,10 +492,18 @@ img,video,iframe,table{max-width:100%;}
   <div id="tab-facturas" class="tab-pane active">
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
-    <!-- Chrome-style internal tabs: Facturas / Registros -->
-    <div style="display:flex;gap:2px;padding:0 0 0 0;margin-bottom:16px;border-bottom:1.5px solid var(--line);">
-      <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:8px 18px 10px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);border-bottom:2.5px solid var(--accent);margin-bottom:-1.5px;border-radius:6px 6px 0 0;background:var(--bg-raised);">Facturas</button>
-      <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:8px 18px 10px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-3);border-bottom:2.5px solid transparent;margin-bottom:-1.5px;border-radius:6px 6px 0 0;">Registros</button>
+    <!-- Chrome-style internal tabs: Facturas / Registros + toggle -->
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1.5px solid var(--line);margin-bottom:16px;">
+      <div style="display:flex;gap:2px;">
+        <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:8px 18px 10px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);border-bottom:2.5px solid var(--accent);margin-bottom:-1.5px;border-radius:6px 6px 0 0;background:var(--bg-raised);">Facturas</button>
+        <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:8px 18px 10px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-3);border-bottom:2.5px solid transparent;margin-bottom:-1.5px;border-radius:6px 6px 0 0;">Registros</button>
+      </div>
+      <!-- Gastos / Ingresos toggle -->
+      <div id="tipo-toggle" style="display:flex;background:var(--bg-raised);border-radius:8px;padding:2px;margin-bottom:4px;gap:1px;">
+        <button id="toggle-todos" onclick="setTipoToggle('todos')" style="padding:4px 10px;font-size:11px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:var(--accent);color:#fff;">Todos</button>
+        <button id="toggle-gastos" onclick="setTipoToggle('gasto')" style="padding:4px 10px;font-size:11px;font-weight:600;border:none;border-radius:6px;cursor:pointer;background:none;color:var(--text-3);">Gastos</button>
+        <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" style="padding:4px 10px;font-size:11px;font-weight:600;border:none;border-radius:6px;cursor:pointer;background:none;color:var(--text-3);">Ingresos</button>
+      </div>
     </div>
     <div id="subtab-facturas-content">
 
@@ -503,8 +511,6 @@ img,video,iframe,table{max-width:100%;}
 
 <div class="filter-bar" id="filter-bar">
   <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
-  <button class="filter-chip" onclick="setFilter('ingreso',this)">Ingresos</button>
-  <button class="filter-chip" onclick="setFilter('gasto',this)">Gastos</button>
   <button class="filter-chip" onclick="setFilter('mes',this)">Este mes</button>
   <button class="filter-chip" id="chip-tickets" onclick="setFilter('ticket',this)">Tickets</button>
   <select id="filter-proveedor" onchange="renderList()" style="flex-shrink:0;padding:5px 8px;font-size:12px;border:0.5px solid var(--line-2);border-radius:20px;background:var(--bg-raised);color:var(--text-2);cursor:pointer;">
@@ -2230,7 +2236,28 @@ async function generateTicket(docId,nombre,importe,fecha,concepto,metodo){
   alert(`✓ Ingreso registrado en ${rec._quarter||Q}`);
   syncFromFirestore();
 }
-let currentSubTab='facturas';
+let tipoToggle='todos';
+function setTipoToggle(tipo){
+  tipoToggle=tipo;
+  // Update toggle buttons
+  ['todos','gastos','ingresos'].forEach(t=>{
+    const btn=document.getElementById('toggle-'+t);
+    if(!btn) return;
+    const active=t===tipo;
+    btn.style.background=active?'var(--accent)':'none';
+    btn.style.color=active?'#fff':'var(--text-3)';
+    btn.style.fontWeight=active?'700':'600';
+  });
+  // Apply to facturas filter
+  if(tipo==='todos'){ setFilter('todos', document.querySelector('#filter-bar .filter-chip')); }
+  else if(tipo==='ingreso'){ setFilter('ingreso', null); }
+  else if(tipo==='gasto'){ setFilter('gasto', null); }
+  // Apply to registros view
+  if(tipo==='gasto') regView='gastos';
+  else if(tipo==='ingreso') regView='ingresos';
+  else regView='gastos'; // default to gastos in registros when "todos"
+  renderAll();
+}
 function switchSubTab(tab){
   currentSubTab=tab;
   const facturas=document.getElementById('subtab-facturas-content');
@@ -2415,7 +2442,7 @@ function groupNames(names){
   // Sort groups by label
   return Object.fromEntries(Object.entries(groups).sort(([a],[b])=>a.localeCompare(b)));
 }
-function setFilter(f,btn){ factFilter=f; document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderList(); }
+function setFilter(f,btn){ factFilter=f; document.querySelectorAll('#filter-bar .filter-chip').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderList(); }
 // ── YEAR + QUARTER ──
 const ALL_QUARTERS=['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026','1T 2027','2T 2027','3T 2027','4T 2027'];
 function prevQuarter(){ const i=ALL_QUARTERS.indexOf(Q); if(i>0) setQFromHeader(ALL_QUARTERS[i-1]); }
@@ -3066,13 +3093,8 @@ function renderRegistros(){
   if(regView==='gastos') facts=facts.filter(f=>f.tipo==='gasto');
   else facts=facts.filter(f=>f.tipo==='ingreso');
 
-  // Header with toggle only — no quarter selector (uses main header)
   const hdr=document.getElementById('reg-header');
-  hdr.innerHTML=`
-    <div class="filter-bar" style="margin-bottom:10px;">
-      <button onclick="setView('gastos',this)" class="filter-chip${regView==='gastos'?' active':''}">Gastos</button>
-      <button onclick="setView('ingresos',this)" class="filter-chip${regView==='ingresos'?' active':''}">Ingresos</button>
-    </div>`;
+  hdr.innerHTML=`<div id="reg-totals-bar-inner"></div>`;
 
   // Totals
   const totBar=document.getElementById('reg-totals-bar');

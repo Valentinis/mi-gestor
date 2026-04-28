@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.176</div>
+    <div class="login-version">v5.177</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -425,7 +425,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.176</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.177</div>
       </div>
     </div>
     <div class="top-right">
@@ -3000,10 +3000,13 @@ function renderRegistros(){
       const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
       if(activeBtn){
         const offset=activeBtn.offsetLeft - (qsr.offsetWidth/2) + (activeBtn.offsetWidth/2);
+        console.log('QSR scroll debug:',{offsetLeft:activeBtn.offsetLeft,qsrWidth:qsr.offsetWidth,btnWidth:activeBtn.offsetWidth,offset,scrollWidth:qsr.scrollWidth});
         qsr.scrollLeft=Math.max(0,offset);
+      } else {
+        console.log('QSR: active btn not found for',regQ);
       }
     }
-  },50);
+  },100);
 
   // Totals
   const totBar=document.getElementById('reg-totals-bar');

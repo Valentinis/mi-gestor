@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.182</div>
+    <div class="login-version">v5.184</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -425,12 +425,12 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.182</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.184</div>
       </div>
     </div>
     <div class="top-right">
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:8px;cursor:pointer;color:var(--text-3);padding:4px 6px;display:flex;align-items:center;justify-content:center;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
       <select id="header-q-select" onchange="setQFromHeader(this.value)" style="font-size:13px;font-weight:700;border:none;border-radius:10px;background:var(--accent);color:#fff;padding:6px 12px;cursor:pointer;-webkit-appearance:none;appearance:none;">
         <option value="1T 2024">1T 2024</option><option value="2T 2024">2T 2024</option><option value="3T 2024">3T 2024</option><option value="4T 2024">4T 2024</option>
@@ -2993,37 +2993,30 @@ function renderRegistros(){
   const hdr=document.getElementById('reg-header');
   const quarters=['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026'];
   const existingQsr=document.getElementById('qs-r');
-  const prevQ=existingQsr?existingQsr.dataset.activeQ:null;
-  // Save scroll BEFORE destroying the DOM — but only if user has manually scrolled
-  const userScrolled=existingQsr&&existingQsr.dataset.userScrolled==='1';
-  const savedScroll=userScrolled?existingQsr.scrollLeft:-1;
+  const alreadyInitialized=existingQsr&&existingQsr.dataset.initialized==='1';
+  const savedScroll=alreadyInitialized?existingQsr.scrollLeft:-1;
   hdr.innerHTML=`
     <div class="filter-bar" style="margin-bottom:10px;">
       <button onclick="setView('gastos',this)" class="filter-chip${regView==='gastos'?' active':''}">Gastos</button>
       <button onclick="setView('ingresos',this)" class="filter-chip${regView==='ingresos'?' active':''}">Ingresos</button>
     </div>
-    <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;" data-active-q="${regQ}" data-user-scrolled="0">
+    <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;" data-initialized="${alreadyInitialized?'1':'0'}">
       ${quarters.map(q=>`<button id="qr-${q.replace(' ','_')}" class="filter-chip${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;white-space:nowrap;">${q}</button>`).join('')}
     </div>`;
-  // Track user scroll
-  setTimeout(()=>{
-    const qsr=document.getElementById('qs-r');
-    if(qsr) qsr.addEventListener('scroll',()=>{ qsr.dataset.userScrolled='1'; },{once:false,passive:true});
-  },200);
   setTimeout(()=>{
     const qsr=document.getElementById('qs-r');
     if(!qsr) return;
-    console.log('QSR state:',{prevQ,regQ,savedScroll,userScrolled,qsrOffsetWidth:qsr.offsetWidth,qsrScrollWidth:qsr.scrollWidth});
-    if(userScrolled && prevQ===regQ && savedScroll>=0){
-      console.log('QSR: restoring user scroll to',savedScroll);
+    if(alreadyInitialized){
       qsr.scrollLeft=savedScroll;
+      qsr.dataset.initialized='1';
     } else {
+      // First time only — center active quarter
       const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
       if(activeBtn){
-        const offset=activeBtn.offsetLeft - (qsr.offsetWidth/2) + (activeBtn.offsetWidth/2);
-        console.log('QSR: centering on',regQ,'offset=',offset);
+        const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
         qsr.scrollLeft=Math.max(0,offset);
       }
+      qsr.dataset.initialized='1';
     }
   },100);
 

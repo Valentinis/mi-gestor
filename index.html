@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.197</div>
+    <div class="login-version">v5.198</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px 10px;gap:8px;padding-top:calc(14px + env(safe-area-inset-top))">
     <!-- Left: version + debug only -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.197</div>
+      <div style="font-size:10px;color:var(--text-3);">v5.198</div>
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -500,8 +500,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <!-- Gastos / Ingresos toggle -->
       <div id="tipo-toggle" style="display:flex;background:var(--bg-raised);border-radius:8px;padding:2px;margin-bottom:4px;gap:1px;">
-        <button id="toggle-todos" onclick="setTipoToggle('todos')" style="padding:4px 10px;font-size:11px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:var(--accent);color:#fff;">Todos</button>
-        <button id="toggle-gastos" onclick="setTipoToggle('gasto')" style="padding:4px 10px;font-size:11px;font-weight:600;border:none;border-radius:6px;cursor:pointer;background:none;color:var(--text-3);">Gastos</button>
+        <button id="toggle-gastos" onclick="setTipoToggle('gasto')" style="padding:4px 10px;font-size:11px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:var(--accent);color:#fff;">Gastos</button>
         <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" style="padding:4px 10px;font-size:11px;font-weight:600;border:none;border-radius:6px;cursor:pointer;background:none;color:var(--text-3);">Ingresos</button>
       </div>
     </div>
@@ -2236,26 +2235,19 @@ async function generateTicket(docId,nombre,importe,fecha,concepto,metodo){
   alert(`✓ Ingreso registrado en ${rec._quarter||Q}`);
   syncFromFirestore();
 }
-let tipoToggle='todos';
+let tipoToggle='gasto';
 function setTipoToggle(tipo){
   tipoToggle=tipo;
-  // Update toggle buttons
-  ['todos','gastos','ingresos'].forEach(t=>{
+  ['gastos','ingresos'].forEach(t=>{
     const btn=document.getElementById('toggle-'+t);
     if(!btn) return;
-    const active=t===tipo;
+    const active=(t==='gastos'&&tipo==='gasto')||(t==='ingresos'&&tipo==='ingreso');
     btn.style.background=active?'var(--accent)':'none';
     btn.style.color=active?'#fff':'var(--text-3)';
     btn.style.fontWeight=active?'700':'600';
   });
-  // Apply to facturas filter
-  if(tipo==='todos'){ setFilter('todos', document.querySelector('#filter-bar .filter-chip')); }
-  else if(tipo==='ingreso'){ setFilter('ingreso', null); }
-  else if(tipo==='gasto'){ setFilter('gasto', null); }
-  // Apply to registros view
-  if(tipo==='gasto') regView='gastos';
-  else if(tipo==='ingreso') regView='ingresos';
-  else regView='gastos'; // default to gastos in registros when "todos"
+  if(tipo==='ingreso'){ setFilter('ingreso',null); regView='ingresos'; }
+  else { setFilter('gasto',null); regView='gastos'; }
   renderAll();
 }
 function switchSubTab(tab){

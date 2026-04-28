@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.215</div>
+    <div class="login-version">v5.217</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -421,21 +421,27 @@ img,video,iframe,table{max-width:100%;}
 
 <div id="main-screen">
   <div id="ptr-indicator">↻ Actualizando...</div>
-  <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px 10px;gap:8px;padding-top:calc(14px + env(safe-area-inset-top))">
-    <!-- Left: version + debug only -->
-    <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.215</div>
-      <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+  <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px 14px 6px;gap:8px;padding-top:calc(8px + env(safe-area-inset-top))">
+    <!-- Left: version + debug + totals + advisor -->
+    <div style="display:flex;align-items:center;gap:5px;">
+      <div style="font-size:9px;color:var(--text-3);">v5.218</div>
+      <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
+      <button onclick="openAdvisor()" id="advisor-btn" style="background:rgba(240,132,74,0.15);border:0.5px solid rgba(240,132,74,0.3);border-radius:6px;cursor:pointer;color:var(--accent);padding:2px 6px;display:flex;align-items:center;gap:3px;font-size:10px;font-weight:600;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Asesor
+      </button>
+      <span id="fact-sum-ing" style="font-size:10px;color:var(--green);font-weight:700;"></span>
+      <span id="fact-sum-gas" style="font-size:10px;color:var(--red);font-weight:700;"></span>
     </div>
     <!-- Center: quarter navigator -->
     <div style="display:flex;align-items:center;gap:4px;">
-      <button onclick="prevQuarter()" style="background:rgba(255,255,255,0.08);border:none;border-radius:8px;cursor:pointer;color:#fff;padding:6px 8px;display:flex;align-items:center;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      <button onclick="prevQuarter()" style="background:rgba(255,255,255,0.08);border:none;border-radius:6px;cursor:pointer;color:#fff;padding:4px 6px;display:flex;align-items:center;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <div style="position:relative;">
-        <button id="qbadge" onclick="document.getElementById('header-q-select').size=8;document.getElementById('header-q-select').style.display='block';document.getElementById('header-q-select').focus();" style="background:var(--accent);border:none;border-radius:10px;color:#fff;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">2T 2026</button>
+        <button id="qbadge" onclick="document.getElementById('header-q-select').size=8;document.getElementById('header-q-select').style.display='block';document.getElementById('header-q-select').focus();" style="background:var(--accent);border:none;border-radius:8px;color:#fff;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">2T 2026</button>
         <select id="header-q-select" onchange="setQFromHeader(this.value);this.style.display='none';this.size=1;" style="position:absolute;top:100%;left:50%;transform:translateX(-50%);display:none;z-index:1000;background:var(--bg-card);color:var(--text);border:0.5px solid var(--line-2);border-radius:10px;padding:4px;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;box-shadow:0 4px 20px rgba(0,0,0,0.4);" onblur="this.style.display='none';this.size=1;">
           <option value="1T 2024">1T 2024</option><option value="2T 2024">2T 2024</option><option value="3T 2024">3T 2024</option><option value="4T 2024">4T 2024</option>
           <option value="1T 2025">1T 2025</option><option value="2T 2025">2T 2025</option><option value="3T 2025">3T 2025</option><option value="4T 2025">4T 2025</option>
@@ -443,8 +449,8 @@ img,video,iframe,table{max-width:100%;}
           <option value="1T 2027">1T 2027</option><option value="2T 2027">2T 2027</option><option value="3T 2027">3T 2027</option><option value="4T 2027">4T 2027</option>
         </select>
       </div>
-      <button onclick="nextQuarter()" style="background:rgba(255,255,255,0.08);border:none;border-radius:8px;cursor:pointer;color:#fff;padding:6px 8px;display:flex;align-items:center;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      <button onclick="nextQuarter()" style="background:rgba(255,255,255,0.08);border:none;border-radius:6px;cursor:pointer;color:#fff;padding:4px 6px;display:flex;align-items:center;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
     <!-- Right: dots + refresh + avatar -->
@@ -514,12 +520,6 @@ img,video,iframe,table{max-width:100%;}
 <select id="filter-cliente" onchange="renderList()" style="display:none;"><option value="">Cliente</option></select>
 <input id="fact-search" type="search" style="display:none;" oninput="renderList()">
 
-<!-- Totals summary -->
-
-<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
-  <span id="fact-sum-ing" style="font-size:13px;color:var(--green);font-weight:600;"></span>
-  <span id="fact-sum-gas" style="font-size:13px;color:var(--red);font-weight:600;"></span>
-</div>
 <div class="reg-panel">
   <div class="reg-list" id="reg-list" style="padding-bottom:70px;"><div class="empty">Sin registros</div></div>
 </div>
@@ -535,7 +535,7 @@ img,video,iframe,table{max-width:100%;}
 
   <!-- Sticky unified search bar -->
 
-  <div id="fact-search-bar" style="position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:0;right:0;z-index:100;padding:8px 12px;background:var(--bg);border-top:0.5px solid var(--line);">
+  <div id="fact-search-bar" style="position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:0;right:0;z-index:100;padding:8px 12px;background:var(--bg);border-top:0.5px solid var(--line);display:none;">
     <div style="display:flex;align-items:center;gap:6px;background:var(--bg-raised);border-radius:12px;padding:0 10px;border:0.5px solid var(--line);">
       <!-- Entity type selector -->
       <select id="fact-entity-select" onchange="onEntitySelectChange()" style="border:none;background:none;color:var(--text-3);font-size:12px;font-weight:600;cursor:pointer;padding:8px 0;flex-shrink:0;max-width:90px;outline:none;">
@@ -802,6 +802,29 @@ img,video,iframe,table{max-width:100%;}
       <div id="cal-day-detail-list"></div>
     </div>
   </div>
+
+<!-- ADVISOR MODAL -->
+
+<div id="advisor-modal" style="display:none;position:fixed;inset:0;z-index:10500;background:rgba(0,0,0,0.7);" onclick="if(event.target===this)closeAdvisor()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:24px 24px 0 0;padding:20px 16px 32px;max-height:75vh;overflow-y:auto;padding-bottom:calc(32px + env(safe-area-inset-bottom));">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#F5EDE0;">Asesor Fiscal</div>
+          <div style="font-size:11px;color:rgba(245,237,224,0.4);">Análisis de tu trimestre</div>
+        </div>
+      </div>
+      <button onclick="closeAdvisor()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;color:#F5EDE0;font-size:16px;">×</button>
+    </div>
+    <div id="advisor-content" style="min-height:80px;"></div>
+    <button onclick="runAdvisor()" id="advisor-run-btn" style="width:100%;margin-top:16px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">
+      Analizar trimestre actual
+    </button>
+  </div>
+</div>
 
 <!-- CONFIG MODAL (kept for compatibility) -->
 
@@ -2334,6 +2357,7 @@ function switchNav(id,btn){
       if(user.picture&&ca){ ca.src=user.picture; ca.style.display='block'; if(ci) ci.style.display='none'; }
     }
     const cq=document.getElementById('config-current-q'); if(cq) cq.textContent=Q;
+    updateFactSearchBar();
     return;
   }
   const tabId=id==='registros'?'facturas':id;
@@ -2344,7 +2368,12 @@ function switchNav(id,btn){
   else if(id==='facturas') switchSubTab('facturas');
   if(id==='drive') renderDriveTab();
   if(id==='tickets') renderTicketsPendientes();
-  if(id==='calendario'){ calYear=new Date().getFullYear(); calMonth=new Date().getMonth(); renderCalendario(); }
+  if(id==='calendario'){
+    calYear=new Date().getFullYear(); calMonth=new Date().getMonth();
+    renderCalendario();
+    // Re-render after a tick in case data just loaded
+    setTimeout(renderCalendario, 300);
+  }
   updateFactSearchBar();
 }
 function switchTab(id,btn){ switchNav(id,btn); }
@@ -2535,7 +2564,87 @@ function updateFactSearchBar(){
   const facturasActive=document.getElementById('tab-facturas')?.classList.contains('active');
   bar.style.display=facturasActive?'block':'none';
 }
-// ── CALENDARIO ──
+// ── ASESOR FISCAL ──
+function openAdvisor(){
+  document.getElementById('advisor-modal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeAdvisor(){
+  document.getElementById('advisor-modal').style.display='none';
+  document.body.style.overflow='';
+}
+async function runAdvisor(){
+  if(!claudeKey||!claudeKey.startsWith('sk-ant-')){
+    document.getElementById('advisor-content').innerHTML='<div style="color:rgba(245,237,224,0.5);font-size:13px;">Configura tu clave de API Claude en Config para usar el asesor.</div>';
+    return;
+  }
+  const btn=document.getElementById('advisor-run-btn');
+  btn.textContent='Analizando...'; btn.disabled=true;
+  const content=document.getElementById('advisor-content');
+  content.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:rgba(245,237,224,0.5);font-size:13px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>Analizando tus datos...</div>';
+
+  // Build context for Claude
+  const facts=getF(Q);
+  const ingresos=facts.filter(f=>f.tipo==='ingreso');
+  const gastos=facts.filter(f=>f.tipo==='gasto');
+  const totalIng=ingresos.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+  const totalGas=gastos.reduce((a,f)=>a+(f.base_iva||0),0);
+  const proveedores=[...new Set(gastos.map(f=>f.proveedor_cliente).filter(Boolean))];
+  const clientes=[...new Set(ingresos.map(f=>f.proveedor_cliente).filter(Boolean))];
+
+  // Check previous quarter for comparison
+  const allQ=Object.keys(data).sort();
+  const prevQ=allQ[allQ.indexOf(Q)-1];
+  const prevFacts=prevQ?getF(prevQ):[];
+  const prevIng=prevFacts.filter(f=>f.tipo==='ingreso').reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+  const prevGas=prevFacts.filter(f=>f.tipo==='gasto').reduce((a,f)=>a+(f.base_iva||0),0);
+
+  // Expected recurring expenses
+  const EXPECTED_RECURRING=['Alibau','alquiler','Lowi','SumUp'];
+  const missingRecurring=EXPECTED_RECURRING.filter(e=>!proveedores.some(p=>p.toLowerCase().includes(e.toLowerCase())));
+
+  const today=new Date();
+  const daysLeft=new Date(today.getFullYear(),today.getMonth()+1,0).getDate()-today.getDate();
+  const [qNum,qYear]=Q.split(' ');
+  const qEndMonth={'1T':3,'2T':6,'3T':9,'4T':12}[qNum];
+  const daysToDeadline=Math.round((new Date(parseInt(qYear),qEndMonth-1,20)-today)/(1000*60*60*24));
+
+  const prompt=`Eres el asesor fiscal de Valentín López Pérez, ceramista autónomo en Barcelona (IAE 862, estimación directa simplificada, IVA 21%, retención 7% en 2024 y años anteriores).
+
+DATOS TRIMESTRE ${Q}:
+- Ingresos totales: ${totalIng.toFixed(2)}€ (${ingresos.length} facturas)
+- Gastos totales: ${totalGas.toFixed(2)}€ (${gastos.length} facturas)
+- Balance: ${(totalIng-totalGas).toFixed(2)}€
+- Clientes: ${clientes.join(', ')||'ninguno'}
+- Proveedores: ${proveedores.join(', ')||'ninguno'}
+${prevQ?`- Trimestre anterior (${prevQ}): ${prevIng.toFixed(2)}€ ingresos, ${prevGas.toFixed(2)}€ gastos`:''}
+${missingRecurring.length?`- Gastos recurrentes posiblemente no registrados: ${missingRecurring.join(', ')}`:''}
+- Días para presentar modelos: ${daysToDeadline} días (día 20 de ${['enero','abril','julio','octubre'][parseInt(qNum[0])-1]})
+
+Da 3-4 consejos concretos y accionables en español. Sé directo y práctico. Usa emojis. Máximo 150 palabras en total. Formato: lista con • para cada consejo.`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,messages:[{role:'user',content:prompt}]})
+    });
+    const d=await resp.json();
+    if(d.error) throw new Error(d.error.message);
+    const text=d.content.find(b=>b.type==='text')?.text||'';
+    // Render markdown-like bullets
+    const html=text.split('\n').map(l=>{
+      if(l.startsWith('•')||l.startsWith('-')) return `<div style="display:flex;gap:8px;margin-bottom:10px;"><span style="color:var(--accent);flex-shrink:0;">${l[0]}</span><span style="font-size:13px;color:#F5EDE0;line-height:1.5;">${l.slice(1).trim()}</span></div>`;
+      if(l.trim()) return `<div style="font-size:13px;color:rgba(245,237,224,0.6);margin-bottom:6px;">${l}</div>`;
+      return '';
+    }).join('');
+    content.innerHTML=html;
+    btn.textContent='Analizar de nuevo'; btn.disabled=false;
+  }catch(e){
+    content.innerHTML=`<div style="color:#f87171;font-size:13px;">Error: ${e.message}</div>`;
+    btn.textContent='Reintentar'; btn.disabled=false;
+  }
+}
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
 const CAL_MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -2717,7 +2826,11 @@ function updateYearQ(ns){
   }
 }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); const qb=document.getElementById('qbadge'); if(qb) qb.textContent=q; const hs=document.getElementById('header-q-select'); if(hs) hs.value=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
-function renderAll(){ renderList(); recalc(); updateSI(); renderRegistros(); }
+function renderAll(){
+  renderList(); recalc(); updateSI(); renderRegistros();
+  // Re-render calendar if active
+  if(document.getElementById('tab-calendario')?.classList.contains('active')) renderCalendario();
+}
 function skeletonItems(n){
   return Array(n).fill(0).map(()=>`
     <div class="skel-item">

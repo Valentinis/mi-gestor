@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.202</div>
+    <div class="login-version">v5.204</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px 10px;gap:8px;padding-top:calc(14px + env(safe-area-inset-top))">
     <!-- Left: version + debug only -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.202</div>
+      <div style="font-size:10px;color:var(--text-3);">v5.204</div>
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -512,17 +512,6 @@ img,video,iframe,table{max-width:100%;}
   <button class="filter-chip active" onclick="setFilter('todos',this)">Todos</button>
   <button class="filter-chip" onclick="setFilter('mes',this)">Este mes</button>
   <button class="filter-chip" id="chip-tickets" onclick="setFilter('ticket',this)">Tickets</button>
-  <select id="filter-proveedor" onchange="renderList()" style="flex-shrink:0;padding:5px 8px;font-size:12px;border:0.5px solid var(--line-2);border-radius:20px;background:var(--bg-raised);color:var(--text-2);cursor:pointer;">
-    <option value="">Proveedor</option>
-  </select>
-  <select id="filter-cliente" onchange="renderList()" style="flex-shrink:0;padding:5px 8px;font-size:12px;border:0.5px solid var(--line-2);border-radius:20px;background:var(--bg-raised);color:var(--text-2);cursor:pointer;">
-    <option value="">Cliente</option>
-  </select>
-</div>
-<!-- Search -->
-<div style="position:relative;margin-bottom:12px;">
-  <input id="fact-search" type="search" placeholder="Buscar proveedor, cliente..." oninput="renderList()" style="width:100%;padding:9px 12px 9px 34px;background:var(--bg-raised);border:0.5px solid var(--line);border-radius:10px;font-size:13px;color:var(--text);box-sizing:border-box;">
-  <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
 </div>
 <!-- Summary chips -->
 <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
@@ -531,8 +520,12 @@ img,video,iframe,table{max-width:100%;}
   <span id="fact-sum-gas" style="font-size:12px;color:var(--red);font-weight:600;"></span>
   <button onclick="clearQ()" class="btn-danger-sm" style="margin-left:auto;">Borrar trimestre</button>
 </div>
+<!-- Hidden selects for filter logic -->
+<select id="filter-proveedor" onchange="renderList()" style="display:none;"><option value="">Proveedor</option></select>
+<select id="filter-cliente" onchange="renderList()" style="display:none;"><option value="">Cliente</option></select>
+<input id="fact-search" type="search" style="display:none;" oninput="renderList()">
 <div class="reg-panel">
-  <div class="reg-list" id="reg-list"><div class="empty">Sin registros</div></div>
+  <div class="reg-list" id="reg-list" style="padding-bottom:70px;"><div class="empty">Sin registros</div></div>
 </div>
 <div class="storage-bar" style="opacity:0.6;"><span id="si"></span></div>
 
@@ -542,6 +535,29 @@ img,video,iframe,table{max-width:100%;}
     <div id="reg-header"></div>
     <div id="reg-totals-bar"></div>
     <div id="reg-tbody"></div>
+  </div>
+
+  <!-- Sticky unified search bar -->
+
+  <div id="fact-search-bar" style="position:fixed;bottom:calc(60px + env(safe-area-inset-bottom));left:0;right:0;z-index:100;padding:8px 12px;background:var(--bg);border-top:0.5px solid var(--line);">
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg-raised);border-radius:12px;padding:0 10px;border:0.5px solid var(--line);">
+      <!-- Entity type selector -->
+      <select id="fact-entity-select" onchange="onEntitySelectChange()" style="border:none;background:none;color:var(--text-3);font-size:12px;font-weight:600;cursor:pointer;padding:8px 0;flex-shrink:0;max-width:90px;outline:none;">
+        <option value="">Todos</option>
+        <option value="proveedor" id="entity-proveedor-opt">Proveedor</option>
+        <option value="cliente" id="entity-cliente-opt">Cliente</option>
+      </select>
+      <div style="width:0.5px;height:16px;background:var(--line);flex-shrink:0;"></div>
+      <!-- Search input -->
+      <div style="position:relative;flex:1;display:flex;align-items:center;">
+        <svg style="position:absolute;left:0;color:var(--text-3);flex-shrink:0;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="fact-search-input" type="search" placeholder="Buscar..." oninput="onSearchInput()" style="width:100%;padding:8px 8px 8px 22px;background:none;border:none;font-size:13px;color:var(--text);outline:none;box-sizing:border-box;">
+      </div>
+      <!-- Clear button -->
+      <button id="fact-search-clear" onclick="clearSearch()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px;flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
   </div>
   </div><!-- end tab-facturas -->
   <div id="tab-manual" class="tab-pane">
@@ -2292,6 +2308,7 @@ function switchNav(id,btn){
   else if(id==='facturas') switchSubTab('facturas');
   if(id==='drive') renderDriveTab();
   if(id==='tickets') renderTicketsPendientes();
+  updateFactSearchBar();
 }
 function switchTab(id,btn){ switchNav(id,btn); }
 function openAddModal(){
@@ -2437,7 +2454,50 @@ function groupNames(names){
 function setFilter(f,btn){ factFilter=f; document.querySelectorAll('#filter-bar .filter-chip').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderList(); }
 // ── YEAR + QUARTER ──
 const ALL_QUARTERS=['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026','1T 2027','2T 2027','3T 2027','4T 2027'];
-function prevQuarter(){ const i=ALL_QUARTERS.indexOf(Q); if(i>0) setQFromHeader(ALL_QUARTERS[i-1]); }
+function onEntitySelectChange(){
+  const sel=document.getElementById('fact-entity-select');
+  const provSel=document.getElementById('filter-proveedor');
+  const cliSel=document.getElementById('filter-cliente');
+  const input=document.getElementById('fact-search-input');
+  // Reset both hidden selects
+  if(provSel) provSel.value='';
+  if(cliSel) cliSel.value='';
+  input.value='';
+  input.placeholder=sel.value==='proveedor'?'Buscar proveedor...':sel.value==='cliente'?'Buscar cliente...':'Buscar...';
+  renderList();
+}
+function onSearchInput(){
+  const input=document.getElementById('fact-search-input');
+  const sel=document.getElementById('fact-entity-select');
+  const q=input.value;
+  const clearBtn=document.getElementById('fact-search-clear');
+  if(clearBtn) clearBtn.style.display=q?'block':'none';
+  // Wire to hidden search input for renderList
+  const hidden=document.getElementById('fact-search');
+  if(hidden){ hidden.value=q; }
+  renderList();
+}
+function clearSearch(){
+  const input=document.getElementById('fact-search-input');
+  const hidden=document.getElementById('fact-search');
+  const provSel=document.getElementById('filter-proveedor');
+  const cliSel=document.getElementById('filter-cliente');
+  const clearBtn=document.getElementById('fact-search-clear');
+  const sel=document.getElementById('fact-entity-select');
+  if(input) input.value='';
+  if(hidden) hidden.value='';
+  if(provSel) provSel.value='';
+  if(cliSel) cliSel.value='';
+  if(sel) sel.value='';
+  if(clearBtn) clearBtn.style.display='none';
+  renderList();
+}
+function updateFactSearchBar(){
+  const bar=document.getElementById('fact-search-bar');
+  if(!bar) return;
+  const facturasActive=document.getElementById('tab-facturas')?.classList.contains('active');
+  bar.style.display=facturasActive?'block':'none';
+} const i=ALL_QUARTERS.indexOf(Q); if(i>0) setQFromHeader(ALL_QUARTERS[i-1]); }
 function nextQuarter(){ const i=ALL_QUARTERS.indexOf(Q); if(i<ALL_QUARTERS.length-1) setQFromHeader(ALL_QUARTERS[i+1]); }
 function setQFromHeader(q){
   Q=q; regQ=q;
@@ -2516,8 +2576,9 @@ function renderList(){
   const cli=(cliSel&&cliSel.value)||'';
   if(prov){ const variants=prov.split('|'); fs=fs.filter(f=>variants.includes(f.proveedor_cliente||'')); }
   if(cli){ const variants=cli.split('|'); fs=fs.filter(f=>variants.includes(f.proveedor_cliente||'')); }
-  // Search
-  const q=(document.getElementById('fact-search')||{}).value||'';
+  // Search — use unified search bar input
+  const searchInput=document.getElementById('fact-search-input');
+  const q=(searchInput&&searchInput.value)||(document.getElementById('fact-search')||{}).value||'';
   if(q) fs=fs.filter(f=>(f.proveedor_cliente||'').toLowerCase().includes(q.toLowerCase())||(f.concepto||'').toLowerCase().includes(q.toLowerCase()));
   document.getElementById('rc-f').textContent=fs.length+' reg.';
   // Summary — always calculated on full quarter, not filtered set
@@ -3915,7 +3976,8 @@ async function refreshFromDrive(){
     if(!pulling) return;
     pulling=false;
     const ind=indicator();
-    if(triggered){
+    const finalDy=currentY-startY; // use FINAL position, not max reached
+    if(finalDy>=THRESHOLD){
       triggered=false;
       refreshFromDrive().then(()=>{
         if(ind){
@@ -3926,7 +3988,8 @@ async function refreshFromDrive(){
         }
       });
     } else {
-      // Snap back
+      // Didn't reach threshold or pulled back up — snap back
+      triggered=false;
       if(ind){
         ind.style.transition='transform .2s ease, opacity .2s ease';
         ind.style.transform='translateX(-50%) translateY(-60px)';

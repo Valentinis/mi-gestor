@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.193</div>
+    <div class="login-version">v5.194</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px 10px;gap:8px;padding-top:calc(14px + env(safe-area-inset-top))">
     <!-- Left: version + debug only -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.193</div>
+      <div style="font-size:10px;color:var(--text-3);">v5.194</div>
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -3165,12 +3165,13 @@ const isTouchDevice=()=>window.matchMedia('(hover:none)').matches||('ontouchstar
 
 function addSwipeToClose(sheetEl, closeFn){
   if(!isTouchDevice()) return;
-  let startY=0, currentY=0, dragging=false;
-  // Prevent touches on the sheet from propagating to the background
+  let startY=0, currentY=0, dragging=false, moved=false;
   sheetEl.addEventListener('touchstart',e=>{
     if(e.touches.length!==1) return;
     startY=e.touches[0].clientY;
+    currentY=startY;
     dragging=true;
+    moved=false;
     sheetEl.style.transition='none';
     e.stopPropagation();
   },{passive:true});
@@ -3178,7 +3179,8 @@ function addSwipeToClose(sheetEl, closeFn){
     if(!dragging) return;
     currentY=e.touches[0].clientY;
     const dy=currentY-startY;
-    if(dy>0){
+    if(dy>10) moved=true; // only mark as moved after 10px
+    if(dy>0 && moved){
       e.preventDefault();
       e.stopPropagation();
       sheetEl.style.transform=`translateY(${dy}px)`;
@@ -3190,12 +3192,13 @@ function addSwipeToClose(sheetEl, closeFn){
     e.stopPropagation();
     sheetEl.style.transition='transform .25s ease';
     const dy=currentY-startY;
-    if(dy>80){
+    if(moved && dy>120){ // increased threshold to 120px
       sheetEl.style.transform=`translateY(100%)`;
       setTimeout(()=>{ sheetEl.style.transform=''; closeFn(); },220);
     } else {
       sheetEl.style.transform='';
     }
+    moved=false;
   });
 }
 const LS_TICK='migestor_tickets_pending';

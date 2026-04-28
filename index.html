@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.164</div>
+    <div class="login-version">v5.167</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.164</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.167</div>
       </div>
     </div>
     <div class="top-right">
@@ -1088,7 +1088,7 @@ EXTRAE EXACTAMENTE:
 - cuota_iva: importe del IVA
 - retencion_pct: porcentaje de retención. Busca en todas las páginas. Si base+IVA ≠ TOTAL, calcula la diferencia como retención.
 - retencion_importe: importe de retención. Si base+IVA ≠ TOTAL, calcula: retencion_importe = base+IVA - TOTAL.
-- ingresos_brutos: total a cobrar incluyendo IVA (solo para ingresos)
+- ingresos_brutos: importe real a cobrar = base + IVA - retención (solo para ingresos)
 - notas: Si algún artículo supera 300€ individualmente añade "⚠️ Posible amortización"
 
 CASOS ESPECIALES:
@@ -1121,7 +1121,8 @@ function classifyRecord(f){
     if(diff>0.5){
       f.retencion_importe=diff;
       f.retencion_pct=Math.round(diff/(f.base_iva||1)*100);
-      f.operacion='PROF'; // ingreso con retención → factura profesional
+      f.operacion='PROF';
+      f.ingresos_brutos=Math.round((f.ingresos_brutos||0)*100)/100; // already correct (what Claude returned)
     }
   }
   // Mismo para gastos
@@ -1181,6 +1182,15 @@ function classifyRecord(f){
   if(hasRetention&&!isCompany&&f.tipo==='gasto'){
     f.operacion='PROF';
     if(!f.retencion_pct) f.retencion_pct=15;
+    return f;
+  }
+
+  // ── PROF: ingreso con retención explícita ──
+  if(hasRetention&&f.tipo==='ingreso'){
+    f.operacion='PROF';
+    // ingresos_brutos = lo que realmente cobras = base + IVA - retención
+    const bruto=(f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0);
+    if(bruto>0) f.ingresos_brutos=Math.round(bruto*100)/100;
     return f;
   }
 
@@ -1685,8 +1695,8 @@ function getModelosAfectados(f){
     else if(f.operacion==='EXENTO'){m.push('130');}
   } else {
     if(f.operacion==='INTRA_S'){m.push('349','303','130');}
+    else if(f.operacion==='PROF'){m.push('303','130');} // retención soportada reduce el 130
     else{m.push('303','130');}
-    if(f.retencion_pct>0) m.push('111');
   }
   return [...new Set(m)];
 }

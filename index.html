@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.185</div>
+    <div class="login-version">v5.186</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -425,7 +425,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.185</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.186</div>
       </div>
     </div>
     <div class="top-right">
@@ -688,18 +688,18 @@ img,video,iframe,table{max-width:100%;}
       <p style="font-size:13px;color:rgba(255,255,255,0.45);margin:0 0 16px;">SumUp · Bizum · Transferencia Imagin</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
         <div class="upload-zone" onclick="triggerTicketUpload()" style="margin-bottom:0;">
-          <div class="upload-icon">📁</div>
+          <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.6"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
           <div class="upload-title">Seleccionar</div>
           <div class="upload-sub">Foto o PDF</div>
         </div>
         <div class="upload-zone" onclick="triggerTicketCamera()" style="margin-bottom:0;">
-          <div class="upload-icon">📷</div>
+          <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
           <div class="upload-title">Cámara</div>
           <div class="upload-sub">Fotografiar</div>
         </div>
       </div>
       <div class="upload-zone" onclick="pasteTicketFromClipboard()" style="margin-bottom:8px;">
-        <div class="upload-icon">📋</div>
+        <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.6"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div>
         <div class="upload-title">Pegar imagen</div>
         <div class="upload-sub">Desde portapapeles</div>
       </div>
@@ -751,12 +751,12 @@ img,video,iframe,table{max-width:100%;}
       <div id="claude-no-key-add" class="tip-box" style="display:none;">Ve a <strong>Config</strong> e introduce tu API key.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
         <div class="upload-zone" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)" style="margin-bottom:0;">
-          <div class="upload-icon">📁</div>
+          <div class="upload-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.6"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
           <div class="upload-title">Seleccionar</div>
           <div class="upload-sub">Foto o PDF</div>
         </div>
         <div class="upload-zone" onclick="triggerCamera()" style="margin-bottom:0;">
-          <div class="upload-icon">📷</div>
+          <div class="upload-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
           <div class="upload-title">Cámara</div>
           <div class="upload-sub">Fotografiar factura</div>
         </div>
@@ -783,7 +783,7 @@ const FS_URL=`https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databas
 // Auto-detect current quarter
 function currentQuarter(){ const m=new Date().getMonth(); const q=m<3?'1T':m<6?'2T':m<9?'3T':'4T'; return q+' 2026'; }
 let pin='', Q=currentQuarter(), data={}, token=null, user=null, driveLoaded=false;
-let regQ=currentQuarter(), regView='gastos';
+let regQ=currentQuarter(), regView='gastos', regQScrollInit=false;
 let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, ticketsFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
 
@@ -2993,8 +2993,7 @@ function renderRegistros(){
   const hdr=document.getElementById('reg-header');
   const quarters=['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026'];
   const existingQsr=document.getElementById('qs-r');
-  const alreadyInitialized=!!existingQsr;
-  const savedScroll=alreadyInitialized?existingQsr.scrollLeft:-1;
+  const savedScroll=existingQsr?existingQsr.scrollLeft:0;
   hdr.innerHTML=`
     <div class="filter-bar" style="margin-bottom:10px;">
       <button onclick="setView('gastos',this)" class="filter-chip${regView==='gastos'?' active':''}">Gastos</button>
@@ -3006,7 +3005,7 @@ function renderRegistros(){
   setTimeout(()=>{
     const qsr=document.getElementById('qs-r');
     if(!qsr) return;
-    if(alreadyInitialized){
+    if(regQScrollInit){
       qsr.scrollLeft=savedScroll;
     } else {
       const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
@@ -3014,6 +3013,7 @@ function renderRegistros(){
         const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
         qsr.scrollLeft=Math.max(0,offset);
       }
+      regQScrollInit=true;
     }
   },100);
 

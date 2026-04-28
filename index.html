@@ -361,7 +361,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.190</div>
+    <div class="login-version">v5.191</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -420,18 +420,11 @@ img,video,iframe,table{max-width:100%;}
 <div id="main-screen">
   <div id="ptr-indicator">↻ Actualizando...</div>
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 16px;gap:8px;">
-    <!-- Left: version + debug -->
+    <!-- Left: version + debug only -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.190</div>
+      <div style="font-size:10px;color:var(--text-3);">v5.191</div>
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-      </button>
-      <div style="display:flex;gap:3px;align-items:center;">
-        <div class="dot dot-off" id="claude-dot"></div>
-        <div class="dot dot-off" id="drive-dot"></div>
-      </div>
-      <button id="refresh-btn" onclick="refreshFromDrive()" title="Actualizar" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
-        <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
       </button>
     </div>
     <!-- Center: quarter navigator -->
@@ -452,24 +445,27 @@ img,video,iframe,table{max-width:100%;}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
-    <!-- Right: avatar (opens config) -->
-    <div style="display:flex;justify-content:flex-end;">
-      <div id="user-avatar" onclick="openConfigModal()" style="width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;">
-        <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
-        <span id="user-initials" style="color:#fff;font-size:14px;font-weight:700;">VL</span>
+    <!-- Right: dots only, no avatar (config moved to nav) -->
+    <div style="display:flex;justify-content:flex-end;align-items:center;gap:4px;">
+      <div style="display:flex;gap:3px;align-items:center;">
+        <div class="dot dot-off" id="claude-dot"></div>
+        <div class="dot dot-off" id="drive-dot"></div>
       </div>
+      <button id="refresh-btn" onclick="refreshFromDrive()" title="Actualizar" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
+        <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+      </button>
     </div>
   </div>
   <div class="tabs">
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
+    <button class="nav-btn" id="nav-tickets" onclick="switchNav('tickets',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4V9z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+      <span>Tickets</span>
+    </button>
     <button class="nav-btn active" id="nav-facturas" onclick="switchNav('facturas',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      <span>Facturas</span>
-    </button>
-    <button class="nav-btn" id="nav-registros" onclick="switchNav('registros',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <span>Registros</span>
+      <span>Gestor</span>
     </button>
     <button class="nav-add" onclick="openAddModal()" style="position:relative;">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -479,9 +475,12 @@ img,video,iframe,table{max-width:100%;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span>Modelos</span>
     </button>
-    <button class="nav-btn" id="nav-tickets" onclick="switchNav('tickets',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4V9z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
-      <span>Tickets</span>
+    <button class="nav-btn" id="nav-config" onclick="openConfigModal()">
+      <div id="nav-avatar" style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+        <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
+        <span id="user-initials" style="color:#fff;font-size:10px;font-weight:700;">VL</span>
+      </div>
+      <span>Config</span>
     </button>
   </nav>
   <!-- Solid block to prevent content bleeding under nav on iOS -->
@@ -491,6 +490,12 @@ img,video,iframe,table{max-width:100%;}
   <div id="tab-facturas" class="tab-pane active">
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
+    <!-- Internal tabs: Facturas / Registros -->
+    <div style="display:flex;border-bottom:0.5px solid var(--line);margin-bottom:0;">
+      <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="flex:1;padding:10px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);border-bottom:2px solid var(--accent);">Facturas</button>
+      <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;">Registros</button>
+    </div>
+    <div id="subtab-facturas-content">
 
 <!-- Filter bar -->
 
@@ -524,12 +529,14 @@ img,video,iframe,table{max-width:100%;}
 </div>
 <div class="storage-bar" style="opacity:0.6;"><span id="si"></span></div>
 
-  </div>
-  <div id="tab-registros" class="tab-pane">
+  </div><!-- end subtab-facturas-content -->
+  <!-- Registros subtab -->
+  <div id="subtab-registros-content" style="display:none;">
     <div id="reg-header"></div>
     <div id="reg-totals-bar"></div>
     <div id="reg-tbody"></div>
   </div>
+  </div><!-- end tab-facturas -->
   <div id="tab-manual" class="tab-pane">
     <div class="tip-box"><h4>Importar JSON manualmente</h4><ol><li>Sube la factura al chat con Claude</li><li>Claude te devuelve un <code>JSON</code></li><li>Cópialo y pégalo aquí</li></ol></div>
 <div class="card">
@@ -2200,13 +2207,37 @@ async function generateTicket(docId,nombre,importe,fecha,concepto,metodo){
   alert(`✓ Ingreso registrado en ${rec._quarter||Q}`);
   syncFromFirestore();
 }
+let currentSubTab='facturas';
+function switchSubTab(tab){
+  currentSubTab=tab;
+  const facturas=document.getElementById('subtab-facturas-content');
+  const registros=document.getElementById('subtab-registros-content');
+  const btnF=document.getElementById('subtab-facturas-btn');
+  const btnR=document.getElementById('subtab-registros-btn');
+  if(tab==='facturas'){
+    if(facturas) facturas.style.display='';
+    if(registros) registros.style.display='none';
+    if(btnF){ btnF.style.color='var(--accent)'; btnF.style.borderBottomColor='var(--accent)'; btnF.style.fontWeight='700'; }
+    if(btnR){ btnR.style.color='var(--text-3)'; btnR.style.borderBottomColor='transparent'; btnR.style.fontWeight='600'; }
+  } else {
+    if(facturas) facturas.style.display='none';
+    if(registros) registros.style.display='';
+    if(btnF){ btnF.style.color='var(--text-3)'; btnF.style.borderBottomColor='transparent'; btnF.style.fontWeight='600'; }
+    if(btnR){ btnR.style.color='var(--accent)'; btnR.style.borderBottomColor='var(--accent)'; btnR.style.fontWeight='700'; }
+    renderRegistros();
+  }
+}
 function switchNav(id,btn){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
+  // Map registros to facturas tab
+  const tabId=id==='registros'?'facturas':id;
+  const el=document.getElementById('tab-'+tabId);
+  if(el) el.classList.add('active');
   if(btn) btn.classList.add('active');
+  if(id==='registros') switchSubTab('registros');
+  else if(id==='facturas') switchSubTab('facturas');
   if(id==='drive') renderDriveTab();
-  if(id==='registros') renderRegistros();
   if(id==='tickets') renderTicketsPendientes();
 }
 function switchTab(id,btn){ switchNav(id,btn); }

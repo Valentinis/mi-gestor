@@ -100,7 +100,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .tabs::-webkit-scrollbar{display:none;}
 /* Bottom nav */
 .tab-bar-top{display:none;}
-.tab-pane{display:none;padding:12px 12px 160px;width:100%;overflow-x:hidden;box-sizing:border-box;}
+.tab-pane{display:none !important;padding:12px 12px 160px;width:100%;overflow-x:hidden;box-sizing:border-box;}
+.tab-pane.active{display:block !important;}
+.tab-pane.active.flex-tab{display:flex !important;}
 .tab-pane.active{display:block !important;visibility:visible !important;opacity:1 !important;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#1C1814;border-top:1px solid rgba(139,90,43,0.12);display:flex;align-items:center;justify-content:space-around;padding:8px 8px 20px;z-index:9999;box-shadow:0 -8px 24px rgba(0,0,0,0.15);}
 @media(prefers-color-scheme:dark){.bottom-nav{background:#1C1814 !important;border-top-color:rgba(240,132,74,0.15);}}
@@ -361,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.192</div>
+    <div class="login-version">v5.193</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -422,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px 10px;gap:8px;padding-top:calc(14px + env(safe-area-inset-top))">
     <!-- Left: version + debug only -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.192</div>
+      <div style="font-size:10px;color:var(--text-3);">v5.193</div>
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -490,10 +492,10 @@ img,video,iframe,table{max-width:100%;}
   <div id="tab-facturas" class="tab-pane active">
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
-    <!-- Internal tabs: Facturas / Registros -->
-    <div style="display:flex;border-bottom:0.5px solid var(--line);margin-bottom:0;">
-      <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="flex:1;padding:10px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);border-bottom:2px solid var(--accent);">Facturas</button>
-      <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="flex:1;padding:10px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;">Registros</button>
+    <!-- Chrome-style internal tabs: Facturas / Registros -->
+    <div style="display:flex;gap:2px;padding:0 0 0 0;margin-bottom:16px;border-bottom:1.5px solid var(--line);">
+      <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:8px 18px 10px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);border-bottom:2.5px solid var(--accent);margin-bottom:-1.5px;border-radius:6px 6px 0 0;background:var(--bg-raised);">Facturas</button>
+      <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:8px 18px 10px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-3);border-bottom:2.5px solid transparent;margin-bottom:-1.5px;border-radius:6px 6px 0 0;">Registros</button>
     </div>
     <div id="subtab-facturas-content">
 
@@ -620,6 +622,16 @@ img,video,iframe,table{max-width:100%;}
     <div class="val-result" id="val-res"></div>
   </div>
   <div id="tab-config" class="tab-pane">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div id="config-avatar" style="width:48px;height:48px;border-radius:50%;background:var(--accent);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+        <img id="config-avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
+        <span id="config-initials" style="color:#fff;font-size:18px;font-weight:700;">VL</span>
+      </div>
+      <div>
+        <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
+        <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
+      </div>
+    </div>
     <div class="section-label">Sincronización</div>
     <div class="card">
       <div class="config-row">
@@ -647,11 +659,12 @@ img,video,iframe,table{max-width:100%;}
     </div>
     <div class="section-label">Google Sheets</div>
     <div class="card"><div class="config-row"><div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div><button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear</button></div></div>
+    <button onclick="signOut()" style="width:100%;margin-top:20px;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">Cerrar sesión</button>
   </div>
 
   <!-- TICKETS TAB -->
 
-  <div id="tab-tickets" class="tab-pane" style="display:flex;flex-direction:column;padding-bottom:0;">
+  <div id="tab-tickets" class="tab-pane flex-tab" style="flex-direction:column;padding:0;">
     <div style="padding:16px 16px 0;flex-shrink:0;">
       <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">Tickets de venta</div>
       <div style="font-size:13px;color:var(--text-3);margin-top:3px;">SumUp · Bizum · Transferencia</div>
@@ -740,21 +753,7 @@ img,video,iframe,table{max-width:100%;}
 
   <!-- CONFIG TAB -->
 
-  <div id="tab-config" class="tab-pane">
-    <div style="padding:8px 0 16px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-        <div id="config-avatar" style="width:48px;height:48px;border-radius:50%;background:var(--accent);overflow:hidden;display:flex;align-items:center;justify-content:center;">
-          <span id="config-initials" style="color:#fff;font-size:18px;font-weight:700;">VL</span>
-        </div>
-        <div>
-          <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
-          <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
-        </div>
-      </div>
-      <div id="config-tab-content"></div>
-      <button onclick="signOut()" style="width:100%;margin-top:16px;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">Cerrar sesión</button>
-    </div>
-  </div>
+<!-- (content is in the first tab-config above) -->
 
 <!-- CONFIG MODAL (kept for compatibility) -->
 
@@ -2257,14 +2256,12 @@ function switchNav(id,btn){
   if(id==='config'){
     document.getElementById('tab-config').classList.add('active');
     if(btn) btn.classList.add('active');
-    // Populate config tab content from config modal content
-    const src=document.getElementById('config-modal-inner');
-    const dst=document.getElementById('config-tab-content');
-    if(src&&dst) dst.innerHTML=src.innerHTML;
-    // Update user info
     if(user){
       const cn=document.getElementById('config-name'); if(cn) cn.textContent=user.name||'';
       const ce=document.getElementById('config-email'); if(ce) ce.textContent=user.email||'';
+      const ci=document.getElementById('config-initials');
+      const ca=document.getElementById('config-avatar-img');
+      if(user.picture&&ca){ ca.src=user.picture; ca.style.display='block'; if(ci) ci.style.display='none'; }
     }
     return;
   }

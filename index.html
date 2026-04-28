@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.161</div>
+    <div class="login-version">v5.162</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -423,7 +423,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.161</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.162</div>
       </div>
     </div>
     <div class="top-right">
@@ -950,14 +950,15 @@ function showPin(){
   document.getElementById('pin-screen').style.display='none';
   document.getElementById('main-screen').style.display='block';
   if(user){
-    document.getElementById('avatar-name').textContent=user.name||'';
-    document.getElementById('avatar-email').textContent=user.email||'';
-    const img=document.getElementById('avatar-img'); if(user.picture){img.src=user.picture;img.style.display='block';}
-    document.getElementById('drive-user-name').textContent=user.name||'';
-    document.getElementById('drive-user-email').textContent=user.email||'';
+    const an=document.getElementById('avatar-name'); if(an) an.textContent=user.name||'';
+    const ae=document.getElementById('avatar-email'); if(ae) ae.textContent=user.email||'';
+    const img=document.getElementById('avatar-img'); if(img&&user.picture){img.src=user.picture;img.style.display='block';}
+    const dun=document.getElementById('drive-user-name'); if(dun) dun.textContent=user.name||'';
+    const due=document.getElementById('drive-user-email'); if(due) due.textContent=user.email||'';
   }
-  if(claudeKey){document.getElementById('claude-key-input').value=claudeKey;updateClaudeKey(claudeKey);}
-  else{document.getElementById('claude-no-key').style.display='block';}
+  const cki=document.getElementById('claude-key-input');
+  if(claudeKey){ if(cki) cki.value=claudeKey; updateClaudeKey(claudeKey);}
+  else{ const cnk=document.getElementById('claude-no-key'); if(cnk) cnk.style.display='block'; }
   updateSheetDisplay();
   const cq=currentQuarter();
   Q=cq; regQ=cq;

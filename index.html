@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.179</div>
+    <div class="login-version">v5.181</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -425,10 +425,11 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.179</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.181</div>
       </div>
     </div>
     <div class="top-right">
+      <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:8px;cursor:pointer;color:var(--text-3);padding:4px 7px;font-size:12px;line-height:1;">🐛</button>
       <select id="header-q-select" onchange="setQFromHeader(this.value)" style="font-size:13px;font-weight:700;border:none;border-radius:10px;background:var(--accent);color:#fff;padding:6px 12px;cursor:pointer;-webkit-appearance:none;appearance:none;">
         <option value="1T 2024">1T 2024</option><option value="2T 2024">2T 2024</option><option value="3T 2024">3T 2024</option><option value="4T 2024">4T 2024</option>
         <option value="1T 2025">1T 2025</option><option value="2T 2025">2T 2025</option><option value="3T 2025">3T 2025</option><option value="4T 2025">4T 2025</option>
@@ -442,7 +443,6 @@ img,video,iframe,table{max-width:100%;}
       <button id="refresh-btn" onclick="refreshFromDrive()" title="Actualizar desde Drive" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:4px;display:none;">
         <svg id="refresh-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
       </button>
-      <button onclick="toggleDebug()" title="Debug" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px;font-size:11px;opacity:0.4;">🐛</button>
       <button onclick="openConfigModal()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:4px;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
@@ -3004,8 +3004,10 @@ function renderRegistros(){
     </div>`;
   setTimeout(()=>{
     const qsr=document.getElementById('qs-r');
-    if(!qsr) return;
+    if(!qsr){ console.log('QSR: element not found'); return; }
+    console.log('QSR state:',{prevQ,regQ,savedScroll,qsrScrollLeft:qsr.scrollLeft,qsrOffsetWidth:qsr.offsetWidth,qsrScrollWidth:qsr.scrollWidth});
     if(prevQ===regQ && savedScroll>=0){
+      console.log('QSR: restoring scroll to',savedScroll);
       qsr.scrollLeft=savedScroll;
     } else {
       const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));

@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.187</div>
+    <div class="login-version">v5.188</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -425,7 +425,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.187</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.188</div>
       </div>
     </div>
     <div class="top-right">
@@ -981,16 +981,6 @@ function showPin(){
   loadTicketsPending();
   renderAll(); updateSI(); showSyncBanner();
   initDrive();
-  // Center quarter selector once on app load
-  setTimeout(()=>{
-    const qsr=document.getElementById('qs-r');
-    if(!qsr) return;
-    const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
-    if(activeBtn){
-      const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
-      qsr.scrollLeft=Math.max(0,offset);
-    }
-  },300);
 }
 function signOut(){ 
   token=null; user=null; localStorage.removeItem(LS_AUTH); updateDots();
@@ -1044,10 +1034,10 @@ function showSyncBanner(){
   if(!banner){
     banner=document.createElement('div');
     banner.id='sync-banner';
-    banner.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#F0844A;color:#fff;text-align:center;font-size:12px;font-weight:600;padding:6px 16px;z-index:500;border-radius:20px;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,0.3);';
+    banner.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#F0844A;color:#fff;font-size:12px;font-weight:600;padding:6px 16px;z-index:500;border-radius:20px;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:6px;';
     document.body.appendChild(banner);
   }
-  banner.textContent='⏳ Sincronizando con Drive...';
+  banner.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;flex-shrink:0;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Sincronizando con Drive...';
   banner.style.opacity='1';
 }
 function hideSyncBanner(){
@@ -1058,7 +1048,7 @@ function hideSyncBanner(){
     driveLoaded=true;
     renderAll();
     const b=document.getElementById('sync-banner');
-    if(b){b.textContent='✓ Sincronizado';setTimeout(()=>{b.style.opacity='0';setTimeout(()=>b.remove(),400);},1200);}
+    if(b){b.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Sincronizado';setTimeout(()=>{b.style.opacity='0';setTimeout(()=>b.remove(),400);},1200);}
   }, delay);
 }
 
@@ -3012,8 +3002,23 @@ function renderRegistros(){
     <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;">
       ${quarters.map(q=>`<button id="qr-${q.replace(' ','_')}" class="filter-chip${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;white-space:nowrap;">${q}</button>`).join('')}
     </div>`;
-  // Restore scroll position — never auto-center here
-  if(existingQsr) setTimeout(()=>{ const qsr=document.getElementById('qs-r'); if(qsr) qsr.scrollLeft=savedScroll; },0);
+  setTimeout(()=>{
+    const qsr=document.getElementById('qs-r');
+    if(!qsr) return;
+    if(regQScrollInit){
+      qsr.scrollLeft=savedScroll; // restore position, never auto-center again
+    } else {
+      regQScrollInit=true;
+      const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
+      if(activeBtn){
+        const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
+        // Smooth scroll via CSS transition
+        qsr.style.scrollBehavior='smooth';
+        qsr.scrollLeft=Math.max(0,offset);
+        setTimeout(()=>{ qsr.style.scrollBehavior=''; },500);
+      }
+    }
+  },150);
 
   // Totals
   const totBar=document.getElementById('reg-totals-bar');

@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.186</div>
+    <div class="login-version">v5.187</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -425,7 +425,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.186</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.187</div>
       </div>
     </div>
     <div class="top-right">
@@ -642,7 +642,7 @@ img,video,iframe,table{max-width:100%;}
 
 ```
 <button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
   Analizar extracto / pago
 </button>
 
@@ -668,7 +668,7 @@ img,video,iframe,table{max-width:100%;}
 
 <!-- Empty state -->
 <div id="tickets-empty" style="padding:48px 0;text-align:center;">
-  <div style="font-size:36px;margin-bottom:12px;">🎫</div>
+  <div style="margin-bottom:12px;opacity:0.3;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
   <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin tickets pendientes</div>
   <div style="font-size:13px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
 </div>
@@ -2129,7 +2129,7 @@ async function syncFromFirestore(){
     const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
     const j=await r.json();
     if(!j.documents||!j.documents.length){
-      list.innerHTML='<div style="padding:40px 0;text-align:center;color:var(--text-3);"><div style="font-size:32px;margin-bottom:8px;">🎫</div><div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div><div style="font-size:12px;margin-top:4px;">Los pagos de la app del taller aparecerán aquí</div></div>';
+      list.innerHTML='<div style="padding:40px 0;text-align:center;color:var(--text-3);"><div style="margin-bottom:8px;opacity:0.3;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div><div style="font-size:12px;margin-top:4px;">Los pagos de la app del taller aparecerán aquí</div></div>';
       return;
     }
     renderTickets(j.documents);
@@ -2523,7 +2523,7 @@ function openModal(id){
         </div>`;
       } else if(isHTML){
         preview.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#1C1814;">
-          <span style="font-size:28px;">🎫</span>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:600;color:#F5EDE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.num_factura||driveFileName||'Ticket'}</div>
             <div style="font-size:11px;color:rgba(255,255,255,0.4);">Factura simplificada · Toca para ver</div>
@@ -3008,12 +3008,16 @@ function renderRegistros(){
     if(regQScrollInit){
       qsr.scrollLeft=savedScroll;
     } else {
-      const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
-      if(activeBtn){
-        const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
-        qsr.scrollLeft=Math.max(0,offset);
+      // Only center when tab is visible
+      const tab=document.getElementById('tab-registros');
+      if(tab&&tab.classList.contains('active')){
+        const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
+        if(activeBtn){
+          const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
+          qsr.scrollLeft=Math.max(0,offset);
+        }
+        regQScrollInit=true;
       }
-      regQScrollInit=true;
     }
   },100);
 

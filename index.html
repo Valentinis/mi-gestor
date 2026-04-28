@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.198</div>
+    <div class="login-version">v5.201</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px 10px;gap:8px;padding-top:calc(14px + env(safe-area-inset-top))">
     <!-- Left: version + debug only -->
     <div style="display:flex;align-items:center;gap:6px;">
-      <div style="font-size:10px;color:var(--text-3);">v5.198</div>
+      <div style="font-size:10px;color:var(--text-3);">v5.201</div>
       <button onclick="toggleDebug()" title="Debug console" style="background:rgba(255,255,255,0.06);border:none;border-radius:6px;cursor:pointer;color:var(--text-3);padding:3px 5px;display:flex;align-items:center;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -2527,22 +2527,83 @@ function renderList(){
   const si=document.getElementById('fact-sum-ing'); if(si) si.textContent=totalIng>0?'↑ '+fmt(totalIng):'';
   const sg=document.getElementById('fact-sum-gas'); if(sg) sg.textContent=totalGas>0?'↓ '+fmt(totalGas):'';
   if(!fs.length){list.innerHTML='<div class="empty">Sin registros</div>';return;}
-  list.innerHTML=[...fs].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")).map(f=>{
+  const sorted=[...fs].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
+
+  function getWeekKey(dateStr){
+    if(!dateStr) return 'sin-fecha';
+    const d=new Date(dateStr);
+    const day=d.getDay();
+    const diffToMon=day===0?-6:1-day;
+    const mon=new Date(d); mon.setDate(d.getDate()+diffToMon);
+    return mon.toISOString().slice(0,10);
+  }
+  function fmtWeekLabel(monStr){
+    if(monStr==='sin-fecha') return 'Sin fecha';
+    const mon=new Date(monStr);
+    const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+    const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    const d1=mon.getDate(),m1=months[mon.getMonth()];
+    const d2=sun.getDate(),m2=months[sun.getMonth()];
+    return m1===m2?`${d1}–${d2} ${m1}`:`${d1} ${m1} – ${d2} ${m2}`;
+  }
+  const weeks=[]; const weekMap={};
+  sorted.forEach(f=>{
+    const wk=getWeekKey(f.fecha);
+    if(!weekMap[wk]){weekMap[wk]=[];weeks.push(wk);}
+    weekMap[wk].push(f);
+  });
+
+  function getBarColor(f){
     const isIng=f.tipo==='ingreso';
-    const amount=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0));
-    const fid=String(f._id);
-    return `<div class="fact-item" onclick="openModal('${fid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);">
-      <div class="fact-color-bar ${f.tipo||'gasto'}"></div>
-      <div class="fact-main">
-        <div class="fact-name">${f.proveedor_cliente||'—'}</div>
-        <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}</div>
-      </div>
-      <div class="fact-right">
-        <div class="fact-amount" style="color:${isIng?'var(--green)':'var(--red)'};font-weight:700;">${isIng?'+':'−'}${fmt(amount)}</div>
-        <div class="fact-date">${f.fecha||''}</div>
-      </div>
-      <div style="flex-shrink:0;" onclick="event.stopPropagation()">${driveIcon(f)}</div>
+    const j=f.justificacion||'';
+    return isIng?(
+      j.includes('Taller')||j.includes('curs')||j.includes('workshop')?'#F39C12':
+      j.includes('SumUp')||j.includes('Comis')?'#95A5A6':'#27AE60'
+    ):(
+      j.includes('Alquiler')?'#4A90D9':
+      j.includes('arcilla')||j.includes('Material de taller')?'#8B4513':
+      j.includes('Mobiliario')||j.includes('equipamiento')?'#795548':
+      j.includes('Suministros')?'#FF9800':
+      j.includes('profesionales externos')||j.includes('autónomo')?'#9B59B6':
+      j.includes('informático')||j.includes('digital')?'#17A2B8':
+      j.includes('Marketing')?'#E91E63':
+      j.includes('Formación')?'#3F51B5':
+      j.includes('Seguridad')||j.includes('Limpieza')?'#607D8B':
+      j.includes('oficina')?'#78909C':
+      j.includes('fotográf')?'#26A69A':'#E67E22'
+    );
+  }
+
+  list.innerHTML=weeks.map(wk=>{
+    const items=weekMap[wk];
+    const wIng=items.filter(f=>f.tipo==='ingreso').reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+    const wGas=items.filter(f=>f.tipo==='gasto').reduce((a,f)=>a+(f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0),0);
+    const totals=(wIng>0?`<span style="color:#27AE60;font-size:11px;font-weight:600;">↑${fmt(wIng)}</span>`:'')+
+                 (wIng>0&&wGas>0?' ':'')+
+                 (wGas>0?`<span style="color:#E05252;font-size:11px;font-weight:600;">↓${fmt(wGas)}</span>`:'');
+    const header=`<div style="display:flex;align-items:center;gap:8px;padding:12px 0 6px;position:sticky;top:0;background:var(--bg);z-index:1;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-3);white-space:nowrap;letter-spacing:.03em;">${fmtWeekLabel(wk)}</div>
+      <div style="flex:1;height:0.5px;background:var(--line);"></div>
+      <div style="display:flex;gap:6px;">${totals}</div>
     </div>`;
+    const rows=items.map(f=>{
+      const isIng=f.tipo==='ingreso';
+      const amount=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0));
+      const fid=String(f._id);
+      return `<div class="fact-item" onclick="openModal('${fid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);">
+        <div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:${getBarColor(f)};"></div>
+        <div class="fact-main">
+          <div class="fact-name">${f.proveedor_cliente||'—'}</div>
+          <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}</div>
+        </div>
+        <div class="fact-right">
+          <div class="fact-amount" style="color:${isIng?'var(--green)':'var(--red)'};font-weight:700;">${isIng?'+':'−'}${fmt(amount)}</div>
+          <div class="fact-date">${f.fecha||''}</div>
+        </div>
+        <div style="flex-shrink:0;" onclick="event.stopPropagation()">${driveIcon(f)}</div>
+      </div>`;
+    }).join('');
+    return header+rows;
   }).join('');
 }
 

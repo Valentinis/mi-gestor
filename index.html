@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.171</div>
+    <div class="login-version">v5.173</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -425,7 +425,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.171</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.173</div>
       </div>
     </div>
     <div class="top-right">
@@ -2979,18 +2979,29 @@ function renderRegistros(){
   // Header with toggle + quarter selector
   const hdr=document.getElementById('reg-header');
   const quarters=['1T 2024','2T 2024','3T 2024','4T 2024','1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026'];
+  // Preserve scroll position if quarter selector already exists
+  const existingQsr=document.getElementById('qs-r');
+  const savedScroll=existingQsr?existingQsr.scrollLeft:-1;
+  const prevQ=existingQsr?existingQsr.dataset.activeQ:null;
   hdr.innerHTML=`
     <div class="filter-bar" style="margin-bottom:10px;">
       <button onclick="setView('gastos',this)" class="filter-chip${regView==='gastos'?' active':''}">Gastos</button>
       <button onclick="setView('ingresos',this)" class="filter-chip${regView==='ingresos'?' active':''}">Ingresos</button>
     </div>
-    <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;">
+    <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;" data-active-q="${regQ}">
       ${quarters.map(q=>`<button id="qr-${q.replace(' ','_')}" class="filter-chip${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;white-space:nowrap;">${q}</button>`).join('')}
     </div>`;
-  // Scroll active quarter into view
   requestAnimationFrame(()=>{
-    const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
-    if(activeBtn) activeBtn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    const qsr=document.getElementById('qs-r');
+    if(!qsr) return;
+    if(prevQ===regQ && savedScroll>=0){
+      // Same quarter — restore scroll position
+      qsr.scrollLeft=savedScroll;
+    } else {
+      // Quarter changed — scroll active into view
+      const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
+      if(activeBtn) activeBtn.scrollIntoView({behavior:'instant',block:'nearest',inline:'center'});
+    }
   });
 
   // Totals
@@ -3083,7 +3094,7 @@ function renderRegistros(){
 const isTouchDevice=()=>window.matchMedia('(hover:none)').matches||('ontouchstart' in window);
 
 function addSwipeToClose(sheetEl, closeFn){
-  if(!isTouchDevice()) return; // desktop: keep X button
+  if(!isTouchDevice()) return;
   let startY=0, currentY=0, dragging=false;
   sheetEl.addEventListener('touchstart',e=>{
     if(e.touches.length!==1) return;
@@ -3094,9 +3105,12 @@ function addSwipeToClose(sheetEl, closeFn){
   sheetEl.addEventListener('touchmove',e=>{
     if(!dragging) return;
     currentY=e.touches[0].clientY;
-    const dy=Math.max(0,currentY-startY);
-    sheetEl.style.transform=`translateY(${dy}px)`;
-  },{passive:true});
+    const dy=currentY-startY;
+    if(dy>0){
+      e.preventDefault(); // block background scroll only when dragging down
+      sheetEl.style.transform=`translateY(${dy}px)`;
+    }
+  },{passive:false});
   sheetEl.addEventListener('touchend',()=>{
     if(!dragging) return;
     dragging=false;

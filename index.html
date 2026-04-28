@@ -360,7 +360,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.167</div>
+    <div class="login-version">v5.171</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -401,6 +401,7 @@ img,video,iframe,table{max-width:100%;}
           <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Ret. %</div><input id="edit-ret" type="number" step="1" style="width:100%;padding:8px 6px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></div>
         </div>
         <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Justificación</div><select id="edit-just" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></select></div>
+        <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Trimestre</div><select id="edit-quarter" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></select></div>
       </div>
       <button onclick="saveModalEdit()" style="margin-top:12px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Revisar cambios →</button>
     </div>
@@ -424,7 +425,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
       <div>
         <div id="user-name" style="font-size:14px;font-weight:700;color:var(--text);line-height:1.2;">Valentín</div>
-        <div style="font-size:10px;color:var(--text-3);">v5.167</div>
+        <div style="font-size:10px;color:var(--text-3);">v5.171</div>
       </div>
     </div>
     <div class="top-right">
@@ -1582,7 +1583,7 @@ async function handleClaudeFiles(files){
       // Build review UI with checkboxes and justification
       const reviewHTML=items.map((f,i)=>{
         const isIng=f.tipo==='ingreso';
-        const total=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0));
+        const total=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0));
         const opts=isIng?JUST_OPTIONS_ING:JUST_OPTIONS;
         const suggested=autoJust(f);
         const justOpts=opts.map(o=>`<option value="${o}" ${o===suggested&&suggested?'selected':o===''&&!suggested?'selected':''}>${o===''?'— Seleccionar justificación —':o}</option>`).join('');
@@ -1804,15 +1805,30 @@ function saveAnalysis(divId, count){
         const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
         const ext=savedFile.name.includes('.')?'.'+savedFile.name.split('.').pop().toLowerCase():'.jpg';
         const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
+        // Mark as uploading
+        savedItems.forEach(rec=>{
+          const inData=Object.values(data).flat().find(x=>x._id==rec._id);
+          if(inData){ inData._driveUploading=true; delete inData._driveError; }
+        });
+        renderAll();
         uploadFileToDrive(new File([savedFile],newName,{type:savedFile.type}),Q).then(created=>{
-          if(created&&created.webViewLink){
-            savedItems.forEach(rec=>{
-              const inData=Object.values(data).flat().find(x=>x._id==rec._id);
-              if(inData){ inData._driveLink=created.webViewLink; }
-            });
-            saveDataToDrive(Q).catch(()=>{});
-          }
-        }).catch(()=>{});
+          savedItems.forEach(rec=>{
+            const inData=Object.values(data).flat().find(x=>x._id==rec._id);
+            if(inData){
+              delete inData._driveUploading;
+              if(created&&created.webViewLink){ inData._driveLink=created.webViewLink; delete inData._driveError; }
+              else { inData._driveError=true; }
+            }
+          });
+          saveDataToDrive(Q).catch(()=>{});
+          renderAll();
+        }).catch(()=>{
+          savedItems.forEach(rec=>{
+            const inData=Object.values(data).flat().find(x=>x._id==rec._id);
+            if(inData){ delete inData._driveUploading; inData._driveError=true; }
+          });
+          renderAll();
+        });
         delete window['_file_'+divId];
       }
     }).catch(e=>{ 
@@ -2183,8 +2199,7 @@ function switchNav(id,btn){
 function switchTab(id,btn){ switchNav(id,btn); }
 function openAddModal(){
   if(!claudeKey.startsWith('sk-ant-')) document.getElementById('claude-no-key-add').style.display='block';
-  const cq=currentQuarter();
-  document.querySelectorAll('#qs-add .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===cq));
+  document.querySelectorAll('#qs-add .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===Q));
   document.getElementById('add-modal').style.display='block';
   document.body.style.overflow='hidden';
   const sheet=document.querySelector('#add-modal .add-sheet');
@@ -2406,7 +2421,7 @@ function renderList(){
   if(!fs.length){list.innerHTML='<div class="empty">Sin registros</div>';return;}
   list.innerHTML=[...fs].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")).map(f=>{
     const isIng=f.tipo==='ingreso';
-    const amount=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0));
+    const amount=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0));
     const fid=String(f._id);
     return `<div class="fact-item" onclick="openModal('${fid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);">
       <div class="fact-color-bar ${f.tipo||'gasto'}"></div>
@@ -2662,13 +2677,23 @@ function toggleModalEdit(){
   const showing=sec.style.display!=='none';
   sec.style.display=showing?'none':'block';
   btn.textContent=showing?'✏️ Editar':'✕ Cancelar';
+  // Populate quarter selector
+  if(!showing){
+    const qSel=document.getElementById('edit-quarter');
+    if(qSel){
+      const quarters=[];
+      for(let y=2022;y<=new Date().getFullYear()+1;y++)
+        for(let t=1;t<=4;t++) quarters.push(`${t}T ${y}`);
+      const currentQ=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId))||Q;
+      qSel.innerHTML=quarters.map(q=>`<option value="${q}"${q===currentQ?' selected':''}>${q}</option>`).join('');
+    }
+  }
 }
 function saveModalEdit(){
   if(!modalFacturaId) return;
   const all=Object.values(data).flat();
   const f=all.find(x=>x._id==modalFacturaId);
   if(!f) return;
-  // Collect changes
   const changes=[];
   const newConc=document.getElementById('edit-concepto')?.value||'';
   const newFecha=document.getElementById('edit-fecha')?.value||'';
@@ -2676,24 +2701,34 @@ function saveModalEdit(){
   const newPiva=parseInt(document.getElementById('edit-piva')?.value||0);
   const newRet=parseInt(document.getElementById('edit-ret')?.value||0);
   const newJust=document.getElementById('edit-just')?.value||'';
+  const newQ=document.getElementById('edit-quarter')?.value||'';
+  const currentQ=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId))||Q;
   if(newConc!==f.concepto) changes.push(`Concepto: "${f.concepto}" → "${newConc}"`);
   if(newFecha!==f.fecha) changes.push(`Fecha: ${f.fecha} → ${newFecha}`);
   if(Math.abs(newBase-(f.base_iva||0))>0.001) changes.push(`Base: ${fmt(f.base_iva||0)} → ${fmt(newBase)}`);
   if(newPiva!==(f.pct_iva||0)) changes.push(`IVA%: ${f.pct_iva||0}% → ${newPiva}%`);
   if(newRet!==(f.retencion_pct||0)) changes.push(`Retención%: ${f.retencion_pct||0}% → ${newRet}%`);
   if(newJust!==f.justificacion) changes.push(`Justificación: "${f.justificacion||'—'}" → "${newJust}"`);
+  if(newQ&&newQ!==currentQ) changes.push(`Trimestre: ${currentQ} → ${newQ}`);
   if(!changes.length){ alert('No hay cambios.'); return; }
   if(!confirm('Cambios a aplicar:\n\n'+changes.join('\n')+'\n\n¿Confirmar?')) return;
-  // Apply
   if(newConc!==f.concepto) f.concepto=newConc;
   if(newFecha!==f.fecha) f.fecha=newFecha;
   if(Math.abs(newBase-(f.base_iva||0))>0.001){ f.base_iva=newBase; f.base_irpf=newBase; f.cuota_iva=Math.round(newBase*(newPiva/100)*100)/100; }
   if(newPiva!==(f.pct_iva||0)){ f.pct_iva=newPiva; f.cuota_iva=Math.round((f.base_iva||0)*(newPiva/100)*100)/100; }
   if(newRet!==(f.retencion_pct||0)){ f.retencion_pct=newRet; f.retencion_importe=Math.round((f.base_iva||0)*(newRet/100)*100)/100; }
   if(newJust!==f.justificacion) f.justificacion=newJust;
-  const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId));
+  // Move to different quarter if changed
+  if(newQ&&newQ!==currentQ){
+    data[currentQ]=data[currentQ].filter(x=>x._id!=modalFacturaId);
+    if(!data[newQ]) data[newQ]=[];
+    data[newQ].push(f);
+    saveLocal(); renderAll();
+    if(token){ saveDataToDrive(currentQ).catch(()=>{}); saveDataToDrive(newQ).catch(()=>{}); }
+    closeModal(); return;
+  }
   saveLocal(); renderAll();
-  if(token&&q) saveDataToDrive(q).catch(()=>{});
+  if(token&&currentQ) saveDataToDrive(currentQ).catch(()=>{});
   openModal(modalFacturaId);
 }
 function toggleJustEdit(){ toggleModalEdit(); }
@@ -2827,9 +2862,12 @@ function hasDriveBackup(f){
   }
   return found;
 }
-function driveIcon(f){ return hasDriveBackup(f)
-  ?'<span title="Copia en Drive" style="font-size:13px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:1px 4px;font-weight:700;">✓</span>'
-  :`<span style="display:inline-flex;align-items:center;gap:3px;"><span title="Sin copia en Drive" style="font-size:13px;background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 4px;font-weight:700;">!</span><button onclick="event.stopPropagation();quickUpload('${f._id}')" title="Subir a Drive" style="font-size:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:1px 5px;cursor:pointer;font-weight:700;line-height:1.4;">↑</button></span>`; }
+function driveIcon(f){
+  if(f._driveUploading) return '<span title="Subiendo..." style="font-size:13px;background:var(--bg-raised);color:var(--text-3);border-radius:4px;padding:1px 4px;animation:spin 1s linear infinite;display:inline-block;">↻</span>';
+  if(hasDriveBackup(f)) return '<span title="Copia en Drive" style="font-size:13px;background:var(--green-bg);color:var(--green);border-radius:4px;padding:1px 4px;font-weight:700;">✓</span>';
+  if(f._driveError) return `<span style="display:inline-flex;align-items:center;gap:3px;"><span title="Error al subir" style="font-size:13px;background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 4px;font-weight:700;">!</span><button onclick="event.stopPropagation();quickUpload('${f._id}')" title="Reintentar subida" style="font-size:10px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:1px 5px;cursor:pointer;font-weight:700;line-height:1.4;">↑</button></span>`;
+  return '<span title="Pendiente de subir" style="font-size:13px;color:var(--text-3);border-radius:4px;padding:1px 4px;">·</span>';
+}
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──

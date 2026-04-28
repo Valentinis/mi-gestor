@@ -2497,7 +2497,8 @@ function updateFactSearchBar(){
   if(!bar) return;
   const facturasActive=document.getElementById('tab-facturas')?.classList.contains('active');
   bar.style.display=facturasActive?'block':'none';
-} const i=ALL_QUARTERS.indexOf(Q); if(i>0) setQFromHeader(ALL_QUARTERS[i-1]); }
+}
+function prevQuarter(){ const i=ALL_QUARTERS.indexOf(Q); if(i>0) setQFromHeader(ALL_QUARTERS[i-1]); }
 function nextQuarter(){ const i=ALL_QUARTERS.indexOf(Q); if(i<ALL_QUARTERS.length-1) setQFromHeader(ALL_QUARTERS[i+1]); }
 function setQFromHeader(q){
   Q=q; regQ=q;

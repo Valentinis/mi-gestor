@@ -981,6 +981,16 @@ function showPin(){
   loadTicketsPending();
   renderAll(); updateSI(); showSyncBanner();
   initDrive();
+  // Center quarter selector once on app load
+  setTimeout(()=>{
+    const qsr=document.getElementById('qs-r');
+    if(!qsr) return;
+    const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
+    if(activeBtn){
+      const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
+      qsr.scrollLeft=Math.max(0,offset);
+    }
+  },300);
 }
 function signOut(){ 
   token=null; user=null; localStorage.removeItem(LS_AUTH); updateDots();
@@ -3002,24 +3012,8 @@ function renderRegistros(){
     <div id="qs-r" style="display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px;">
       ${quarters.map(q=>`<button id="qr-${q.replace(' ','_')}" class="filter-chip${regQ===q?' active':''}" onclick="setQReg('${q}',this)" style="flex-shrink:0;white-space:nowrap;">${q}</button>`).join('')}
     </div>`;
-  setTimeout(()=>{
-    const qsr=document.getElementById('qs-r');
-    if(!qsr) return;
-    if(regQScrollInit){
-      qsr.scrollLeft=savedScroll;
-    } else {
-      // Only center when tab is visible
-      const tab=document.getElementById('tab-registros');
-      if(tab&&tab.classList.contains('active')){
-        const activeBtn=document.getElementById('qr-'+regQ.replace(' ','_'));
-        if(activeBtn){
-          const offset=activeBtn.offsetLeft-(qsr.offsetWidth/2)+(activeBtn.offsetWidth/2);
-          qsr.scrollLeft=Math.max(0,offset);
-        }
-        regQScrollInit=true;
-      }
-    }
-  },100);
+  // Restore scroll position — never auto-center here
+  if(existingQsr) setTimeout(()=>{ const qsr=document.getElementById('qs-r'); if(qsr) qsr.scrollLeft=savedScroll; },0);
 
   // Totals
   const totBar=document.getElementById('reg-totals-bar');

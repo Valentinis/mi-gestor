@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.252</div>
+    <div class="login-version">v5.253</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -421,12 +421,12 @@ img,video,iframe,table{max-width:100%;}
 
 <div id="main-screen">
   <div id="ptr-indicator">↻ Actualizando...</div>
-  <div class="top-bar" style="display:flex;flex-direction:column;padding:calc(8px + env(safe-area-inset-top)) 14px 0;background:#0E0C0A;">
+  <div class="top-bar" style="display:flex;flex-direction:column;padding-top:calc(8px + env(safe-area-inset-top));background:#0E0C0A;">
     <!-- Top row: left/center/right -->
-    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-bottom:6px;gap:8px;">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 14px 6px;gap:8px;">
       <!-- Left -->
       <div style="display:flex;align-items:center;gap:5px;">
-        <div style="font-size:9px;color:var(--text-3);">v5.252</div>
+        <div style="font-size:9px;color:var(--text-3);">v5.253</div>
         <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
         </button>
@@ -471,7 +471,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
     </div><!-- end top row grid -->
     <!-- Subtab row - shown only for Gestor -->
-    <div id="subtab-bar" style="display:flex;align-items:center;justify-content:space-between;padding:6px 0 0;">
+    <div id="subtab-bar" style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 0;">
       <div style="display:flex;gap:28px;">
         <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0 0 8px;font-size:15px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);">Facturas</button>
         <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0 0 8px;font-size:15px;font-weight:400;border:none;background:none;cursor:pointer;color:var(--text-3);">Registros</button>
@@ -482,7 +482,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--text-3);cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;">+€</button>
       </div>
     </div>
-    <div style="height:0.5px;background:var(--line);margin:0 -14px;"></div>
+    <div style="height:0.5px;background:var(--line);"></div>
   </div><!-- end top-bar -->
   <div class="tabs">
   <!-- BOTTOM NAV -->
@@ -2924,7 +2924,7 @@ function updateYearQ(ns){
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); const qb=document.getElementById('qbadge'); if(qb) qb.textContent=q; const hs=document.getElementById('header-q-select'); if(hs) hs.value=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); }
 function renderAll(){
   renderList(); recalc(); updateSI(); renderRegistros();
-  // Re-render calendar only if active, WITHOUT resetting the month
+  updateFactSearchBar();
   if(document.getElementById('tab-calendario')?.classList.contains('active')) renderCalendario();
 }
 function skeletonItems(n){

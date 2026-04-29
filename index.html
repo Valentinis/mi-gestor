@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.260</div>
+    <div class="login-version">v5.262</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -426,7 +426,7 @@ img,video,iframe,table{max-width:100%;}
     <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-bottom:4px;gap:8px;">
       <!-- Left -->
       <div style="display:flex;align-items:center;gap:5px;">
-        <div style="font-size:9px;color:var(--text-3);">v5.260</div>
+        <div style="font-size:9px;color:var(--text-3);">v5.262</div>
         <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
         </button>
@@ -480,10 +480,10 @@ img,video,iframe,table{max-width:100%;}
       <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);">Facturas</button>
       <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);">Registros</button>
     </div>
-    <div id="tipo-toggle" style="display:flex;gap:3px;align-items:center;background:var(--bg-raised);border-radius:20px;padding:3px;">
-      <button id="toggle-todos" onclick="setTipoToggle('todos')" title="Todos" style="height:28px;padding:0 10px;border-radius:16px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-size:11px;font-weight:700;transition:all .15s;">€</button>
-      <button id="toggle-gastos" onclick="setTipoToggle('gasto')" title="Gastos" style="height:28px;padding:0 10px;border-radius:16px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:11px;font-weight:700;transition:all .15s;">−€</button>
-      <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="height:28px;padding:0 10px;border-radius:16px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:11px;font-weight:700;transition:all .15s;">+€</button>
+    <div id="tipo-toggle" style="display:flex;gap:1px;align-items:center;background:var(--bg-raised);border-radius:14px;padding:2px;overflow:hidden;">
+      <button id="toggle-todos" onclick="setTipoToggle('todos')" title="Todos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-size:10px;font-weight:700;transition:all .25s cubic-bezier(0.34,1.56,0.64,1);max-width:44px;overflow:hidden;white-space:nowrap;">€</button>
+      <button id="toggle-gastos" onclick="setTipoToggle('gasto')" title="Gastos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;transition:all .15s;">−€</button>
+      <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;transition:all .15s;">+€</button>
     </div>
   </div>
   <div style="height:0.5px;background:var(--line);"></div>
@@ -2346,22 +2346,6 @@ function setTipoToggle(tipo, fromRegistros=false){
   else { setFilter('todos',document.querySelector('#filter-bar .filter-chip')); regView='gastos'; }
   renderAll();
 }
-function onSubTabScroll(el){
-  const idx=Math.round(el.scrollLeft/window.innerWidth);
-  const tab=idx===0?'facturas':'registros';
-  if(tab!==currentSubTab){
-    currentSubTab=tab;
-    const isF=tab==='facturas';
-    const btnF=document.getElementById('subtab-facturas-btn');
-    const btnR=document.getElementById('subtab-registros-btn');
-    if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'700':'400'; }
-    if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'700'; }
-    if(!isF){
-      if(tipoToggle==='todos') setTipoToggle('gasto',true);
-      renderRegistros();
-    }
-  }
-}
 function switchSubTab(tab){
   currentSubTab=tab;
   const container=document.getElementById('subtab-swipe-container');
@@ -2369,12 +2353,29 @@ function switchSubTab(tab){
   if(container) container.scrollTo({left:isF?0:window.innerWidth, behavior:'smooth'});
   const btnF=document.getElementById('subtab-facturas-btn');
   const btnR=document.getElementById('subtab-registros-btn');
-  if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'700':'400'; }
-  if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'700'; }
-  if(!isF){
-    if(tipoToggle==='todos') setTipoToggle('gasto',true);
-    renderRegistros();
+  if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'800':'400'; }
+  if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'800'; }
+  // Animate € (todos) button in/out
+  const btnT=document.getElementById('toggle-todos');
+  if(btnT){
+    if(isF){
+      btnT.style.transition='all .25s cubic-bezier(0.34,1.56,0.64,1)';
+      btnT.style.maxWidth='44px'; btnT.style.opacity='1'; btnT.style.transform='scale(1)';
+      btnT.style.padding='0 7px'; btnT.style.pointerEvents='auto';
+    } else {
+      btnT.style.transition='all .2s ease';
+      btnT.style.maxWidth='0'; btnT.style.opacity='0'; btnT.style.transform='scale(0.5)';
+      btnT.style.padding='0'; btnT.style.pointerEvents='none';
+      if(tipoToggle==='todos') setTipoToggle('gasto',true);
+    }
   }
+  // Haptic
+  if(navigator.vibrate) navigator.vibrate(8);
+}
+function onSubTabScroll(el){
+  const idx=Math.round(el.scrollLeft/window.innerWidth);
+  const tab=idx===0?'facturas':'registros';
+  if(tab!==currentSubTab) switchSubTab(tab);
 }
 function switchNav(id,btn){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));

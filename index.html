@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.255</div>
+    <div class="login-version">v5.257</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -426,7 +426,7 @@ img,video,iframe,table{max-width:100%;}
     <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-bottom:4px;gap:8px;">
       <!-- Left -->
       <div style="display:flex;align-items:center;gap:5px;">
-        <div style="font-size:9px;color:var(--text-3);">v5.255</div>
+        <div style="font-size:9px;color:var(--text-3);">v5.257</div>
         <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
         </button>
@@ -471,7 +471,7 @@ img,video,iframe,table{max-width:100%;}
       </div>
     </div><!-- end top row grid -->
     <!-- Subtab row - shown only for Gestor -->
-    <div id="subtab-bar" style="display:flex;align-items:center;justify-content:space-between;padding:4px 0 0;">
+    <div id="subtab-bar" style="display:flex;align-items:center;justify-content:space-between;padding:4px 14px 0;margin:0 -14px;">
       <div style="display:flex;gap:24px;">
         <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0 0 6px;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);">Facturas</button>
         <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0 0 6px;font-size:14px;font-weight:400;border:none;background:none;cursor:pointer;color:var(--text-3);">Registros</button>
@@ -515,8 +515,8 @@ img,video,iframe,table{max-width:100%;}
   <div id="tab-facturas" class="tab-pane active">
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
-    <div id="subtab-swipe-container" style="display:flex;overflow-x:scroll;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;width:100%;" onscroll="onSubTabScroll(this)">
-    <div id="subtab-facturas-content" style="min-width:100%;scroll-snap-align:start;flex-shrink:0;">
+    <div id="subtab-swipe-container" style="position:relative;" ontouchstart="subTabTouchStart(event)" ontouchend="subTabTouchEnd(event)">
+    <div id="subtab-facturas-content" style="transition:opacity .15s ease;">
 
 <!-- Summary bar with reg count and totals -->
 
@@ -535,7 +535,7 @@ img,video,iframe,table{max-width:100%;}
 
   </div><!-- end subtab-facturas-content -->
   <!-- Registros subtab -->
-  <div id="subtab-registros-content" style="min-width:100%;scroll-snap-align:start;flex-shrink:0;">
+  <div id="subtab-registros-content" style="display:none;transition:opacity .15s ease;">
     <div id="reg-header"></div>
     <div id="reg-totals-bar"></div>
     <div id="reg-tbody"></div>
@@ -2355,33 +2355,24 @@ function setTipoToggle(tipo, fromRegistros=false){
   else { setFilter('todos',document.querySelector('#filter-bar .filter-chip')); regView='gastos'; }
   renderAll();
 }
-let subTabScrolling=false;
-function onSubTabScroll(el){
-  // Sync tab buttons with scroll position
-  const idx=Math.round(el.scrollLeft/el.offsetWidth);
-  const tab=idx===0?'facturas':'registros';
-  if(tab!==currentSubTab){
-    currentSubTab=tab;
-    const btnF=document.getElementById('subtab-facturas-btn');
-    const btnR=document.getElementById('subtab-registros-btn');
-    const isF=tab==='facturas';
-    if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'700':'400'; }
-    if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'700'; }
-    if(!isF){
-      if(tipoToggle==='todos') setTipoToggle('gasto',true);
-      renderRegistros();
-    }
-  }
+let subTabSwipeStartX=0, subTabSwipeStartY=0, subTabSwiping=false;
+function subTabTouchStart(e){ subTabSwipeStartX=e.touches[0].clientX; subTabSwipeStartY=e.touches[0].clientY; subTabSwiping=false; }
+function subTabTouchEnd(e){
+  const dx=e.changedTouches[0].clientX-subTabSwipeStartX;
+  const dy=e.changedTouches[0].clientY-subTabSwipeStartY;
+  if(Math.abs(dx)<Math.abs(dy)||Math.abs(dx)<40) return;
+  if(dx<0&&currentSubTab==='facturas') switchSubTab('registros');
+  else if(dx>0&&currentSubTab==='registros') switchSubTab('facturas');
 }
 function switchSubTab(tab){
   currentSubTab=tab;
-  const container=document.getElementById('subtab-swipe-container');
+  const facturas=document.getElementById('subtab-facturas-content');
+  const registros=document.getElementById('subtab-registros-content');
   const btnF=document.getElementById('subtab-facturas-btn');
   const btnR=document.getElementById('subtab-registros-btn');
   const isF=tab==='facturas';
-  if(container){
-    container.scrollTo({left:isF?0:container.offsetWidth, behavior:'smooth'});
-  }
+  if(facturas) facturas.style.display=isF?'':'none';
+  if(registros) registros.style.display=isF?'none':'';
   if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'700':'400'; }
   if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'700'; }
   if(!isF){

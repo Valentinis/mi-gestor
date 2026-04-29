@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.259</div>
+    <div class="login-version">v5.260</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -426,7 +426,7 @@ img,video,iframe,table{max-width:100%;}
     <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-bottom:4px;gap:8px;">
       <!-- Left -->
       <div style="display:flex;align-items:center;gap:5px;">
-        <div style="font-size:9px;color:var(--text-3);">v5.259</div>
+        <div style="font-size:9px;color:var(--text-3);">v5.260</div>
         <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
         </button>
@@ -475,15 +475,15 @@ img,video,iframe,table{max-width:100%;}
 
   <!-- Subtab bar OUTSIDE top-bar, full width -->
 
-  <div id="subtab-bar" style="display:flex;align-items:center;justify-content:space-between;background:#0E0C0A;padding:6px 14px 6px 0;position:sticky;top:0;z-index:99;">
+  <div id="subtab-bar" style="display:flex;align-items:center;justify-content:space-between;background:#0E0C0A;padding:6px 14px 6px 16px;position:sticky;top:0;z-index:99;">
     <div style="display:flex;gap:24px;">
-      <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0 0 0 0;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);">Facturas</button>
-      <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:14px;font-weight:400;border:none;background:none;cursor:pointer;color:var(--text-3);">Registros</button>
+      <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);">Facturas</button>
+      <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);">Registros</button>
     </div>
-    <div id="tipo-toggle" style="display:flex;gap:4px;align-items:center;">
-      <button id="toggle-todos" onclick="setTipoToggle('todos')" title="Todos" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--text-3);cursor:pointer;background:var(--text-3);color:var(--bg);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;">€</button>
-      <button id="toggle-gastos" onclick="setTipoToggle('gasto')" title="Gastos" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--text-3);cursor:pointer;background:transparent;color:var(--text-3);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;">−€</button>
-      <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--text-3);cursor:pointer;background:transparent;color:var(--text-3);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;">+€</button>
+    <div id="tipo-toggle" style="display:flex;gap:3px;align-items:center;background:var(--bg-raised);border-radius:20px;padding:3px;">
+      <button id="toggle-todos" onclick="setTipoToggle('todos')" title="Todos" style="height:28px;padding:0 10px;border-radius:16px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-size:11px;font-weight:700;transition:all .15s;">€</button>
+      <button id="toggle-gastos" onclick="setTipoToggle('gasto')" title="Gastos" style="height:28px;padding:0 10px;border-radius:16px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:11px;font-weight:700;transition:all .15s;">−€</button>
+      <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="height:28px;padding:0 10px;border-radius:16px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:11px;font-weight:700;transition:all .15s;">+€</button>
     </div>
   </div>
   <div style="height:0.5px;background:var(--line);"></div>
@@ -2338,21 +2338,9 @@ function setTipoToggle(tipo, fromRegistros=false){
   const btnT=document.getElementById('toggle-todos');
   const btnG=document.getElementById('toggle-gastos');
   const btnI=document.getElementById('toggle-ingresos');
-  if(btnT){
-    const active=tipo==='todos';
-    btnT.style.background=active?'var(--text-3)':'transparent';
-    btnT.style.color=active?'var(--bg)':'var(--text-3)';
-    btnT.style.opacity=(!active||fromRegistros)?( fromRegistros&&active?'0.35':'1'):'1';
-    btnT.style.borderStyle=fromRegistros&&active?'dashed':'solid';
-  }
-  if(btnG){
-    btnG.style.background=tipo==='gasto'?'var(--text-3)':'transparent';
-    btnG.style.color=tipo==='gasto'?'var(--bg)':'var(--text-3)';
-  }
-  if(btnI){
-    btnI.style.background=tipo==='ingreso'?'var(--text-3)':'transparent';
-    btnI.style.color=tipo==='ingreso'?'var(--bg)':'var(--text-3)';
-  }
+  if(btnT){ btnT.style.background=tipo==='todos'?'var(--accent)':'transparent'; btnT.style.color=tipo==='todos'?'#fff':'var(--text-3)'; }
+  if(btnG){ btnG.style.background=tipo==='gasto'?'var(--accent)':'transparent'; btnG.style.color=tipo==='gasto'?'#fff':'var(--text-3)'; }
+  if(btnI){ btnI.style.background=tipo==='ingreso'?'var(--accent)':'transparent'; btnI.style.color=tipo==='ingreso'?'#fff':'var(--text-3)'; }
   if(tipo==='ingreso'){ setFilter('ingreso',null); regView='ingresos'; }
   else if(tipo==='gasto'){ setFilter('gasto',null); regView='gastos'; }
   else { setFilter('todos',document.querySelector('#filter-bar .filter-chip')); regView='gastos'; }

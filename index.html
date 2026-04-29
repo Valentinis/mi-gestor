@@ -77,8 +77,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 
 /* MAIN */
 #main-screen{display:none;position:fixed;top:0;left:0;right:0;bottom:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(–bg);}
-.top-bar{background:#0D0D1A;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:none;padding:12px 16px 12px;padding-top:max(52px, calc(12px + env(safe-area-inset-top)));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-@media(prefers-color-scheme:dark){.top-bar{background:#0D0D1A !important;}.bottom-nav{background:#1C1814 !important;}}
+.top-bar{background:#0E0C0A;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:none;padding:12px 16px 12px;padding-top:max(52px, calc(12px + env(safe-area-inset-top)));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+@media(prefers-color-scheme:dark){.top-bar{background:#0E0C0A !important;}.bottom-nav{background:#1C1814 !important;}}
 .top-left{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .top-title{font-size:15px;font-weight:700;color:var(–text);}
 .top-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.237</div>
+    <div class="login-version">v5.238</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px 14px 6px;gap:8px;padding-top:calc(8px + env(safe-area-inset-top))">
     <!-- Left: version + debug + totals + advisor -->
     <div style="display:flex;align-items:center;gap:5px;">
-      <div style="font-size:9px;color:var(--text-3);">v5.237</div>
+      <div style="font-size:9px;color:var(--text-3);">v5.238</div>
       <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -499,12 +499,12 @@ img,video,iframe,table{max-width:100%;}
   <div id="tab-facturas" class="tab-pane active">
     <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
-    <!-- Sticky tab bar -->
-    <div style="position:sticky;top:0;z-index:50;background:#0E0C0A;margin:-12px -12px 16px;padding:10px 16px 0;">
+    <!-- Sticky tab bar - sticks just below header -->
+    <div id="subtab-bar" style="position:sticky;top:var(--header-h,56px);z-index:49;background:#0E0C0A;margin:-12px -12px 16px;padding:10px 16px 0;">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div style="display:flex;gap:24px;">
-          <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0 0 10px;font-size:15px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);border-bottom:2px solid var(--accent);">Facturas</button>
-          <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0 0 10px;font-size:15px;font-weight:400;border:none;background:none;cursor:pointer;color:var(--text-3);border-bottom:2px solid transparent;">Registros</button>
+          <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0 0 10px;font-size:15px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent);border-bottom:none;">Facturas</button>
+          <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0 0 10px;font-size:15px;font-weight:400;border:none;background:none;cursor:pointer;color:var(--text-3);border-bottom:none;">Registros</button>
         </div>
         <div id="tipo-toggle" style="display:flex;background:var(--bg-raised);border-radius:8px;padding:2px;gap:1px;margin-bottom:4px;">
           <button id="toggle-todos" onclick="setTipoToggle('todos')" style="padding:4px 10px;font-size:11px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:var(--accent);color:#fff;transition:all .15s;">Todos</button>
@@ -546,7 +546,7 @@ img,video,iframe,table{max-width:100%;}
 
   <!-- Sticky unified search bar -->
 
-  <div id="fact-search-bar" style="position:fixed;bottom:calc(75px + env(safe-area-inset-bottom));left:0;right:0;z-index:9998;padding:8px 12px;background:var(--bg);border-top:0.5px solid var(--line);display:none;">
+  <div id="fact-search-bar" style="position:fixed;bottom:calc(82px + env(safe-area-inset-bottom));left:0;right:0;z-index:9998;padding:8px 12px;background:var(--bg);border-top:0.5px solid var(--line);display:none;">
     <div style="display:flex;align-items:center;gap:6px;background:var(--bg-raised);border-radius:12px;padding:0 10px;border:0.5px solid var(--line);">
       <!-- Entity type selector -->
       <select id="fact-entity-select" onchange="onEntitySelectChange()" style="border:none;background:none;color:var(--text-3);font-size:12px;font-weight:600;cursor:pointer;padding:8px 0;flex-shrink:0;max-width:90px;outline:none;">
@@ -1111,6 +1111,11 @@ function showPin(){
   loadTicketsPending();
   renderAll(); updateSI(); showSyncBanner();
   initDrive();
+  // Set header height CSS var for sticky subtabs
+  requestAnimationFrame(()=>{
+    const tb=document.querySelector('.top-bar');
+    if(tb) document.documentElement.style.setProperty('--header-h', tb.offsetHeight+'px');
+  });
 }
 function signOut(){ 
   token=null; user=null; localStorage.removeItem(LS_AUTH); updateDots();
@@ -2381,8 +2386,8 @@ function switchSubTab(tab){
   const btnR=document.getElementById('subtab-registros-btn');
   const isF=tab==='facturas';
   if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=isF?'translateX(0)':'translateX(-50%)'; }
-  if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'700':'400'; btnF.style.borderBottomColor=isF?'var(--accent)':'transparent'; }
-  if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'700'; btnR.style.borderBottomColor=isF?'transparent':'var(--accent)'; }
+  if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'700':'400'; }
+  if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'700'; }
   if(!isF) renderRegistros();
 }
 function switchNav(id,btn){

@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.240</div>
+    <div class="login-version">v5.241</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -424,7 +424,7 @@ img,video,iframe,table{max-width:100%;}
   <div class="top-bar" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px 14px 6px;gap:8px;padding-top:calc(8px + env(safe-area-inset-top))">
     <!-- Left: version + debug + totals + advisor -->
     <div style="display:flex;align-items:center;gap:5px;">
-      <div style="font-size:9px;color:var(--text-3);">v5.240</div>
+      <div style="font-size:9px;color:var(--text-3);">v5.241</div>
       <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       </button>
@@ -515,9 +515,7 @@ img,video,iframe,table{max-width:100%;}
       <div style="height:0.5px;background:var(--line);margin:0 -16px;"></div>
     </div>
     <div id="subtab-swipe-container" style="overflow:hidden;position:relative;" ontouchstart="subTabTouchStart(event)" ontouchmove="subTabTouchMove(event)" ontouchend="subTabTouchEnd(event)">
-    <!-- Sliding track -->
-    <div id="subtab-track" style="display:flex;width:200%;transition:transform .3s cubic-bezier(0.25,0.46,0.45,0.94);">
-      <div id="subtab-facturas-content" style="width:50%;flex-shrink:0;">
+    <div id="subtab-facturas-content">
 
 <!-- Summary bar with reg count and totals -->
 
@@ -536,12 +534,11 @@ img,video,iframe,table{max-width:100%;}
 
   </div><!-- end subtab-facturas-content -->
   <!-- Registros subtab -->
-  <div id="subtab-registros-content" style="width:50%;flex-shrink:0;">
+  <div id="subtab-registros-content" style="display:none;">
     <div id="reg-header"></div>
     <div id="reg-totals-bar"></div>
     <div id="reg-tbody"></div>
   </div>
-  </div><!-- end subtab-track -->
   </div><!-- end subtab-swipe-container -->
 
   <!-- Sticky unified search bar -->
@@ -2349,43 +2346,28 @@ function setTipoToggle(tipo){
   renderAll();
 }
 let subTabSwipeStartX=0, subTabSwipeStartY=0, subTabSwiping=false;
-function subTabTouchStart(e){
-  subTabSwipeStartX=e.touches[0].clientX;
-  subTabSwipeStartY=e.touches[0].clientY;
-  subTabSwiping=false;
-}
+function subTabTouchStart(e){ subTabSwipeStartX=e.touches[0].clientX; subTabSwipeStartY=e.touches[0].clientY; subTabSwiping=false; }
 function subTabTouchMove(e){
   const dx=e.touches[0].clientX-subTabSwipeStartX;
   const dy=e.touches[0].clientY-subTabSwipeStartY;
-  if(!subTabSwiping && Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10) subTabSwiping=true;
-  if(!subTabSwiping) return;
-  e.preventDefault();
-  const track=document.getElementById('subtab-track');
-  if(!track) return;
-  const base=currentSubTab==='facturas'?0:-50;
-  const pct=base+(dx/window.innerWidth*50);
-  const clamped=Math.max(-50,Math.min(0,pct));
-  track.style.transition='none';
-  track.style.transform=`translateX(${clamped}%)`;
+  if(!subTabSwiping&&Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10) subTabSwiping=true;
 }
 function subTabTouchEnd(e){
   if(!subTabSwiping) return;
+  subTabSwiping=false;
   const dx=e.changedTouches[0].clientX-subTabSwipeStartX;
   if(dx<-40&&currentSubTab==='facturas') switchSubTab('registros');
   else if(dx>40&&currentSubTab==='registros') switchSubTab('facturas');
-  else {
-    const track=document.getElementById('subtab-track');
-    if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=currentSubTab==='facturas'?'translateX(0)':'translateX(-50%)'; }
-  }
-  subTabSwiping=false;
 }
 function switchSubTab(tab){
   currentSubTab=tab;
-  const track=document.getElementById('subtab-track');
+  const facturas=document.getElementById('subtab-facturas-content');
+  const registros=document.getElementById('subtab-registros-content');
   const btnF=document.getElementById('subtab-facturas-btn');
   const btnR=document.getElementById('subtab-registros-btn');
   const isF=tab==='facturas';
-  if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=isF?'translateX(0)':'translateX(-50%)'; }
+  if(facturas) facturas.style.display=isF?'':'none';
+  if(registros) registros.style.display=isF?'none':'';
   if(btnF){ btnF.style.color=isF?'var(--accent)':'var(--text-3)'; btnF.style.fontWeight=isF?'700':'400'; }
   if(btnR){ btnR.style.color=isF?'var(--text-3)':'var(--accent)'; btnR.style.fontWeight=isF?'400':'700'; }
   if(!isF) renderRegistros();

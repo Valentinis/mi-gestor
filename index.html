@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.268</div>
+    <div class="login-version">v5.269</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -421,28 +421,11 @@ img,video,iframe,table{max-width:100%;}
 
 <div id="main-screen">
   <div id="ptr-indicator">↻ Actualizando...</div>
-  <div class="top-bar" style="display:flex;flex-direction:column;padding:calc(8px + env(safe-area-inset-top)) 14px 0;background:#0E0C0A;">
-    <!-- Top row: left/center/right -->
-    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-bottom:4px;gap:8px;">
-      <!-- Left -->
-      <div style="display:flex;align-items:center;gap:5px;">
-        <div style="font-size:9px;color:var(--text-3);">v5.268</div>
-        <button onclick="toggleDebug()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px;display:flex;align-items:center;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-        </button>
-        <button onclick="openAdvisor()" id="advisor-btn" style="background:rgba(240,132,74,0.15);border:0.5px solid rgba(240,132,74,0.3);border-radius:6px;cursor:pointer;color:var(--accent);padding:2px 6px;display:flex;align-items:center;gap:3px;font-size:10px;font-weight:600;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Asesor
-        </button>
-        <span id="fact-sum-ing" style="display:none;"></span>
-        <span id="fact-sum-gas" style="display:none;"></span>
-      </div>
-      <!-- Center: quarter display only -->
-      <div style="display:flex;align-items:center;justify-content:center;">
-        <span id="header-q-display" style="font-size:13px;font-weight:800;color:var(--text-3);">2T 2026</span>
-      </div>
-      <!-- Right: avatar -->
-      <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;">
+  <div class="top-bar" style="display:flex;flex-direction:column;padding:calc(8px + env(safe-area-inset-top)) 0 0;background:#0E0C0A;">
+    <!-- Top row -->
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 14px 6px;gap:8px;">
+      <!-- Left: dots + refresh -->
+      <div style="display:flex;align-items:center;gap:6px;">
         <div style="display:flex;gap:3px;align-items:center;">
           <div class="dot dot-off" id="claude-dot"></div>
           <div class="dot dot-off" id="drive-dot"></div>
@@ -450,30 +433,42 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
+        <span id="fact-sum-ing" style="display:none;"></span>
+        <span id="fact-sum-gas" style="display:none;"></span>
+      </div>
+      <!-- Center: dynamic title -->
+      <div id="header-center" style="display:flex;align-items:center;justify-content:center;gap:6px;">
+        <!-- Gestor: quarter with arrows -->
+        <div id="header-quarter-nav" style="display:flex;align-items:center;gap:4px;">
+          <button onclick="prevQuarter()" style="background:rgba(255,255,255,0.08);border:none;border-radius:6px;cursor:pointer;color:#fff;padding:4px 6px;display:flex;align-items:center;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button id="qbadge" onclick="document.getElementById('header-q-select').size=8;document.getElementById('header-q-select').style.display='block';document.getElementById('header-q-select').focus();" style="background:var(--accent);border:none;border-radius:8px;color:#fff;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">2T 2026</button>
+          <button onclick="nextQuarter()" style="background:rgba(255,255,255,0.08);border:none;border-radius:6px;cursor:pointer;color:#fff;padding:4px 6px;display:flex;align-items:center;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <!-- Other screens: title -->
+        <span id="header-title" style="display:none;font-size:15px;font-weight:800;color:var(--text);"></span>
+      </div>
+      <!-- Right: avatar -->
+      <div style="display:flex;justify-content:flex-end;align-items:center;">
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
         </div>
       </div>
-    </div><!-- end top row grid -->
+    </div>
+    <!-- Dynamic second row: subtabs for Gestor, nothing for others -->
+    <div id="header-subtabs" style="display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#0E0C0A;">
+      <div style="display:flex;gap:24px;">
+        <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0 0 8px;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);">Facturas</button>
+        <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0 0 8px;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);">Registros</button>
+        <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0 0 8px;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);">Tickets</button>
+      </div>
+    </div>
     <div style="height:0.5px;background:var(--line);"></div>
   </div><!-- end top-bar -->
-
-  <!-- Subtab bar OUTSIDE top-bar, full width -->
-
-  <div id="subtab-bar" style="display:flex;align-items:center;justify-content:space-between;background:#0E0C0A;padding:6px 14px 6px 16px;position:sticky;top:0;z-index:99;">
-    <div style="display:flex;gap:24px;">
-      <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);">Facturas</button>
-      <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);">Registros</button>
-      <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);">Tickets</button>
-    </div>
-    <div id="tipo-toggle" style="display:flex;gap:1px;align-items:center;background:var(--bg-raised);border-radius:14px;padding:2px;overflow:hidden;">
-      <button id="toggle-todos" onclick="setTipoToggle('todos')" title="Todos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-size:10px;font-weight:700;transition:all .25s cubic-bezier(0.34,1.56,0.64,1);max-width:44px;overflow:hidden;white-space:nowrap;">€</button>
-      <button id="toggle-gastos" onclick="setTipoToggle('gasto')" title="Gastos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;transition:all .15s;">−€</button>
-      <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;transition:all .15s;">+€</button>
-    </div>
-  </div>
-  <div style="height:0.5px;background:var(--line);"></div>
   <div class="tabs">
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
@@ -499,12 +494,9 @@ img,video,iframe,table{max-width:100%;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span>Calendario</span>
     </button>
-    <button class="nav-btn" id="nav-config" onclick="switchNav('config',this)">
-      <div id="nav-avatar" style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-        <img id="nav-avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
-        <span id="nav-initials" style="color:#fff;font-size:10px;font-weight:700;">VL</span>
-      </div>
-      <span>Config</span>
+    <button class="nav-btn" id="nav-stats" onclick="switchNav('stats',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Stats</span>
     </button>
   </nav>
 
@@ -530,12 +522,19 @@ img,video,iframe,table{max-width:100%;}
     <div id="subtab-swipe-container" style="display:flex;overflow-x:scroll;scroll-snap-type:x mandatory;-webkit-scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain;" onscroll="onSubTabScroll(this)">
     <div id="subtab-facturas-content" style="width:100vw;min-width:100vw;flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;overflow-x:hidden;box-sizing:border-box;padding:0 12px;">
 
-<!-- Summary bar with reg count and totals -->
+<!-- Summary bar with reg count, totals and toggle -->
 
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-  <span id="rc-f" style="font-size:12px;color:var(--text-3);"></span>
-  <span id="fact-sum-ing-show" style="font-size:12px;color:var(--green);font-weight:600;"></span>
-  <span id="fact-sum-gas-show" style="font-size:12px;color:var(--red);font-weight:600;"></span>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span id="rc-f" style="font-size:12px;color:var(--text-3);"></span>
+    <span id="fact-sum-ing-show" style="font-size:12px;color:var(--green);font-weight:600;"></span>
+    <span id="fact-sum-gas-show" style="font-size:12px;color:var(--red);font-weight:600;"></span>
+  </div>
+  <div id="tipo-toggle" style="display:flex;gap:1px;align-items:center;background:var(--bg-raised);border-radius:14px;padding:2px;overflow:hidden;">
+    <button id="toggle-todos" onclick="setTipoToggle('todos')" title="Todos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:var(--accent);color:#fff;font-size:10px;font-weight:700;transition:all .25s cubic-bezier(0.34,1.56,0.64,1);max-width:44px;overflow:hidden;white-space:nowrap;">€</button>
+    <button id="toggle-gastos" onclick="setTipoToggle('gasto')" title="Gastos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;transition:all .15s;">−€</button>
+    <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;transition:all .15s;">+€</button>
+  </div>
 </div>
 <!-- Hidden selects and inputs for filter logic -->
 <select id="filter-proveedor" onchange="renderList()" style="display:none;"><option value="">Proveedor</option></select>
@@ -672,6 +671,13 @@ img,video,iframe,table{max-width:100%;}
       <div>
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+          <span style="font-size:10px;color:var(--text-3);">v5.269</span>
+          <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            Debug
+          </button>
+        </div>
       </div>
     </div>
     <div class="section-label">Sincronización</div>
@@ -2443,6 +2449,27 @@ function renderTicketsSubtab(){
   html+='</div>';
   wrap.innerHTML=html;
 }
+function updateHeader(id){
+  const isGestor=(id==='facturas'||id==='registros'||id==='gestor');
+  // Subtabs row
+  const hs=document.getElementById('header-subtabs');
+  if(hs) hs.style.display=isGestor?'flex':'none';
+  // Quarter nav
+  const qn=document.getElementById('header-quarter-nav');
+  if(qn) qn.style.display=isGestor?'flex':'none';
+  // Title for other screens
+  const ht=document.getElementById('header-title');
+  const titles={modelos:'Modelos',calendario:'Calendario',stats:'Estadísticas',config:'Config'};
+  if(ht){
+    ht.style.display=isGestor?'none':'block';
+    ht.textContent=titles[id]||'';
+  }
+  // FABs
+  const fabAdd=document.getElementById('fab-add');
+  const fabTicket=document.getElementById('fab-ticket');
+  if(fabAdd) fabAdd.style.display=(isGestor&&currentSubTab!=='tickets')?'flex':'none';
+  if(fabTicket) fabTicket.style.display=(isGestor&&currentSubTab==='tickets')?'flex':'none';
+}
 function switchNav(id,btn){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -2457,6 +2484,17 @@ function switchNav(id,btn){
       if(user.picture&&ca){ ca.src=user.picture; ca.style.display='block'; if(ci) ci.style.display='none'; }
     }
     const cq=document.getElementById('config-current-q'); if(cq) cq.textContent=Q;
+    updateHeader('config');
+    updateFactSearchBar();
+    return;
+  }
+  if(id==='stats'){
+    let st=document.getElementById('tab-stats');
+    if(!st){ st=document.createElement('div'); st.id='tab-stats'; st.className='tab-pane'; document.querySelector('.tabs').appendChild(st); }
+    renderStatsTab(st);
+    st.classList.add('active');
+    if(btn) btn.classList.add('active');
+    updateHeader('stats');
     updateFactSearchBar();
     return;
   }
@@ -2472,15 +2510,20 @@ function switchNav(id,btn){
     calYear=new Date().getFullYear(); calMonth=new Date().getMonth();
     setTimeout(renderCalendario, 50);
   }
-  // Show subtab bar and FABs only for Gestor
-  const sb=document.getElementById('subtab-bar');
-  const fabAdd=document.getElementById('fab-add');
-  const fabTicket=document.getElementById('fab-ticket');
-  const isGestor=(id==='facturas'||id==='registros');
-  if(sb) sb.style.display=isGestor?'flex':'none';
-  if(fabAdd) fabAdd.style.display=isGestor&&currentSubTab!=='tickets'?'flex':'none';
-  if(fabTicket) fabTicket.style.display=isGestor&&currentSubTab==='tickets'?'flex':'none';
+  updateHeader(id);
   updateFactSearchBar();
+}
+function renderStatsTab(el){
+  el.innerHTML=`<div style="padding:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2 style="font-size:18px;font-weight:800;color:var(--text);margin:0;">Estadísticas</h2>
+      <button onclick="openAdvisor()" style="background:rgba(240,132,74,0.15);border:0.5px solid rgba(240,132,74,0.3);border-radius:8px;cursor:pointer;color:var(--accent);padding:6px 12px;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Asesor fiscal
+      </button>
+    </div>
+    <div id="stats-content" style="color:var(--text-3);font-size:14px;text-align:center;padding:40px 0;">Próximamente</div>
+  </div>`;
 }
 function switchTab(id,btn){ switchNav(id,btn); }
 function openAddModal(){

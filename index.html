@@ -113,7 +113,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .nav-add{width:52px;height:52px;border-radius:50%;background:#F0844A;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
 .nav-add svg{width:28px;height:28px;stroke-width:2.5;}
 /* Add invoice modal */
-#add-modal{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);}
+#add-modal{display:none;position:fixed;inset:0;z-index:10003;background:rgba(0,0,0,0.92);}
 #add-modal .add-sheet{position:absolute;bottom:0;left:0;right:0;background:#1C1814;border-radius:28px 28px 0 0;padding:28px 24px;padding-bottom:calc(120px + env(safe-area-inset-bottom));max-height:96vh;overflow-y:auto;color:#F5EDE0;}
 #add-modal .add-sheet p{color:rgba(245,237,224,0.5) !important;}
 #add-modal .add-sheet .analysis-filename{color:#F5EDE0;}
@@ -363,7 +363,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.293</div>
+    <div class="login-version">v5.294</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -432,6 +432,11 @@ img,video,iframe,table{max-width:100%;}
           <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Registros</button>
           <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Tickets</button>
         </div>
+        <!-- Resultado: subtabs -->
+        <div id="header-resultado-tabs" style="display:none;gap:20px;align-items:center;">
+          <button id="resultado-btn-stats" onclick="switchResultadoTab('stats')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);white-space:nowrap;transition:color .25s ease;">Stats</button>
+          <button id="resultado-btn-modelos" onclick="switchResultadoTab('modelos')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Modelos</button>
+        </div>
         <!-- Other screens: title -->
         <span id="header-title" style="display:none;font-size:16px;font-weight:800;color:var(--text);"></span>
       </div>
@@ -444,7 +449,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.293</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.294</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -549,16 +554,13 @@ img,video,iframe,table{max-width:100%;}
         <option value="1T 2027">1T 2027</option><option value="2T 2027">2T 2027</option><option value="3T 2027">3T 2027</option><option value="4T 2027">4T 2027</option>
       </select>
     </div>
-    <button class="nav-btn" id="nav-analisis" onclick="switchNav('analisis',this)">
+    <button class="nav-btn" id="nav-resultado" onclick="switchNav('resultado',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      <span>Análisis</span>
+      <span>Resultado</span>
     </button>
-    <button class="nav-btn" id="nav-config" onclick="switchNav('config',this)">
-      <div id="nav-avatar" style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-        <img id="nav-avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
-        <span id="nav-initials" style="color:#fff;font-size:10px;font-weight:700;">VL</span>
-      </div>
-      <span>Config</span>
+    <button class="nav-btn" id="nav-chat-btn" onclick="openAsesorChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chat</span>
     </button>
   </nav>
 
@@ -762,7 +764,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.293</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.294</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2613,11 +2615,14 @@ function renderTicketsSubtab(searchQ=''){
 }
 function updateHeader(id){
   const isGestor=(id==='facturas'||id==='registros'||id==='gestor');
+  const isResultado=(id==='resultado');
   const hs=document.getElementById('header-subtabs');
-  if(hs) hs.style.display=isGestor?'flex':'none';
   const ht=document.getElementById('header-title');
-  const titles={analisis:'Análisis',modelos:'Modelos',stats:'Estadísticas',config:'Configuración',calendario:'Calendario'};
-  if(ht){ ht.style.display=isGestor?'none':'block'; ht.textContent=titles[id]||''; }
+  const hr=document.getElementById('header-resultado-tabs');
+  const titles={resultado:'Resultado',analisis:'Resultado',modelos:'Modelos',stats:'Estadísticas',config:'Configuración',calendario:'Calendario'};
+  if(hs) hs.style.display=isGestor?'flex':'none';
+  if(hr) hr.style.display=isResultado?'flex':'none';
+  if(ht){ ht.style.display=(isGestor||isResultado)?'none':'block'; ht.textContent=titles[id]||''; }
   const fabC=document.getElementById('fab-container');
   if(fabC) fabC.style.display=(isGestor&&currentSubTab!=='tickets')?'flex':'none';
   const fabTicket=document.getElementById('fab-ticket');
@@ -2641,14 +2646,24 @@ function switchNav(id,btn){
     updateFactSearchBar();
     return;
   }
-  if(id==='analisis'){
-    let el=document.getElementById('tab-analisis');
-    if(!el){ el=document.createElement('div'); el.id='tab-analisis'; el.className='tab-pane'; document.querySelector('.tabs').appendChild(el); }
+  if(id==='resultado'){
+    let el=document.getElementById('tab-resultado');
+    if(!el){ el=document.createElement('div'); el.id='tab-resultado'; el.className='tab-pane'; document.querySelector('.tabs').appendChild(el); }
     el.classList.add('active');
     if(btn) btn.classList.add('active');
-    updateHeader('analisis');
+    updateHeader('resultado');
     updateFactSearchBar();
-    renderAnalisisTab(el);
+    renderResultadoTab(el);
+    return;
+  }
+  if(id==='calendario'){
+    const el=document.getElementById('tab-calendario');
+    if(el) el.classList.add('active');
+    if(btn) btn.classList.add('active');
+    calYear=new Date().getFullYear(); calMonth=new Date().getMonth();
+    updateHeader('calendario');
+    updateFactSearchBar();
+    setTimeout(renderCalendario,50);
     return;
   }
   const tabId=id==='registros'?'facturas':id;
@@ -2807,36 +2822,69 @@ function openCameraCapture(){
   inp.onchange=e=>handleClaudeFiles(e.target.files);
   inp.click();
 }
-let analisisTab='stats';
-function renderAnalisisTab(el){
-  // Build shell with internal tabs
+let resultadoTab='stats';
+let resStartX=0, resStartY=0, resSwiping=false;
+
+function renderResultadoTab(el){
+  el.style.padding='0';
   el.innerHTML=`
-    <div style="position:sticky;top:0;z-index:48;background:#0E0C0A;display:flex;gap:24px;padding:8px 16px 0;border-bottom:0.5px solid rgba(255,255,255,0.06);">
-      <button id="analisis-btn-stats" onclick="switchAnalisisTab('stats')" style="padding:0 0 8px;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);transition:color .25s ease;">Stats</button>
-      <button id="analisis-btn-modelos" onclick="switchAnalisisTab('modelos')" style="padding:0 0 8px;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);transition:color .25s ease;">Modelos</button>
-    </div>
-    <div id="analisis-stats-panel"></div>
-    <div id="analisis-modelos-panel" style="display:none;"></div>`;
-  switchAnalisisTab(analisisTab);
+    <div style="overflow:hidden;position:relative;" ontouchstart="resTouchStart(event)" ontouchmove="resTouchMove(event)" ontouchend="resTouchEnd(event)">
+      <div id="resultado-track" style="display:flex;width:200%;transition:transform .3s cubic-bezier(0.25,0.46,0.45,0.94);">
+        <div id="resultado-stats-panel" style="width:50%;min-width:50%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;"></div>
+        <div id="resultado-modelos-panel" style="width:50%;min-width:50%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:12px 12px 140px;"></div>
+      </div>
+    </div>`;
+  switchResultadoTab(resultadoTab);
 }
-function switchAnalisisTab(tab){
-  analisisTab=tab;
-  const sp=document.getElementById('analisis-stats-panel');
-  const mp=document.getElementById('analisis-modelos-panel');
-  const bs=document.getElementById('analisis-btn-stats');
-  const bm=document.getElementById('analisis-btn-modelos');
-  if(!sp||!mp) return;
+
+function switchResultadoTab(tab){
+  resultadoTab=tab;
+  const track=document.getElementById('resultado-track');
   const isStats=tab==='stats';
-  sp.style.display=isStats?'':'none';
-  mp.style.display=isStats?'none':'';
-  if(bs){ bs.style.color=isStats?'var(--accent)':'var(--text-3)'; }
-  if(bm){ bm.style.color=isStats?'var(--text-3)':'var(--accent)'; }
-  if(isStats) renderStatsTab(sp);
-  else {
-    // Copy modelos content
-    const src=document.getElementById('tab-modelos');
-    if(src&&!mp.innerHTML) mp.innerHTML=src.innerHTML;
+  if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=isStats?'translateX(0)':'translateX(-50%)'; }
+  // Update header buttons
+  const bs=document.getElementById('resultado-btn-stats');
+  const bm=document.getElementById('resultado-btn-modelos');
+  if(bs) bs.style.color=isStats?'var(--accent)':'var(--text-3)';
+  if(bm) bm.style.color=isStats?'var(--text-3)':'var(--accent)';
+  if(isStats){
+    const sp=document.getElementById('resultado-stats-panel');
+    if(sp) renderStatsTab(sp);
+  } else {
+    const mp=document.getElementById('resultado-modelos-panel');
+    if(mp&&!mp.children.length){
+      const src=document.getElementById('tab-modelos');
+      if(src) mp.innerHTML=src.innerHTML;
+    }
   }
+  if(navigator.vibrate) navigator.vibrate(8);
+}
+
+function resTouchStart(e){ resStartX=e.touches[0].clientX; resStartY=e.touches[0].clientY; resSwiping=false; const t=document.getElementById('resultado-track'); if(t) t.style.transition='none'; }
+function resTouchMove(e){
+  const dx=e.touches[0].clientX-resStartX;
+  const dy=e.touches[0].clientY-resStartY;
+  if(!resSwiping&&Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10) resSwiping=true;
+  if(!resSwiping) return;
+  const track=document.getElementById('resultado-track');
+  if(!track) return;
+  const base=resultadoTab==='stats'?0:-50;
+  const pct=base+(dx/window.innerWidth)*50;
+  track.style.transform=`translateX(${Math.max(-50,Math.min(0,pct))}%)`;
+}
+function resTouchEnd(e){
+  if(!resSwiping) return;
+  resSwiping=false;
+  const dx=e.changedTouches[0].clientX-resStartX;
+  if(Math.abs(dx)>=50){
+    if(dx<0&&resultadoTab==='stats') switchResultadoTab('modelos');
+    else if(dx>0&&resultadoTab==='modelos') switchResultadoTab('stats');
+    else snapResultado();
+  } else { snapResultado(); }
+}
+function snapResultado(){
+  const track=document.getElementById('resultado-track');
+  if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=resultadoTab==='stats'?'translateX(0)':'translateX(-50%)'; }
 }
 function renderStatsTab(el){
   // ── Calcular datos ──

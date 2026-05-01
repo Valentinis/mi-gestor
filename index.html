@@ -448,7 +448,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.305</div>
+    <div class="login-version">v5.306</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -536,7 +536,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.305</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.306</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -892,7 +892,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.305</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.306</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2877,8 +2877,8 @@ function renderPendingFacturas(searchQ=''){
       <div class="pending-fact-meta" style="color:#FF5A48;">${f.concepto||'Error desconocido'}</div>
     </div>`;
 
-    return `<div class="pending-fact-card" id="pfc_${id}">
-      <button class="btn-discard-fact" onclick="discardPendingFactura('${id}')">✕</button>
+    return `<div class="pending-fact-card" id="pfc_${id}" onclick="openModal('${id}')" style="cursor:pointer;">
+      <button class="btn-discard-fact" onclick="event.stopPropagation();discardPendingFactura('${id}')">✕</button>
       <div class="pending-fact-badge">⏳ Pendiente de confirmar</div>
       <div class="pending-fact-title">${f.proveedor_cliente||'—'}</div>
       <div class="pending-fact-meta">${f.fecha||'—'}${f.num_factura?' · '+f.num_factura:''} · ${f.concepto||''}</div>
@@ -2889,7 +2889,7 @@ function renderPendingFacturas(searchQ=''){
         <span>IVA ${f.pct_iva||21}% (${fmt(f.cuota_iva||0)})</span>
         ${f.retencion_pct?`<span>· Ret. ${f.retencion_pct}%</span>`:''}
       </div>
-      <button class="btn-confirm-fact" onclick="confirmFactura('${id}')">✓ Confirmar y mover a Historial</button>
+      <button class="btn-confirm-fact" onclick="event.stopPropagation();confirmFactura('${id}')">✓ Confirmar y mover a Historial</button>
     </div>`;
   }).join('')+'</div>';
 }
@@ -4584,6 +4584,37 @@ function openModal(id){
   // Reset edit section
   document.getElementById('modal-edit-section').style.display='none';
   document.getElementById('modal-edit-btn').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar';
+
+  // ── Pending state: duplicate check + footer buttons ──
+  const isPending = f.status==='pending';
+  const footer = document.getElementById('modal-footer');
+
+  // Duplicate warning banner
+  const existingDupBanner = document.getElementById('modal-dup-banner');
+  if(existingDupBanner) existingDupBanner.remove();
+  if(isPending){
+    const allConfirmed = Object.values(data).flat().filter(x=>x.status!=='pending'&&x._id!==f._id);
+    const isDup = allConfirmed.some(x=>
+      (x.num_factura&&f.num_factura&&x.num_factura===f.num_factura&&x.proveedor_cliente===f.proveedor_cliente) ||
+      (x.fecha===f.fecha&&x.proveedor_cliente===f.proveedor_cliente&&Math.abs((x.base_iva||0)-(f.base_iva||0))<0.01)
+    );
+    if(isDup){
+      const banner=document.createElement('div');
+      banner.id='modal-dup-banner';
+      banner.style.cssText='margin:0 16px 12px;padding:10px 12px;background:rgba(255,214,10,0.12);border:0.5px solid rgba(255,214,10,0.3);border-radius:10px;font-size:12px;color:#FFD060;display:flex;gap:8px;align-items:flex-start;';
+      banner.innerHTML='<span style="font-size:16px;flex-shrink:0;">⚠️</span><div><div style="font-weight:700;margin-bottom:2px;">Posible duplicado</div><div style="opacity:.8;">Ya existe una factura de <b>${f.proveedor_cliente||"este proveedor"}</b> con los mismos datos en el historial.</div></div>';
+      footer.parentNode.insertBefore(banner, footer);
+    }
+  }
+
+  // Footer buttons — different for pending vs confirmed
+  if(isPending){
+    footer.innerHTML=`
+      <button onclick="toggleModalEdit()" id="modal-edit-btn" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
+      <button onclick="discardPendingFactura('${f._id}');closeModal();" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">✕ Descartar</button>
+      <button onclick="confirmFactura('${f._id}');closeModal();" style="flex:1;background:#30D158;color:#fff;border:none;border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">✓ Confirmar</button>
+    `;
+  }
   // Populate edit fields
   const ef=document.getElementById('edit-concepto'); if(ef) ef.value=f.concepto||'';
   const fecha2=document.getElementById('edit-fecha'); if(fecha2) fecha2.value=f.fecha||'';
@@ -4611,7 +4642,20 @@ function openModal(id){
   document.getElementById('factura-modal').style.display='block';
   document.body.style.overflow='hidden';
 }
-function closeModal(){ document.getElementById('factura-modal').style.display='none'; document.body.style.overflow=''; modalFacturaId=null; }
+function closeModal(){
+  document.getElementById('factura-modal').style.display='none';
+  document.body.style.overflow='';
+  modalFacturaId=null;
+  // Restore default footer
+  const footer=document.getElementById('modal-footer');
+  if(footer) footer.innerHTML=`
+    <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Drive</button>
+    <button onclick="toggleModalEdit()" id="modal-edit-btn" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
+    <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Reprocesar</button>
+    <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Eliminar</button>
+  `;
+  document.getElementById('modal-dup-banner')?.remove();
+}
 function quickUpload(id){
   if(!token){ alert('Inicia sesión primero.'); return; }
   const all=Object.values(data).flat();

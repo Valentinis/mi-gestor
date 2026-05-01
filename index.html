@@ -448,7 +448,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.309</div>
+    <div class="login-version">v5.310</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -536,7 +536,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.309</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.310</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -892,7 +892,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.309</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.310</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2744,7 +2744,25 @@ async function handleClaudeFilesBackground(files){
     // Guardar en Firestore como pending
     savePendingToFirestore(placeholder, file);
 
-    // 3. Analizar en background
+    // 3. Subir archivo a Drive inmediatamente (para poder previsualizarlo)
+    let pendingDriveFileId = null;
+    if(token && facturasFId){
+      try{
+        const ext = file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
+        const safeName = 'pending_'+tempId+ext;
+        const meta = JSON.stringify({name:safeName, parents:[facturasFId]});
+        const form = new FormData();
+        form.append('metadata', new Blob([meta],{type:'application/json'}));
+        form.append('file', file);
+        const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{
+          method:'POST', headers:{Authorization:'Bearer '+token}, body:form
+        });
+        const created = await r.json();
+        if(created.id){ pendingDriveFileId = created.id; placeholder._driveFileId = created.id; driveFiles.push({id:created.id,name:safeName}); }
+      }catch(e){ console.warn('Error subiendo pending a Drive:',e); }
+    }
+
+    // 4. Analizar en background
     try{
       const result = await analyzeWithClaude(file);
       const items = Array.isArray(result)?result:[result];
@@ -2758,13 +2776,13 @@ async function handleClaudeFilesBackground(files){
         f._quarter = Q;
         f.status = 'pending';
         f._fileName = file.name;
+        if(pendingDriveFileId) f._driveFileId = pendingDriveFileId;
         classifyRecord(f);
         if(!data[Q]) data[Q]=[];
         data[Q].push(f);
         savePendingToFirestore(f, null);
       }
     }catch(e){
-      // Marcar como error
       const rec = Object.values(data).flat().find(f=>f._id===tempId);
       if(rec){ rec.status='error'; rec.concepto='Error: '+e.message; }
     }

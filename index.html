@@ -5016,10 +5016,11 @@ function getRegFacts(){
 function fmtEur(n){ if(!n||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
 
 function renderRegistros(searchQ=''){
+  if(!document.getElementById('reg-header')) return; // Panel no existe en esta versión UI
   const sq=(searchQ||document.getElementById('fact-search-input')?.value||'').toLowerCase();
   const isGastos=regView==='gastos';
   const curMonth=new Date().toISOString().slice(0,7);
-  regQ=Q; // Registros always follows main quarter selector
+  regQ=Q;
   let facts=getRegFacts();
   if(regView==='gastos') facts=facts.filter(f=>f.tipo==='gasto');
   else facts=facts.filter(f=>f.tipo==='ingreso');

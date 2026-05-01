@@ -701,7 +701,7 @@ img,video,iframe,table{max-width:100%;}
   <style>@media(prefers-color-scheme:dark){div[style*='height:20px']{background:#1C1814!important;}}</style>
 
   <div id="tab-facturas" class="tab-pane active" style="padding-left:0;padding-right:0;overflow-x:hidden;">
-    <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="handleClaudeFiles(this.files)"/>
+    <input type="file" id="file-claude" accept="image/*,.pdf" multiple onchange="closeAddModal();handleClaudeFilesBackground(this.files)"/>
     <input type="file" id="file-reprocess" accept="image/*,.pdf" onchange="handleReprocessFile(this.files)" style="display:none;"/>
 
 ```
@@ -1910,8 +1910,8 @@ function enhanceScan(ctx, W, H){
   ctx.putImageData(imageData,0,0);
 }
 
-function triggerCamera(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;} document.getElementById('file-camera').click(); }
-function triggerUpload(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;} document.getElementById('file-claude').click(); }
+function triggerCamera(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;} closeAddModal(); document.getElementById('file-camera').click(); }
+function triggerUpload(){ if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;} closeAddModal(); document.getElementById('file-claude').click(); }
 function pasteFromClipboard(){
   if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
   const st=document.getElementById('paste-status');
@@ -1927,9 +1927,9 @@ function pasteFromClipboard(){
       e.preventDefault();
       const items=[...(e.clipboardData?.items||[])];
       const pdf=items.find(i=>i.type==='application/pdf');
-      if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);trap.blur();return;}}
+      if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';st.style.color='';closeAddModal();handleClaudeFilesBackground([f]);trap.blur();return;}}
       const img=items.find(i=>i.type.startsWith('image/'));
-      if(img){const f=img.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);trap.blur();return;}}
+      if(img){const f=img.getAsFile();if(f){st.textContent='';st.style.color='';closeAddModal();handleClaudeFilesBackground([f]);trap.blur();return;}}
       st.textContent='No se detectó imagen ni PDF.';st.style.color='var(--red)';
       trap.blur();
     });
@@ -1943,9 +1943,9 @@ function pasteFromClipboard(){
     document.removeEventListener('paste',onPaste);
     const items=[...(e.clipboardData?.items||[])];
     const pdf=items.find(i=>i.type==='application/pdf');
-    if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);return;}}
+    if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';st.style.color='';closeAddModal();handleClaudeFilesBackground([f]);return;}}
     const img=items.find(i=>i.type.startsWith('image/'));
-    if(img){const f=img.getAsFile();if(f){st.textContent='';st.style.color='';handleClaudeFiles([f]);return;}}
+    if(img){const f=img.getAsFile();if(f){st.textContent='';st.style.color='';closeAddModal();handleClaudeFilesBackground([f]);return;}}
     st.textContent='No se detectó imagen ni PDF.';st.style.color='var(--red)';
   };
   document.addEventListener('paste',onPaste,{once:true});
@@ -1954,14 +1954,14 @@ function handlePasteEvent(e){
   const st=document.getElementById('paste-status');
   const items=[...(e.clipboardData?.items||[])];
   const pdf=items.find(i=>i.type==='application/pdf');
-  if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';handleClaudeFiles([f]);return;}}
+  if(pdf){const f=pdf.getAsFile();if(f){st.textContent='';closeAddModal();handleClaudeFilesBackground([f]);return;}}
   const img=items.find(i=>i.type.startsWith('image/'));
-  if(img){const f=img.getAsFile();if(f){st.textContent='';handleClaudeFiles([f]);return;}}
+  if(img){const f=img.getAsFile();if(f){st.textContent='';closeAddModal();handleClaudeFilesBackground([f]);return;}}
   st.textContent='No se detectó imagen ni PDF.';
 }
 function dragOver(e){ e.preventDefault(); if(!claudeKey.startsWith('sk-ant-')) return; document.getElementById('upload-zone').classList.add('over'); }
 function dragLeave(){ document.getElementById('upload-zone').classList.remove('over'); }
-function dropFile(e){ e.preventDefault(); dragLeave(); if(!claudeKey.startsWith('sk-ant-')) return; handleClaudeFiles(e.dataTransfer.files); }
+function dropFile(e){ e.preventDefault(); dragLeave(); if(!claudeKey.startsWith('sk-ant-')) return; closeAddModal(); handleClaudeFilesBackground(e.dataTransfer.files); }
 
 async function handleClaudeFiles(files){
   const list=document.getElementById('analysis-list');
@@ -4628,16 +4628,18 @@ function openModal(id){
     just2.innerHTML=opts2.map(o=>`<option value="${o}" ${o===(f.justificacion||'')?'selected':''}>${o===''?'— Seleccionar —':o}</option>`).join('');
   }
   const driveBtn=document.getElementById('modal-drive-btn');
-  if(driveFileId){ 
-    driveBtn.style.display='flex'; driveBtn.textContent='Ver en Drive'; 
-    driveBtn._link=driveFiles.find(x=>x.id===driveFileId)?.link||f._driveLink||null;
-    driveBtn.onclick=()=>openDriveFile(); 
-  } else if(f._driveLink){
-    driveBtn.style.display='flex'; driveBtn.textContent='Ver en Drive';
-    driveBtn._link=f._driveLink;
-    driveBtn.onclick=()=>openDriveFile();
-  } else { 
-    driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); 
+  if(driveBtn){
+    if(driveFileId){ 
+      driveBtn.style.display='flex'; driveBtn.textContent='Ver en Drive'; 
+      driveBtn._link=driveFiles.find(x=>x.id===driveFileId)?.link||f._driveLink||null;
+      driveBtn.onclick=()=>openDriveFile(); 
+    } else if(f._driveLink){
+      driveBtn.style.display='flex'; driveBtn.textContent='Ver en Drive';
+      driveBtn._link=f._driveLink;
+      driveBtn.onclick=()=>openDriveFile();
+    } else { 
+      driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); 
+    }
   }
   document.getElementById('factura-modal').style.display='block';
   document.body.style.overflow='hidden';

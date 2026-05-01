@@ -448,7 +448,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.311</div>
+    <div class="login-version">v5.313</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -536,7 +536,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.311</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.313</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -892,7 +892,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.311</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.313</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2917,13 +2917,51 @@ function confirmFactura(id){
   const allRecs=Object.values(data).flat();
   const rec=allRecs.find(f=>String(f._id)===String(id));
   if(!rec) return;
+
+  // Check for duplicate against confirmed records
+  const allConfirmed=allRecs.filter(x=>x.status!=='pending'&&x.status!=='analyzing'&&String(x._id)!==String(id));
+  const isDup=allConfirmed.some(x=>
+    (x.num_factura&&rec.num_factura&&x.num_factura===rec.num_factura&&x.proveedor_cliente===rec.proveedor_cliente) ||
+    (x.fecha===rec.fecha&&x.proveedor_cliente===rec.proveedor_cliente&&Math.abs((x.base_iva||0)-(rec.base_iva||0))<0.01)
+  );
+
+  if(isDup){
+    const ok=confirm(`⚠️ Posible duplicado\n\nYa existe una factura de "${rec.proveedor_cliente||'este proveedor'}" con los mismos datos en el historial.\n\n¿Confirmar igualmente?`);
+    if(!ok) return;
+  }
   rec.status='confirmed';
   saveLocal();
   haptic('success');
   // Eliminar de Firestore pending
   deletePendingFromFirestore(id);
-  // Guardar en Drive
-  if(token) saveDataToDrive(rec._quarter||Q).catch(()=>{});
+  // Renombrar archivo en Drive si existe como pending_
+  if(token && rec._driveFileId){
+    const f0=rec;
+    const fecha=(f0.fecha||'').slice(0,10);
+    const prov=(f0.proveedor_cliente||'factura').replace(/[^a-zA-Z0-9]/g,'_').slice(0,30);
+    const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
+    const oldFile=driveFiles.find(x=>x.id===rec._driveFileId);
+    const ext=oldFile?.name?.includes('.')?'.'+oldFile.name.split('.').pop():'';
+    const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
+    fetch(`https://www.googleapis.com/drive/v3/files/${rec._driveFileId}`,{
+      method:'PATCH',
+      headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({name:newName})
+    }).then(()=>{
+      if(oldFile) oldFile.name=newName;
+    }).catch(()=>{});
+  }
+  // Guardar en Drive con estado uploading
+  rec._driveUploading=true;
+  renderAll();
+  saveDataToDrive(rec._quarter||Q).then(()=>{
+    delete rec._driveUploading;
+    renderAll();
+  }).catch(()=>{
+    delete rec._driveUploading;
+    rec._driveError=true;
+    renderAll();
+  });
   // Flash confirm animation then remove card
   const safeId=String(id).replace(/[^a-zA-Z0-9_]/g,'_');
   const card=document.getElementById('pfc_'+safeId);
@@ -4987,14 +5025,10 @@ async function handleReprocessFile(files){
 }
 function hasDriveBackup(f){
   if(f._driveLink) return true;
+  if(f._driveFileId) return true;
   if(!f.fecha) return false;
   const datePrefix=(f.fecha||'').slice(0,10);
-  const found=driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
-  if(!found&&driveFiles.length>0&&f.fecha){
-    // Debug: show first mismatch
-    console.log('No match for',datePrefix,'in',driveFiles.slice(0,2).map(d=>d.name));
-  }
-  return found;
+  return driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
 }
 function driveIcon(f){
   if(f._driveUploading) return '<span title="Subiendo..." style="font-size:13px;background:var(--bg-raised);color:var(--text-3);border-radius:4px;padding:1px 4px;animation:spin 1s linear infinite;display:inline-block;">↻</span>';

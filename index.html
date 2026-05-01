@@ -352,6 +352,85 @@ img,video,iframe,table{max-width:100%;}
 .skel-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(–line);}
 .skel-bar{width:3px;height:36px;border-radius:2px;}
 #reg-list.loading,.registros-loading{pointer-events:none;}
+
+/* ── Pending facturas (pestaña F 🧾) ── */
+.pending-fact-card{
+  background:var(--bg-raised);
+  border-radius:16px;
+  padding:14px 14px 12px;
+  margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+  border:0.5px solid rgba(240,132,74,0.25);
+}
+.pending-fact-card::before{
+  content:'';
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:3px;
+  background:var(--accent);
+  border-radius:3px 0 0 3px;
+}
+.pending-fact-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent);background:rgba(240,132,74,0.12);
+  padding:3px 8px;border-radius:20px;margin-bottom:8px;
+}
+.pending-fact-title{font-size:14px;font-weight:700;color:#F5EDE0;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pending-fact-meta{font-size:11px;color:var(--text-3);margin-bottom:10px;}
+.pending-fact-amount{font-size:20px;font-weight:800;margin-bottom:10px;}
+.btn-confirm-fact{
+  width:100%;padding:10px;
+  background:var(--accent);color:#fff;
+  font-size:13px;font-weight:700;
+  border:none;border-radius:12px;cursor:pointer;
+  transition:transform .15s,opacity .15s;
+}
+.btn-confirm-fact:active{transform:scale(0.97);opacity:.85;}
+.btn-discard-fact{
+  position:absolute;top:12px;right:12px;
+  background:rgba(255,255,255,0.07);border:none;
+  border-radius:50%;width:26px;height:26px;
+  font-size:13px;cursor:pointer;color:var(--text-3);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── Stamp animation ── */
+@keyframes stampIn{
+  0%{transform:scale(1.6) rotate(-6deg);opacity:0;}
+  60%{transform:scale(0.93) rotate(1deg);opacity:1;}
+  80%{transform:scale(1.04) rotate(-0.5deg);}
+  100%{transform:scale(1) rotate(0deg);opacity:1;}
+}
+@keyframes stampPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(240,132,74,0);}
+  50%{box-shadow:0 0 0 12px rgba(240,132,74,0.15);}
+}
+.stamp-enter{
+  animation:stampIn .45s cubic-bezier(0.34,1.2,0.64,1) forwards,
+             stampPulse .6s ease .45s forwards;
+}
+
+/* ── Confirm flash ── */
+@keyframes confirmFlash{
+  0%{background:rgba(48,209,88,0.2);}
+  100%{background:transparent;}
+}
+.confirm-flash{animation:confirmFlash .6s ease forwards;}
+
+/* ── Empty pending state ── */
+.pending-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 20px;gap:12px;
+  color:var(--text-3);font-size:13px;text-align:center;
+}
+@keyframes analyzeProgress{
+  0%{width:15%;margin-left:0;}
+  50%{width:60%;margin-left:20%;}
+  100%{width:15%;margin-left:80%;}
+}
+.pending-empty-icon{font-size:48px;opacity:.4;}
 </style>
 
 </head>
@@ -369,7 +448,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.304</div>
+    <div class="login-version">v5.305</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -435,9 +514,9 @@ img,video,iframe,table{max-width:100%;}
       <div id="header-left" style="display:flex;align-items:center;gap:10px;flex:1;overflow:hidden;padding-left:6px;">
         <!-- Gestor: subtabs -->
         <div id="header-subtabs" style="display:flex;gap:20px;align-items:center;">
-          <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);white-space:nowrap;transition:color .25s ease;">Facturas</button>
-          <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Registros</button>
-          <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Tickets</button>
+          <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);white-space:nowrap;transition:color .25s ease;">Historial</button>
+          <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">F 🧾</button>
+          <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">FS ✦</button>
         </div>
         <!-- Resultado: subtabs -->
         <div id="header-resultado-tabs" style="display:none;gap:20px;align-items:center;">
@@ -456,7 +535,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.304</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.305</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -642,7 +721,6 @@ img,video,iframe,table{max-width:100%;}
 <div id="subtab-swipe-container" style="overflow:hidden;position:relative;" ontouchstart="subTabTouchStart(event)" ontouchmove="subTabTouchMove(event)" ontouchend="subTabTouchEnd(event)">
 <div id="subtab-track" style="display:flex;width:300%;transition:transform .3s cubic-bezier(0.25,0.46,0.45,0.94);">
 <div id="subtab-facturas-content" style="width:33.333%;min-width:33.333%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
-```
 
 <!-- Hidden selects and inputs for filter logic -->
 
@@ -657,9 +735,7 @@ img,video,iframe,table{max-width:100%;}
   </div><!-- end subtab-facturas-content -->
   <!-- Registros subtab -->
   <div id="subtab-registros-content" style="width:33.333%;min-width:33.333%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
-    <div id="reg-header"></div>
-    <div id="reg-totals-bar"></div>
-    <div id="reg-tbody"></div>
+    <div id="pending-facturas-wrap"></div>
   </div>
   <!-- Tickets subtab -->
   <div id="subtab-tickets-content" style="width:33.333%;min-width:33.333%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
@@ -809,7 +885,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.304</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.305</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2083,6 +2159,7 @@ function saveAnalysis(divId, count){
     if(just==='Otro (especificar)'&&jOth) just=jOth.value||'Otro';
     f.justificacion=just;
     f._quarter=Q; f._id=Date.now()+Math.random();
+    f.status='pending';
     if(!data[Q]) data[Q]=[];
     if(isDuplicate(f)){
       const skip=confirm(`⚠️ Posible duplicado:\n${f.proveedor_cliente} · ${f.fecha} · ${fmt(f.base_iva||0)}\n\n¿Guardar igualmente?`);
@@ -2093,7 +2170,9 @@ function saveAnalysis(divId, count){
   if(saved===0){ alert('No hay facturas seleccionadas.'); return; }
   saveLocal(); renderAll();
   haptic('success');
-  showToast(saved===1?'1 registro guardado':`${saved} registros guardados`);
+  // Switch to F 🧾 tab and show stamp animation
+  switchSubTab('registros');
+  setTimeout(()=>{ showStampToast(saved); renderPendingFacturas(); }, 100);
   // Show saving indicator
   const saveBtn=document.querySelector(`[onclick="saveAnalysis('${divId}',${count})"]`);
   if(saveBtn){ saveBtn.textContent='Guardando...'; saveBtn.disabled=true; }
@@ -2163,7 +2242,7 @@ async function driveReq(url,opts={}){
   return r;
 }
 async function findOrCreate(name,parent){ const q=encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parent}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`); const j=await r.json(); if(j.files&&j.files.length) return j.files[0].id; const cr=await driveReq('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,mimeType:'application/vnd.google-apps.folder',parents:[parent]})}); return (await cr.json()).id; }
-async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); ticketsFId=await findOrCreate('tickets',rootFId); await loadDriveFiles(); await loadFromDrive(); setDS('ok','Drive OK'); hideSyncBanner(); }catch(e){setDS('err','Error Drive'); hideSyncBanner(); } }
+async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); ticketsFId=await findOrCreate('tickets',rootFId); await loadDriveFiles(); await loadFromDrive(); setDS('ok','Drive OK'); hideSyncBanner(); loadPendingFromFirestore(); }catch(e){setDS('err','Error Drive'); hideSyncBanner(); } }
 async function loadDriveFiles(){
   if(!token||!facturasFId) return;
   try{
@@ -2495,7 +2574,7 @@ async function generateTicket(docId,nombre,importe,fecha,concepto,metodo){
     concepto:concepto,num_factura:'',operacion:'INT',
     base_iva:base,pct_iva:21,cuota_iva:iva,base_irpf:base,
     retencion_pct:0,retencion_importe:0,ingresos_brutos:importe,
-    notas:`Pago ${metodo}`,_id:Date.now()+Math.random()
+    notas:`Pago ${metodo}`,_id:Date.now()+Math.random(),status:'confirmed'
   };
   classifyRecord(rec);
   if(!data[Q]) data[Q]=[];
@@ -2569,7 +2648,7 @@ function switchSubTab(tab){
       toggle.style.padding='2px'; toggle.style.overflow='hidden'; toggle.style.pointerEvents='auto';
     }
   }
-  if(tab==='registros') renderRegistros();
+  if(tab==='registros') renderPendingFacturas();
   if(tab==='tickets') renderTicketsSubtab();
   // Show correct FAB
   const fabC=document.getElementById('fab-container');
@@ -2624,6 +2703,255 @@ function snapTrack(idx){
   const track=document.getElementById('subtab-track');
   if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=`translateX(${-(idx/3)*100}%)`; }
 }
+// ── Background file processing ─────────────────────────────────────────────
+async function handleClaudeFilesBackground(files){
+  if(!files||!files.length) return;
+  if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config primero.'); return; }
+
+  // 1. Ir a Historial inmediatamente con animación stamp
+  switchSubTab('facturas');
+  showStampToast(files.length, true); // true = modo "procesando"
+
+  for(const file of files){
+    const tempId = 'bg_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+
+    // 2. Guardar placeholder "analyzing" en data y Firestore
+    const placeholder = {
+      _id: tempId,
+      _quarter: Q,
+      status: 'analyzing',
+      _fileName: file.name,
+      proveedor_cliente: file.name,
+      fecha: new Date().toISOString().slice(0,10),
+      tipo: 'gasto',
+      base_iva: 0, cuota_iva: 0, pct_iva: 21,
+      concepto: 'Analizando...'
+    };
+    if(!data[Q]) data[Q]=[];
+    data[Q].push(placeholder);
+    renderAll();
+    // Guardar en Firestore como pending
+    savePendingToFirestore(placeholder, file);
+
+    // 3. Analizar en background
+    try{
+      const result = await analyzeWithClaude(file);
+      const items = Array.isArray(result)?result:[result];
+
+      // Eliminar placeholder
+      if(data[Q]) data[Q] = data[Q].filter(f=>f._id!==tempId);
+
+      // Añadir resultados como pending
+      for(const f of items){
+        f._id = Date.now()+Math.random();
+        f._quarter = Q;
+        f.status = 'pending';
+        f._fileName = file.name;
+        classifyRecord(f);
+        if(!data[Q]) data[Q]=[];
+        data[Q].push(f);
+        savePendingToFirestore(f, null);
+      }
+    }catch(e){
+      // Marcar como error
+      const rec = Object.values(data).flat().find(f=>f._id===tempId);
+      if(rec){ rec.status='error'; rec.concepto='Error: '+e.message; }
+    }
+    renderAll();
+  }
+}
+
+async function savePendingToFirestore(rec, file){
+  if(!firestoreProjectId||!currentUser) return;
+  const safeUid = currentUser.uid.replace(/[^a-zA-Z0-9]/g,'_');
+  const docId = String(rec._id).replace(/[^a-zA-Z0-9_]/g,'_');
+  const url = `${FS_URL}/users/${safeUid}/facturas_pending/${docId}`;
+  const fields = {};
+  ['_quarter','status','_fileName','proveedor_cliente','fecha','tipo','base_iva','cuota_iva',
+   'pct_iva','concepto','num_factura','operacion','retencion_pct','retencion_importe',
+   'ingresos_brutos','base_irpf','justificacion','notas'].forEach(k=>{
+    const v = rec[k];
+    if(v===undefined||v===null) return;
+    if(typeof v==='number') fields[k]={doubleValue:v};
+    else fields[k]={stringValue:String(v)};
+  });
+  fields['_id']={stringValue:String(rec._id)};
+  try{
+    await fetch(url,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({fields})
+    });
+  }catch(e){ console.warn('savePendingToFirestore error:',e); }
+}
+
+async function deletePendingFromFirestore(id){
+  if(!firestoreProjectId||!currentUser) return;
+  const safeUid = currentUser.uid.replace(/[^a-zA-Z0-9]/g,'_');
+  const docId = String(id).replace(/[^a-zA-Z0-9_]/g,'_');
+  const url = `${FS_URL}/users/${safeUid}/facturas_pending/${docId}`;
+  try{ await fetch(url,{method:'DELETE',headers:{'Authorization':'Bearer '+token}}); }
+  catch(e){ console.warn('deletePendingFromFirestore error:',e); }
+}
+
+async function loadPendingFromFirestore(){
+  if(!firestoreProjectId||!currentUser) return;
+  const safeUid = currentUser.uid.replace(/[^a-zA-Z0-9]/g,'_');
+  const url = `${FS_URL}/users/${safeUid}/facturas_pending?pageSize=50`;
+  try{
+    const r = await fetch(url,{headers:{'Authorization':'Bearer '+token}});
+    const d = await r.json();
+    if(!d.documents) return;
+    for(const doc of d.documents){
+      const f = doc.fields||{};
+      const rec = {};
+      Object.keys(f).forEach(k=>{ rec[k]=f[k].stringValue||f[k].doubleValue||f[k].booleanValue||''; });
+      if(!rec._quarter||!rec._id) continue;
+      if(!data[rec._quarter]) data[rec._quarter]=[];
+      // No duplicar
+      if(!data[rec._quarter].find(x=>String(x._id)===String(rec._id))){
+        data[rec._quarter].push(rec);
+      }
+    }
+    renderAll();
+  }catch(e){ console.warn('loadPendingFromFirestore error:',e); }
+}
+
+function renderPendingFacturas(searchQ=''){
+  const wrap=document.getElementById('pending-facturas-wrap');
+  if(!wrap) return;
+  const sq=(searchQ||document.getElementById('fact-search-input')?.value||'').toLowerCase();
+  const allRecs=Object.values(data).flat();
+  let pending=allRecs.filter(f=>f.status==='pending');
+  if(sq) pending=pending.filter(f=>
+    (f.proveedor_cliente||'').toLowerCase().includes(sq)||
+    (f.concepto||'').toLowerCase().includes(sq)||
+    (f.fecha||'').includes(sq)
+  );
+  // Badge en pestaña
+  const btn=document.getElementById('subtab-registros-btn');
+  const count=allRecs.filter(f=>f.status==='pending').length;
+  if(btn) btn.innerHTML=`F 🧾${count>0?` <span style="background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:800;vertical-align:top;margin-top:1px;">${count}</span>`:''}`;
+
+  if(!pending.length){
+    wrap.innerHTML=`<div class="pending-empty">
+      <div class="pending-empty-icon">🧾</div>
+      <div style="font-weight:700;color:var(--text);">Sin facturas pendientes</div>
+      <div style="opacity:.6;">Las facturas que añadas por foto o archivo<br>aparecerán aquí para revisar y confirmar.</div>
+    </div>`;
+    return;
+  }
+  wrap.innerHTML=`<div style="padding-top:12px;">`+pending.map((f,i)=>{
+    const isAnalyzing = f.status==='analyzing';
+    const isError = f.status==='error';
+    const isIng=f.tipo==='ingreso';
+    const total=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0));
+    const color=isIng?'#30D158':'#FF5A48';
+    const sign=isIng?'+':'-';
+    const id=f._id;
+
+    if(isAnalyzing) return `<div class="pending-fact-card" id="pfc_${id}" style="opacity:.7;">
+      <div class="pending-fact-badge"><span class="spin" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>Analizando...</div>
+      <div class="pending-fact-title">${f._fileName||'Factura'}</div>
+      <div class="pending-fact-meta">Claude está extrayendo los datos</div>
+      <div style="height:8px;background:rgba(240,132,74,0.15);border-radius:4px;overflow:hidden;margin-top:8px;">
+        <div style="height:100%;background:var(--accent);border-radius:4px;animation:analyzeProgress 2s ease-in-out infinite;"></div>
+      </div>
+    </div>`;
+
+    if(isError) return `<div class="pending-fact-card" id="pfc_${id}" style="border-color:rgba(255,90,72,0.4);">
+      <button class="btn-discard-fact" onclick="discardPendingFactura('${id}')">✕</button>
+      <div class="pending-fact-badge" style="color:#FF5A48;background:rgba(255,90,72,0.12);">⚠️ Error al analizar</div>
+      <div class="pending-fact-title">${f._fileName||'Factura'}</div>
+      <div class="pending-fact-meta" style="color:#FF5A48;">${f.concepto||'Error desconocido'}</div>
+    </div>`;
+
+    return `<div class="pending-fact-card" id="pfc_${id}">
+      <button class="btn-discard-fact" onclick="discardPendingFactura('${id}')">✕</button>
+      <div class="pending-fact-badge">⏳ Pendiente de confirmar</div>
+      <div class="pending-fact-title">${f.proveedor_cliente||'—'}</div>
+      <div class="pending-fact-meta">${f.fecha||'—'}${f.num_factura?' · '+f.num_factura:''} · ${f.concepto||''}</div>
+      <div class="pending-fact-amount" style="color:${color}">${sign}${fmt(total)}</div>
+      <div style="display:flex;gap:6px;font-size:11px;color:var(--text-3);margin-bottom:12px;">
+        <span>Base ${fmt(f.base_iva||0)}</span>
+        <span>·</span>
+        <span>IVA ${f.pct_iva||21}% (${fmt(f.cuota_iva||0)})</span>
+        ${f.retencion_pct?`<span>· Ret. ${f.retencion_pct}%</span>`:''}
+      </div>
+      <button class="btn-confirm-fact" onclick="confirmFactura('${id}')">✓ Confirmar y mover a Historial</button>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function confirmFactura(id){
+  const allRecs=Object.values(data).flat();
+  const rec=allRecs.find(f=>String(f._id)===String(id));
+  if(!rec) return;
+  rec.status='confirmed';
+  saveLocal();
+  haptic('success');
+  // Eliminar de Firestore pending
+  deletePendingFromFirestore(id);
+  // Guardar en Drive
+  if(token) saveDataToDrive(rec._quarter||Q).catch(()=>{});
+  // Flash confirm animation then remove card
+  const card=document.getElementById('pfc_'+id);
+  if(card){
+    card.classList.add('confirm-flash');
+    card.style.transition='all .35s ease';
+    setTimeout(()=>{
+      card.style.opacity='0';
+      card.style.transform='translateX(100%)';
+      card.style.maxHeight='0';
+      card.style.padding='0';
+      card.style.marginBottom='0';
+      setTimeout(()=>{ renderPendingFacturas(); renderAll(); }, 350);
+    }, 300);
+  }
+  showToast('✓ Factura confirmada','success');
+}
+
+function discardPendingFactura(id){
+  if(!confirm('¿Descartar esta factura pendiente?')) return;
+  const q=Object.keys(data).find(k=>data[k].some(f=>String(f._id)===String(id)));
+  if(!q) return;
+  data[q]=data[q].filter(f=>String(f._id)!==String(id));
+  deletePendingFromFirestore(id);
+  saveLocal();
+  haptic('delete');
+  renderPendingFacturas();
+  renderAll();
+}
+
+function showStampToast(count, processing=false){
+  document.getElementById('stamp-overlay')?.remove();
+  const ov=document.createElement('div');
+  ov.id='stamp-overlay';
+  ov.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:99999;display:flex;align-items:center;justify-content:center;';
+  const msg = processing
+    ? (count===1?'Procesando 1 factura...':'Procesando '+count+' facturas...')
+    : (count===1?'1 factura añadida':count+' facturas añadidas');
+  const sub = processing ? 'Puedes seguir usando la app' : 'Revisa y confirma en F 🧾';
+  ov.innerHTML=`<div class="stamp-enter" style="
+    background:var(--bg-raised);
+    border:2px solid var(--accent);
+    border-radius:20px;
+    padding:20px 32px;
+    text-align:center;
+    box-shadow:0 0 40px rgba(240,132,74,0.3);
+  ">
+    <div style="font-size:40px;margin-bottom:6px;">${processing?'⏳':'🧾'}</div>
+    <div style="font-size:16px;font-weight:800;color:var(--accent);">${msg}</div>
+    <div style="font-size:12px;color:var(--text-3);margin-top:4px;">${sub}</div>
+  </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{
+    ov.style.transition='opacity .4s ease';
+    ov.style.opacity='0';
+    setTimeout(()=>ov.remove(), 400);
+  }, 1800);
+}
+
 function renderTicketsSubtab(searchQ=''){
   const sq=(searchQ||document.getElementById('fact-search-input')?.value||'').toLowerCase();
   const wrap=document.getElementById('tickets-subtab-wrap');
@@ -2861,13 +3189,13 @@ function closeFab(){
 function openFilePicker(){
   const inp=document.createElement('input');
   inp.type='file'; inp.accept='image/*,.pdf'; inp.multiple=true;
-  inp.onchange=e=>handleClaudeFiles(e.target.files);
+  inp.onchange=e=>handleClaudeFilesBackground(e.target.files);
   inp.click();
 }
 function openCameraCapture(){
   const inp=document.createElement('input');
   inp.type='file'; inp.accept='image/*'; inp.capture='environment';
-  inp.onchange=e=>handleClaudeFiles(e.target.files);
+  inp.onchange=e=>handleClaudeFilesBackground(e.target.files);
   inp.click();
 }
 let resultadoTab='stats';
@@ -4003,6 +4331,11 @@ function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').f
 function renderAll(){
   renderList(); recalc(); updateSI(); renderRegistros();
   updateFactSearchBar();
+  // Update F 🧾 badge
+  const pendingCount=Object.values(data).flat().filter(f=>f.status==='pending').length;
+  const fBtn=document.getElementById('subtab-registros-btn');
+  if(fBtn) fBtn.innerHTML=`F 🧾${pendingCount>0?` <span style="background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:800;vertical-align:top;margin-top:1px;">${pendingCount}</span>`:''}`;
+  if(currentSubTab==='registros') renderPendingFacturas();
   if(document.getElementById('tab-insights')?.classList.contains('active')&&currentInsightsTab==='calendario') renderCalendario();
 }
 function skeletonItems(n){
@@ -4029,7 +4362,7 @@ function renderList(){
     list.innerHTML='<div style="padding:4px 0;">'+skeletonItems(7)+'</div>';
     return;
   }
-  let fs=getF(Q);
+  let fs=getF(Q).filter(f=>f.status!=='pending'); // Historial: solo confirmed o sin status
   // Populate provider/client dropdowns
   const gastos=fs.filter(f=>f.tipo==='gasto');
   const ingresos=fs.filter(f=>f.tipo==='ingreso');
@@ -4585,7 +4918,7 @@ function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO
 
 // ── MODELOS ──
 function recalc(){
-  const fs=getF(Q);
+  const fs=getF(Q).filter(f=>f.status!=='pending'); // no contar pendientes en cálculos fiscales
   let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0,profB=0,profR=0,profN=0;
   let intra={};
   for(const f of fs){
@@ -5300,7 +5633,8 @@ async function approveTicketWithDrive(t){
     retencion_importe:0,
     ingresos_brutos:bruto,
     notas:'Pago '+(t.metodo||''),
-    _id:Date.now()+Math.random()
+    _id:Date.now()+Math.random(),
+    status:'confirmed'
   };
   classifyRecord(rec);
   // Generate PDF and upload to Drive

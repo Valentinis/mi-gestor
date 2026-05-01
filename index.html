@@ -515,7 +515,8 @@ img,video,iframe,table{max-width:100%;}
         <!-- Gestor: subtabs -->
         <div id="header-subtabs" style="display:flex;gap:20px;align-items:center;">
           <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);white-space:nowrap;transition:color .25s ease;">Historial</button>
-          <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">F 🧾</button>
+          <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Registros</button>
+          <button id="subtab-pending-btn" onclick="switchSubTab('pending')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">F 🧾</button>
           <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">FS ✦</button>
         </div>
         <!-- Resultado: subtabs -->
@@ -719,8 +720,8 @@ img,video,iframe,table{max-width:100%;}
 </div>
 
 <div id="subtab-swipe-container" style="overflow:hidden;position:relative;" ontouchstart="subTabTouchStart(event)" ontouchmove="subTabTouchMove(event)" ontouchend="subTabTouchEnd(event)">
-<div id="subtab-track" style="display:flex;width:300%;transition:transform .3s cubic-bezier(0.25,0.46,0.45,0.94);">
-<div id="subtab-facturas-content" style="width:33.333%;min-width:33.333%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
+<div id="subtab-track" style="display:flex;width:400%;transition:transform .3s cubic-bezier(0.25,0.46,0.45,0.94);">
+<div id="subtab-facturas-content" style="width:25%;min-width:25%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
 
 <!-- Hidden selects and inputs for filter logic -->
 
@@ -734,11 +735,17 @@ img,video,iframe,table{max-width:100%;}
 
   </div><!-- end subtab-facturas-content -->
   <!-- Registros subtab -->
-  <div id="subtab-registros-content" style="width:33.333%;min-width:33.333%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
+  <div id="subtab-registros-content" style="width:25%;min-width:25%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
+    <div id="reg-header"></div>
+    <div id="reg-totals-bar"></div>
+    <div id="reg-tbody"></div>
+  </div>
+  <!-- F 🧾 pending subtab -->
+  <div id="subtab-pending-content" style="width:25%;min-width:25%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
     <div id="pending-facturas-wrap"></div>
   </div>
-  <!-- Tickets subtab -->
-  <div id="subtab-tickets-content" style="width:33.333%;min-width:33.333%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
+  <!-- FS ✦ tickets subtab -->
+  <div id="subtab-tickets-content" style="width:25%;min-width:25%;flex-shrink:0;overflow-x:hidden;box-sizing:border-box;padding:0 12px 140px;will-change:transform;">
     <div id="tickets-subtab-wrap"></div>
   </div>
   </div><!-- end subtab-track -->
@@ -2171,7 +2178,7 @@ function saveAnalysis(divId, count){
   saveLocal(); renderAll();
   haptic('success');
   // Switch to F 🧾 tab and show stamp animation
-  switchSubTab('registros');
+  switchSubTab('pending');
   setTimeout(()=>{ showStampToast(saved); renderPendingFacturas(); }, 100);
   // Show saving indicator
   const saveBtn=document.querySelector(`[onclick="saveAnalysis('${divId}',${count})"]`);
@@ -2609,19 +2616,19 @@ function setTipoToggle(tipo, fromRegistros=false){
 }
 function switchSubTab(tab){
   currentSubTab=tab;
-  const container=document.getElementById('subtab-swipe-container');
   const track=document.getElementById('subtab-track');
-  const idx={'facturas':0,'registros':1,'tickets':2}[tab]||0;
-  if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=`translateX(${-(idx/3)*100}%)`; }
-  const isF=tab==='facturas';
-  const btnF=document.getElementById('subtab-facturas-btn');
-  const btnR=document.getElementById('subtab-registros-btn');
-  const btnTk=document.getElementById('subtab-tickets-btn');
-  ['facturas','registros','tickets'].forEach(t=>{
-    const b=document.getElementById('subtab-'+t+'-btn');
+  const TABS=['facturas','registros','pending','tickets'];
+  const N=TABS.length;
+  const idx=TABS.indexOf(tab); if(idx<0) return;
+  if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=`translateX(${-(idx/N)*100}%)`; }
+  // Button colors
+  ['facturas','registros','pending','tickets'].forEach(t=>{
+    const id=t==='pending'?'subtab-pending-btn':'subtab-'+t+'-btn';
+    const b=document.getElementById(id);
     if(b) b.style.color=tab===t?'var(--accent)':'var(--text-3)';
   });
-  // Animate € button — only visible in Facturas
+  // € toggle — only in Historial
+  const isF=tab==='facturas';
   const btnT=document.getElementById('toggle-todos');
   if(btnT){
     if(isF){
@@ -2635,10 +2642,10 @@ function switchSubTab(tab){
       if(tipoToggle==='todos') setTipoToggle('gasto',true);
     }
   }
-  // Animate entire toggle — hidden in Tickets
+  // Tipo toggle — hidden in tickets and pending
   const toggle=document.getElementById('tipo-toggle');
   if(toggle){
-    if(tab==='tickets'){
+    if(tab==='tickets'||tab==='pending'){
       toggle.style.transition='all .2s ease';
       toggle.style.maxWidth='0'; toggle.style.opacity='0'; toggle.style.transform='scale(0.7)';
       toggle.style.padding='0'; toggle.style.overflow='hidden'; toggle.style.pointerEvents='none';
@@ -2648,15 +2655,16 @@ function switchSubTab(tab){
       toggle.style.padding='2px'; toggle.style.overflow='hidden'; toggle.style.pointerEvents='auto';
     }
   }
-  if(tab==='registros') renderPendingFacturas();
+  if(tab==='registros') renderRegistros();
+  if(tab==='pending') renderPendingFacturas();
   if(tab==='tickets') renderTicketsSubtab();
-  // Show correct FAB
+  // FAB
   const fabC=document.getElementById('fab-container');
   const fabTicket=document.getElementById('fab-ticket');
   if(fabC) fabC.style.display=(tab==='tickets')?'none':'flex';
   if(fabTicket) fabTicket.style.display=(tab==='tickets')?'flex':'none';
   closeFab();
-  // Clear search on tab switch
+  // Clear search
   const si=document.getElementById('fact-search-input');
   if(si) si.value='';
   const scb=document.getElementById('fact-search-clear');
@@ -2678,10 +2686,12 @@ function subTabTouchMove(e){
   if(!subTabSwiping) return;
   const track=document.getElementById('subtab-track');
   if(!track) return;
-  const idx={'facturas':0,'registros':1,'tickets':2}[currentSubTab]||0;
-  const base=-(idx/3)*100;
-  const pct=base+(dx/window.innerWidth)*(100/3);
-  const clamped=Math.max(-(2/3)*100,Math.min(0,pct));
+  const TABS=['facturas','registros','pending','tickets'];
+  const N=TABS.length;
+  const idx=TABS.indexOf(currentSubTab)||0;
+  const base=-(idx/N)*100;
+  const pct=base+(dx/window.innerWidth)*(100/N);
+  const clamped=Math.max(-((N-1)/N)*100,Math.min(0,pct));
   track.style.transform=`translateX(${clamped}%)`;
 }
 function subTabTouchEnd(e){
@@ -2689,10 +2699,10 @@ function subTabTouchEnd(e){
   subTabSwiping=false;
   const dx=e.changedTouches[0].clientX-subTabStartX;
   const dy=e.changedTouches[0].clientY-subTabStartY;
-  const tabs=['facturas','registros','tickets'];
+  const tabs=['facturas','registros','pending','tickets'];
   const cur=tabs.indexOf(currentSubTab);
   if(Math.abs(dx)>=50&&Math.abs(dx)>Math.abs(dy)){
-    if(dx<0&&cur<2) switchSubTab(tabs[cur+1]);
+    if(dx<0&&cur<tabs.length-1) switchSubTab(tabs[cur+1]);
     else if(dx>0&&cur>0) switchSubTab(tabs[cur-1]);
     else snapTrack(cur);
   } else {
@@ -2700,17 +2710,18 @@ function subTabTouchEnd(e){
   }
 }
 function snapTrack(idx){
+  const N=4;
   const track=document.getElementById('subtab-track');
-  if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=`translateX(${-(idx/3)*100}%)`; }
+  if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=`translateX(${-(idx/N)*100}%)`; }
 }
 // ── Background file processing ─────────────────────────────────────────────
 async function handleClaudeFilesBackground(files){
   if(!files||!files.length) return;
   if(!claudeKey.startsWith('sk-ant-')){ alert('Configura la API key en Config primero.'); return; }
 
-  // 1. Ir a Historial inmediatamente con animación stamp
-  switchSubTab('facturas');
-  showStampToast(files.length, true); // true = modo "procesando"
+  // 1. Ir a F 🧾 inmediatamente con animación stamp
+  switchSubTab('pending');
+  showStampToast(files.length, true);
 
   for(const file of files){
     const tempId = 'bg_'+Date.now()+'_'+Math.random().toString(36).slice(2);
@@ -2829,9 +2840,9 @@ function renderPendingFacturas(searchQ=''){
     (f.fecha||'').includes(sq)
   );
   // Badge en pestaña
-  const btn=document.getElementById('subtab-registros-btn');
-  const count=allRecs.filter(f=>f.status==='pending').length;
-  if(btn) btn.innerHTML=`F 🧾${count>0?` <span style="background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:800;vertical-align:top;margin-top:1px;">${count}</span>`:''}`;
+  const btn=document.getElementById('subtab-pending-btn');
+  const count=allRecs.filter(f=>f.status==='pending'||f.status==='analyzing').length;
+  if(btn) btn.innerHTML=count>0?`F 🧾 <span style="background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:800;vertical-align:top;margin-top:1px;">${count}</span>`:'F 🧾';
 
   if(!pending.length){
     wrap.innerHTML=`<div class="pending-empty">
@@ -3563,6 +3574,8 @@ function onSearchInput(){
     renderList();
   } else if(currentSubTab==='registros'){
     renderRegistros(q);
+  } else if(currentSubTab==='pending'){
+    renderPendingFacturas(q);
   } else if(currentSubTab==='tickets'){
     renderTicketsSubtab(q);
   }
@@ -3669,7 +3682,7 @@ function subTabTouchMovePassive(e){
   e.preventDefault();
   const track=document.getElementById('subtab-track');
   if(!track) return;
-  const idx={'facturas':0,'registros':1,'tickets':2}[currentSubTab]||0;
+  const idx={'facturas':0,'registros':1,'pending':2,'tickets':3}[currentSubTab]||0;
   const base=-(idx/3)*100;
   const pct=base+(dx/window.innerWidth)*(100/3);
   const clamped=Math.max(-(2/3)*100,Math.min(0,pct));
@@ -4333,9 +4346,9 @@ function renderAll(){
   updateFactSearchBar();
   // Update F 🧾 badge
   const pendingCount=Object.values(data).flat().filter(f=>f.status==='pending').length;
-  const fBtn=document.getElementById('subtab-registros-btn');
-  if(fBtn) fBtn.innerHTML=`F 🧾${pendingCount>0?` <span style="background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:800;vertical-align:top;margin-top:1px;">${pendingCount}</span>`:''}`;
-  if(currentSubTab==='registros') renderPendingFacturas();
+  const fBtn=document.getElementById('subtab-pending-btn');
+  if(fBtn) fBtn.innerHTML=pendingCount>0?`F 🧾 <span style="background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:800;vertical-align:top;margin-top:1px;">${pendingCount}</span>`:'F 🧾';
+  if(currentSubTab==='pending') renderPendingFacturas();
   if(document.getElementById('tab-insights')?.classList.contains('active')&&currentInsightsTab==='calendario') renderCalendario();
 }
 function skeletonItems(n){

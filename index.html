@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.320</div>
+    <div class="login-version">v5.321</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.320</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.321</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -805,7 +805,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.320</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.321</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -5392,6 +5392,16 @@ function generateTicketPDF(rec){
   return doc.output('arraybuffer');
 }
 
+function getQuarterFromDate(fecha){
+  if(!fecha) return null;
+  const d=new Date(fecha);
+  if(isNaN(d)) return null;
+  const m=d.getMonth()+1;
+  const y=d.getFullYear();
+  const qt=m<=3?'1T':m<=6?'2T':m<=9?'3T':'4T';
+  return qt+' '+y;
+}
+
 async function approveTicketWithDrive(t){
   const numFact=await getNextTicketNum();
   const bruto=t.importe||0;
@@ -5479,32 +5489,36 @@ async function discardTicket(i){
 async function approveTicket(i){
   const t=ticketsPendientes[i];
   if(!t) return;
-  // Disable button while processing
   const btn=document.querySelector(`#tickets-pending-list .approve-btn-${i}`);
   if(btn){ btn.textContent='⏳'; btn.disabled=true; }
   const rec=await approveTicketWithDrive(t);
-  if(!data[Q]) data[Q]=[];
-  data[Q].push(rec);
+  // Determinar trimestre desde la fecha del ticket
+  const ticketQ=getQuarterFromDate(t.fecha)||Q;
+  rec._quarter=ticketQ;
+  if(!data[ticketQ]) data[ticketQ]=[];
+  data[ticketQ].push(rec);
   saveLocal(); renderAll();
-  if(token) saveDataToDrive(Q).catch(()=>{});
+  if(token) saveDataToDrive(ticketQ).catch(()=>{});
   ticketsPendientes.splice(i,1);
   await saveTicketsPending();
-  renderTicketsPendientes();
+  renderTicketsSubtab();
 }
 
 async function approveAllTickets(){
   if(!ticketsPendientes.length) return;
-  if(!data[Q]) data[Q]=[];
-  // Process sequentially to keep ticket numbers ordered
-  for(const t of ticketsPendientes){
+  const saved=[...ticketsPendientes];
+  for(const t of saved){
     const rec=await approveTicketWithDrive(t);
-    data[Q].push(rec);
+    const ticketQ=getQuarterFromDate(t.fecha)||Q;
+    rec._quarter=ticketQ;
+    if(!data[ticketQ]) data[ticketQ]=[];
+    data[ticketQ].push(rec);
+    if(token) saveDataToDrive(ticketQ).catch(()=>{});
   }
   saveLocal(); renderAll();
-  if(token) saveDataToDrive(Q).catch(()=>{});
   ticketsPendientes=[];
   await saveTicketsPending();
-  renderTicketsPendientes();
+  renderTicketsSubtab();
 }
 
 function discardAllTickets(){

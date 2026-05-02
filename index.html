@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.329</div>
+    <div class="login-version">v5.331</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.329</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.331</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -805,7 +805,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.329</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.331</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -4970,6 +4970,53 @@ async function handleTicketText(){
   if(!text) return;
   if(!claudeKey||!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
   const status=document.getElementById('ticket-analysis-status');
+
+  // ── Pre-parser JS para formato columnar (sin Claude) ──────────────────
+  const MESES={enero:31,ene:31,febre:28,feb:28,marzo:31,mar:31,abril:30,abr:30,
+    mayo:31,junio:30,jun:30,julio:31,jul:31,agosto:31,ago:31,
+    septiembre:30,sep:30,octubre:31,oct:31,noviembre:30,nov:30,diciembre:31,dic:31};
+  const year=new Date().getFullYear();
+  const preResults=[];
+  for(const line of text.split('\n')){
+    const parts=line.trim().split(/\s{2,}|\t/).map(p=>p.trim()).filter(Boolean);
+    if(parts.length<4) continue;
+    // Detect sumup monthly: first col = "sumup", second col = month name
+    const col0=parts[0].toLowerCase();
+    const col1=parts[1].toLowerCase();
+    if((col0==='sumup'||col0==='su') && MESES[col1]!==undefined){
+      const lastDay=MESES[col1];
+      const mesNum=Object.keys(MESES).indexOf(col1);
+      // Map month name to month number
+      const mesMap={enero:1,ene:1,febre:2,feb:2,marzo:3,mar:3,abril:4,abr:4,
+        mayo:5,junio:6,jun:6,julio:7,jul:7,agosto:8,ago:8,
+        septiembre:9,sep:9,octubre:10,oct:10,noviembre:11,nov:11,diciembre:12,dic:12};
+      const mesN=mesMap[col1];
+      if(!mesN) continue;
+      const fecha=`${year}-${String(mesN).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`;
+      // Parse base and IVA
+      const parseNum=s=>parseFloat(s.replace(/[€\s]/g,'').replace(',','.'));
+      const base=parseNum(parts[2]||'0');
+      const importe=Math.round(base*1.21*100)/100;
+      const concepto=parts[5]||parts[4]||'Ingresos por SumUp';
+      preResults.push({fecha,hora:'',importe,pct_iva:21,concepto,metodo:'sumup',cliente:''});
+    }
+  }
+  if(preResults.length>0){
+    preResults.sort((a,b)=>a.fecha.localeCompare(b.fecha));
+    const existing=Object.values(data).flat();
+    preResults.forEach(t=>{
+      t._dup=existing.some(f=>f.doc_type==='ticket'&&f.fecha===t.fecha&&Math.abs((f.ingresos_brutos||0)-t.importe)<0.01);
+    });
+    ticketsPendientes=[...ticketsPendientes,...preResults];
+    await saveTicketsPending();
+    closeTicketModal();
+    renderTicketsSubtab();
+    const n=preResults.length;
+    showToast(`✓ ${n===1?'1 pago añadido':n+' pagos añadidos'} a Pendientes`,'success');
+    haptic('success');
+    return;
+  }
+  // ── Fallback: Claude para otros formatos ─────────────────────────────
   status.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 0;">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" style="animation:spin 1s linear infinite;flex-shrink:0;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
     <span style="color:var(--text-2);font-size:13px;font-weight:600;">Analizando con Claude...</span>
@@ -5014,7 +5061,7 @@ El texto puede tener estos formatos:
 FORMATO COLUMNAS (el más común):
   Nombre  Fecha  Base  IVA  Método  Concepto
   Ejemplo: "Sara Tortosa  31/03/2026  61,98 €  13,02 €  Bizum  Clases marzo"
-  → importe = el TOTAL que aparece en el texto (base + IVA). Si el texto tiene base e IVA separados pero no el total, suma ambos: 82,64 + 17,36 = 100,00. El importe siempre es el bruto total cobrado.
+  → importe = base × 1.21 redondeado a 2 decimales. NO sumes base+IVA directamente porque da errores de redondeo. Ejemplo: base 82,64 → importe = round(82.64 × 1.21, 2) = 100,00.
   → fecha puede ser DD/MM/YYYY o D/M/YYYY
   → metodo: si dice "Bizum" → "bizum", "Transferencia" → "transferencia", "SumUp" o "Tarjeta" → "sumup"
   → cliente = nombre de la primera columna

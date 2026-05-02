@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.326</div>
+    <div class="login-version">v5.329</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.326</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.329</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -805,7 +805,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.326</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.329</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -1081,7 +1081,7 @@ const FS_URL=`https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databas
 function currentQuarter(){ const m=new Date().getMonth(); const q=m<3?'1T':m<6?'2T':m<9?'3T':'4T'; return q+' 2026'; }
 let pin='', Q=currentQuarter(), data={}, token=null, user=null, driveLoaded=false;
 let regQ=currentQuarter(), regView='gastos', regQScrollInit=false;
-let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, ticketsFId=null, sheetId=null;
+let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, ticketsFId=null, gastosFId=null, ingresosFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
 
 const JUST_OPTIONS=[
@@ -2118,7 +2118,7 @@ function saveAnalysis(divId, count){
           if(inData){ inData._driveUploading=true; delete inData._driveError; }
         });
         renderAll();
-        uploadFileToDrive(new File([savedFile],newName,{type:savedFile.type}),Q).then(created=>{
+        uploadFileToDrive(new File([savedFile],newName,{type:savedFile.type}),Q,savedItems[0]?.tipo||'gasto').then(created=>{
           savedItems.forEach(rec=>{
             const inData=Object.values(data).flat().find(x=>x._id==rec._id);
             if(inData){
@@ -2157,7 +2157,7 @@ async function driveReq(url,opts={}){
   return r;
 }
 async function findOrCreate(name,parent){ const q=encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parent}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`); const j=await r.json(); if(j.files&&j.files.length) return j.files[0].id; const cr=await driveReq('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,mimeType:'application/vnd.google-apps.folder',parents:[parent]})}); return (await cr.json()).id; }
-async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); ticketsFId=await findOrCreate('tickets',rootFId); await loadDriveFiles(); await loadFromDrive(); setDS('ok','Drive OK'); hideSyncBanner(); }catch(e){setDS('err','Error Drive'); hideSyncBanner(); } }
+async function initDrive(){ if(!token){setDS('err','Sin Drive');return;} setDS('sync','Conectando...'); try{ rootFId=await findOrCreate('MiGestor','root'); dataFId=await findOrCreate('datos',rootFId); facturasFId=await findOrCreate('facturas',rootFId); ticketsFId=await findOrCreate('tickets',rootFId); gastosFId=await findOrCreate('gastos',facturasFId); ingresosFId=await findOrCreate('ingresos',facturasFId); await loadDriveFiles(); await loadFromDrive(); setDS('ok','Drive OK'); hideSyncBanner(); }catch(e){setDS('err','Error Drive'); hideSyncBanner(); } }
 async function loadDriveFiles(){
   if(!token||!facturasFId) return;
   try{
@@ -2209,7 +2209,20 @@ async function loadFromDrive(){
   const el=document.getElementById('drive-last-sync'); if(el) el.textContent='Última sync: '+new Date().toLocaleTimeString('es');
   updateSI();
 }
-async function uploadFileToDrive(file,q){ if(!token||!facturasFId) return null; const qFId=await findOrCreate(q,facturasFId); const meta=JSON.stringify({name:file.name,parents:[qFId]}); const form=new FormData(); form.append('metadata',new Blob([meta],{type:'application/json'})); form.append('file',file); const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); const created=await r.json(); driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); renderDriveTab(); return created; }
+async function uploadFileToDrive(file,q,tipo='gasto'){ 
+  if(!token||!facturasFId) return null; 
+  const parentFId=(tipo==='ingreso'&&ingresosFId)?ingresosFId:(gastosFId||facturasFId);
+  const qFId=await findOrCreate(q,parentFId); 
+  const meta=JSON.stringify({name:file.name,parents:[qFId]}); 
+  const form=new FormData(); 
+  form.append('metadata',new Blob([meta],{type:'application/json'})); 
+  form.append('file',file); 
+  const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form}); 
+  const created=await r.json(); 
+  driveFiles.push({id:created.id,name:file.name,quarter:q,link:created.webViewLink,ts:new Date().toISOString()}); 
+  renderDriveTab(); 
+  return created; 
+}
 async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
 function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
 
@@ -4316,7 +4329,7 @@ function _quickUploadFile(id, mode){
       const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
       const newName=[fecha,prov].filter(Boolean).join('_')+ext;
       const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==id));
-      const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q||Q).catch(()=>null);
+      const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q||Q,f?.tipo||'gasto').catch(()=>null);
       loader.remove();
       if(created&&created.webViewLink){
         f._driveLink=created.webViewLink;
@@ -4348,7 +4361,7 @@ function uploadFromModal(){
       const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
       const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
       const q=(f&&f._quarter)||Q;
-      const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q).catch(()=>null);
+      const created=await uploadFileToDrive(new File([file],newName,{type:file.type}),q,f?.tipo||'gasto').catch(()=>null);
       if(created&&f){ f._driveLink=created.webViewLink; saveLocal(); }
       const driveBtn=document.getElementById('modal-drive-btn');
       driveBtn.textContent='📂 Ver en Drive'; driveBtn._link=created&&created.webViewLink;
@@ -4547,7 +4560,7 @@ async function handleReprocessFile(files){
       const numf=(f0.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20);
       const ext=file.name.includes('.')?'.'+file.name.split('.').pop().toLowerCase():'.jpg';
       const newName=[fecha,prov,numf].filter(Boolean).join('_')+ext;
-      uploadFileToDrive(new File([file],newName,{type:file.type}),q).catch(()=>{});
+      uploadFileToDrive(new File([file],newName,{type:file.type}),q,f0?.tipo||'gasto').catch(()=>{});
     }
     // Force registros and modelos to show the right quarter
     regQ=q; Q=q;
@@ -4979,14 +4992,6 @@ async function handleTicketText(){
     const existing=getF(Q);
     deduped.forEach(t=>{ t._dup=existing.some(f=>f.doc_type==='ticket'&&f.fecha===t.fecha&&Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01); });
     ticketsPendientes=[...ticketsPendientes,...deduped];
-    // Dedup contra pending existentes — solo fecha+importe
-    const pendingSeen=new Set();
-    ticketsPendientes=ticketsPendientes.filter(t=>{
-      const key=(t.fecha||'')+'|'+(t.importe||0);
-      if(pendingSeen.has(key)) return false;
-      pendingSeen.add(key);
-      return true;
-    });
     await saveTicketsPending();
     status.textContent='';
     closeTicketModal();
@@ -5114,14 +5119,6 @@ async function handleTicketFile(file){
       );
     });
     ticketsPendientes=[...ticketsPendientes,...deduped];
-    // Dedup contra pending existentes — solo fecha+importe
-    const pendingSeen=new Set();
-    ticketsPendientes=ticketsPendientes.filter(t=>{
-      const key=(t.fecha||'')+'|'+(t.importe||0);
-      if(pendingSeen.has(key)) return false;
-      pendingSeen.add(key);
-      return true;
-    });
     saveTicketsPending();
     status.textContent='';
     closeTicketModal();
@@ -5488,6 +5485,11 @@ async function discardTicket(i){
 async function approveTicket(i){
   const t=ticketsPendientes[i];
   if(!t) return;
+  // Avisar si es posible duplicado
+  if(t._dup){
+    const ok=confirm(`⚠️ Posible duplicado\n\nYa existe una factura de "${t.cliente||t.concepto||'este cliente'}" con la misma fecha e importe en el historial.\n\n¿Aprobar igualmente?`);
+    if(!ok){ renderTicketsSubtab(); return; }
+  }
   const btn=document.querySelector(`#tickets-pending-list .approve-btn-${i}`);
   if(btn){ btn.textContent='⏳'; btn.disabled=true; }
   const rec=await approveTicketWithDrive(t);

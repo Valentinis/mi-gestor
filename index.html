@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.333</div>
+    <div class="login-version">v5.337</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.333</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.337</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -805,7 +805,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.333</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.337</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2401,7 +2401,6 @@ function deleteFromModal(){
       saveDataToDrive(q).catch(()=>{});
       if(driveLink) deleteDriveFileIfOrphan(driveLink);
     }
-    saveToFirestore().catch(()=>{});
   }
   closeModal();
 }
@@ -4152,6 +4151,21 @@ function renderList(){
       const isIng=f.tipo==='ingreso';
       const amount=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0));
       const fid=String(f._id);
+      // Processing state
+      if(f._processing) return `<div class="fact-item" style="cursor:default;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);opacity:0.6;">
+        <div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:var(--accent);animation:pulse 1s ease-in-out infinite;"></div>
+        <div class="fact-main">
+          <div class="fact-name">${f.proveedor_cliente||'—'}</div>
+          <div class="fact-sub" style="color:var(--accent);">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite;vertical-align:middle;margin-right:3px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            Procesando...
+          </div>
+        </div>
+        <div class="fact-right">
+          <div class="fact-amount" style="color:var(--green);font-weight:700;">+${fmt(f.ingresos_brutos||0)}</div>
+          <div class="fact-date">${fmtFecha(f.fecha)}</div>
+        </div>
+      </div>`;
       return `<div class="fact-item" onclick="openModal('${fid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);">
         <div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:${getBarColor(f)};"></div>
         <div class="fact-main">
@@ -5493,7 +5507,10 @@ async function approveTicketWithDrive(t){
       const blob=new Blob([pdfBuffer],{type:'application/pdf'});
       const fileName=numFact+'_'+(rec.fecha||'').replace(/-/g,'')+'_'+(t.cliente||'venta').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20)+'.pdf';
       const file=new File([blob],fileName,{type:'application/pdf'});
-      const meta=JSON.stringify({name:fileName,parents:[ticketsFId]});
+      // Crear subcarpeta por trimestre
+      const ticketQ=getQuarterFromDate(t.fecha)||Q;
+      const qFolderId=await findOrCreate(ticketQ,ticketsFId);
+      const meta=JSON.stringify({name:fileName,parents:[qFolderId]});
       const form=new FormData();
       form.append('metadata',new Blob([meta],{type:'application/json'}));
       form.append('file',file);
@@ -5545,26 +5562,66 @@ async function discardTicket(i){
 }
 
 async function approveTicket(i){
+  if(window._approvingTicket) return;
+  window._approvingTicket=true;
   const t=ticketsPendientes[i];
-  if(!t) return;
-  // Avisar si es posible duplicado
+  if(!t){ window._approvingTicket=false; return; }
+
   if(t._dup){
     const ok=confirm(`⚠️ Posible duplicado\n\nYa existe una factura de "${t.cliente||t.concepto||'este cliente'}" con la misma fecha e importe en el historial.\n\n¿Aprobar igualmente?`);
-    if(!ok){ renderTicketsSubtab(); return; }
+    if(!ok){ window._approvingTicket=false; renderTicketsSubtab(); return; }
   }
-  const btn=document.querySelector(`#tickets-pending-list .approve-btn-${i}`);
-  if(btn){ btn.textContent='⏳'; btn.disabled=true; }
-  const rec=await approveTicketWithDrive(t);
-  // Determinar trimestre desde la fecha del ticket
-  const ticketQ=getQuarterFromDate(t.fecha)||Q;
-  rec._quarter=ticketQ;
-  if(!data[ticketQ]) data[ticketQ]=[];
-  data[ticketQ].push(rec);
-  saveLocal(); renderAll();
-  if(token) saveDataToDrive(ticketQ).catch(()=>{});
+
+  // 1. Quitar de pendientes y navegar a Historial INMEDIATAMENTE
   ticketsPendientes.splice(i,1);
-  await saveTicketsPending();
+  saveTicketsPending();
+  switchSubTab('facturas');
+  haptic('success');
+
+  // 2. Insertar placeholder con estado "procesando" en data
+  const ticketQ=getQuarterFromDate(t.fecha)||Q;
+  const tempId='processing_'+Date.now();
+  const placeholder={
+    _id:tempId,
+    _quarter:ticketQ,
+    _processing:true,
+    tipo:'ingreso',
+    doc_type:'ticket',
+    proveedor_cliente:t.cliente||'Venta directa',
+    fecha:t.fecha||'',
+    concepto:t.concepto||'Venta / servicio de cerámica',
+    base_iva:0, cuota_iva:0, ingresos_brutos:t.importe||0,
+    operacion:'INT'
+  };
+  if(!data[ticketQ]) data[ticketQ]=[];
+  data[ticketQ].push(placeholder);
+  renderAll();
   renderTicketsSubtab();
+
+  // 3. Procesar en background
+  try{
+    const rec=await approveTicketWithDrive(t);
+    // Reemplazar placeholder con el registro real
+    if(data[ticketQ]){
+      const idx=data[ticketQ].findIndex(x=>x._id===tempId);
+      if(idx>=0) data[ticketQ].splice(idx,1);
+    }
+    rec._quarter=ticketQ;
+    if(!data[ticketQ]) data[ticketQ]=[];
+    data[ticketQ].push(rec);
+    saveLocal(); renderAll();
+    if(token) saveDataToDrive(ticketQ).catch(()=>{});
+    showToast('✓ Ticket aprobado','success');
+  }catch(e){
+    // En caso de error, quitar el placeholder y devolver a pendientes
+    if(data[ticketQ]) data[ticketQ]=data[ticketQ].filter(x=>x._id!==tempId);
+    ticketsPendientes.push(t);
+    saveTicketsPending();
+    renderAll();
+    renderTicketsSubtab();
+    showToast('❌ Error al aprobar: '+e.message,'error');
+  }
+  window._approvingTicket=false;
 }
 
 async function approveAllTickets(){

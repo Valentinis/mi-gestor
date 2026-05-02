@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.304</div>
+    <div class="login-version">v5.305</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -437,7 +437,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="header-subtabs" style="display:flex;gap:20px;align-items:center;">
           <button id="subtab-facturas-btn" onclick="switchSubTab('facturas')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--accent);white-space:nowrap;transition:color .25s ease;">Facturas</button>
           <button id="subtab-registros-btn" onclick="switchSubTab('registros')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Registros</button>
-          <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Tickets</button>
+          <button id="subtab-tickets-btn" onclick="switchSubTab('tickets')" style="padding:0;font-size:15px;font-weight:800;border:none;background:none;cursor:pointer;color:var(--text-3);white-space:nowrap;transition:color .25s ease;">Pendientes</button>
         </div>
         <!-- Resultado: subtabs -->
         <div id="header-resultado-tabs" style="display:none;gap:20px;align-items:center;">
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.304</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.305</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -809,7 +809,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.304</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.305</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -885,7 +885,7 @@ img,video,iframe,table{max-width:100%;}
 <!-- Empty state -->
 <div id="tickets-empty" style="padding:48px 0;text-align:center;">
   <div style="margin-bottom:12px;opacity:0.3;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-  <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin tickets pendientes</div>
+  <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Sin facturas pendientes</div>
   <div style="font-size:13px;color:var(--text-3);">Sube un extracto de SumUp, un Bizum o una transferencia</div>
 </div>
 </div><!-- end scrollable -->
@@ -2453,7 +2453,7 @@ async function syncFromFirestore(){
     const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
     const j=await r.json();
     if(!j.documents||!j.documents.length){
-      list.innerHTML='<div style="padding:40px 0;text-align:center;color:var(--text-3);"><div style="margin-bottom:8px;opacity:0.3;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div style="font-size:14px;font-weight:600;color:var(--text);">Sin tickets pendientes</div><div style="font-size:12px;margin-top:4px;">Los pagos de la app del taller aparecerán aquí</div></div>';
+      list.innerHTML='<div style="padding:40px 0;text-align:center;color:var(--text-3);"><div style="margin-bottom:8px;opacity:0.3;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div style="font-size:14px;font-weight:600;color:var(--text);">Sin facturas pendientes</div><div style="font-size:12px;margin-top:4px;">Los pagos de la app del taller aparecerán aquí</div></div>';
       return;
     }
     renderTickets(j.documents);
@@ -2635,7 +2635,7 @@ function renderTicketsSubtab(searchQ=''){
   if(!pending.length){
     html+=`<div style="padding:40px 0;text-align:center;opacity:0.4;">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;"><path d="M2 9a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4V9z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
-      <div style="font-size:13px;color:var(--text-3);">${sq?'Sin resultados':'Sin tickets pendientes'}</div>
+      <div style="font-size:13px;color:var(--text-3);">${sq?'Sin resultados':'Sin facturas pendientes'}</div>
     </div>`;
   } else {
     html+=pending.map((t,i)=>{
@@ -4568,12 +4568,7 @@ function hasDriveBackup(f){
   if(f._driveLink) return true;
   if(!f.fecha) return false;
   const datePrefix=(f.fecha||'').slice(0,10);
-  const found=driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
-  if(!found&&driveFiles.length>0&&f.fecha){
-    // Debug: show first mismatch
-    console.log('No match for',datePrefix,'in',driveFiles.slice(0,2).map(d=>d.name));
-  }
-  return found;
+  return driveFiles.some(df=>df.name&&df.name.startsWith(datePrefix));
 }
 function driveIcon(f){
   if(f._driveUploading) return '<span title="Subiendo..." style="font-size:13px;background:var(--bg-raised);color:var(--text-3);border-radius:4px;padding:1px 4px;animation:spin 1s linear infinite;display:inline-block;">↻</span>';
@@ -5068,24 +5063,26 @@ async function analyzeTicketWithClaude(file){
     r.readAsDataURL(file);
   });
   const mediaType=file.type;
-  const prompt=`Eres un extractor de datos de pagos para un autónomo ceramista en Barcelona.
-Analiza la imagen y extrae TODAS las transacciones de ingreso que aparezcan.
+  const prompt=`Eres un extractor de datos de pagos para un autónomo ceramista en Barcelona (Valentín López Pérez, NIF 48220739C).
+Analiza el documento y extrae TODAS las transacciones de ingreso que aparezcan.
 
 Fuentes posibles:
 - SumUp (extracto de ventas): cada transacción tiene fecha de encabezado de día, hora, importe, tipo de tarjeta (Visa/Mastercard). Sin nombre de cliente.
 - Imagin Bizum recibido: tipo "Bizum recibido", importe con +, fecha y hora, nombre del ordenante, concepto informado por el ordenante.
 - Imagin Transferencia: tipo "Transfer inmediata", importe con +, fecha y hora, nombre del remitente (campo "Ampliacion remitente"), concepto de la transferencia.
+- Factura simplificada emitida por Valentín: el emisor ES Valentín López Pérez o NIF 48220739C. Extrae el cliente (destinatario), importe total, fecha, concepto del servicio. metodo="transferencia" si no se indica otro método.
 
 Para cada transacción devuelve un objeto JSON con:
 - fecha: "YYYY-MM-DD"
 - hora: "HH:MM" (si está disponible, si no "")
-- importe: número decimal (el importe bruto recibido, positivo)
-- concepto: descripción clara. Para SumUp: "Venta tarjeta [Visa/Mastercard]". Para Bizum: "[Nombre ordenante] — [concepto]". Para transferencia: "[Nombre remitente] — [concepto]".
+- importe: número decimal (el importe TOTAL cobrado con IVA, positivo)
+- pct_iva: número (porcentaje de IVA, por defecto 21)
+- concepto: descripción clara del servicio
 - metodo: "sumup", "bizum" o "transferencia"
-- cliente: nombre del pagador si existe, "" si no (SumUp no tiene)
+- cliente: nombre del pagador/cliente si existe, "" si no
 
 Devuelve SOLO un array JSON válido, sin texto adicional, sin markdown, sin explicaciones.
-Ejemplo: [{"fecha":"2024-01-19","hora":"18:34","importe":18.00,"concepto":"Venta tarjeta Mastercard","metodo":"sumup","cliente":""},{"fecha":"2024-01-19","hora":"17:03","importe":37.00,"concepto":"Venta tarjeta Visa","metodo":"sumup","cliente":""}]`;
+Ejemplo: [{"fecha":"2026-01-30","hora":"","importe":100.00,"pct_iva":21,"concepto":"Clases semanales de cerámica - Febrero","metodo":"transferencia","cliente":"Cateau Oonk"}]`;
 
   const content=isImg
     ?[{type:'image',source:{type:'base64',media_type:mediaType,data:b64}},{type:'text',text:prompt}]
@@ -5113,8 +5110,11 @@ function renderTicketsPendientes(){
   }
   empty.style.display='none';
   wrap.style.display='block';
+  // Ordenar por fecha descendente (más reciente primero)
+  const sorted=[...ticketsPendientes].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
   const list=document.getElementById('tickets-pending-list');
-  list.innerHTML=ticketsPendientes.map((t,i)=>{
+  list.innerHTML=sorted.map((t,i)=>{
+    const realIdx=ticketsPendientes.indexOf(t);
     const isDup=t._dup;
     const border=isDup?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);';
     const dupBadge=isDup?'<span style="font-size:10px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">posible dup.</span>':'';
@@ -5132,8 +5132,8 @@ function renderTicketsPendientes(){
         </div>
       </div>
       <div style="display:flex;gap:6px;margin-top:10px;">
-        <button onclick="approveTicket(${i})" class="approve-btn-${i}" style="flex:1;background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aprobar</button>
-        <button onclick="discardTicket(${i})" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
+        <button onclick="approveTicket(${realIdx})" class="approve-btn-${realIdx}" style="flex:1;background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aprobar</button>
+        <button onclick="discardTicket(${realIdx})" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
       </div>
     </div>`;
   }).join('');
@@ -5167,113 +5167,140 @@ async function getNextTicketNum(){
     num=parseInt(localStorage.getItem(k)||'0')+1;
     localStorage.setItem(k,num);
   }
-  return 'FS-'+year+'-'+String(num).padStart(3,'0');
+  return 'T'+String(year).slice(2)+String(num).padStart(4,'0');
 }
 
 function generateTicketPDF(rec){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'mm',format:'a4'});
   const W=210, mg=20;
-  const base=(rec.base_iva||0).toFixed(2);
-  const iva=(rec.cuota_iva||0).toFixed(2);
-  const total=(rec.ingresos_brutos||0).toFixed(2);
+  const base=parseFloat((rec.base_iva||0).toFixed(2));
+  const ivaAmt=parseFloat((rec.cuota_iva||0).toFixed(2));
+  const total=parseFloat((rec.ingresos_brutos||0).toFixed(2));
+  const pctIva=rec.pct_iva||21;
   const cliente=rec.proveedor_cliente&&rec.proveedor_cliente!=='Venta directa'?rec.proveedor_cliente:'';
+  const fecha=rec.fecha||'—';
+  const numFact=rec.num_factura||'';
+  const concepto=rec.concepto||'Venta / servicio de cerámica';
 
-  // Header bar
-  doc.setFillColor(212,105,30);
-  doc.rect(0,0,W,18,'F');
-  doc.setTextColor(255,255,255);
+  // ── Emisor (izquierda) ──────────────────────────────────
   doc.setFont('helvetica','bold');
   doc.setFontSize(13);
-  doc.text('FACTURA SIMPLIFICADA',mg,12);
-  doc.setFontSize(11);
-  doc.text(rec.num_factura||'',W-mg,12,{align:'right'});
-
-  // Emisor
   doc.setTextColor(30,30,30);
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(12);
-  doc.text('Valentín López Pérez',mg,30);
+  doc.text('Valentín López Pérez',mg,22);
   doc.setFont('helvetica','normal');
   doc.setFontSize(9);
   doc.setTextColor(80,80,80);
-  doc.text('NIF: 48220739C',mg,36);
-  doc.text('Badajoz 95 LOC 1, 08005 Barcelona',mg,41);
-  doc.text('valentinnlopez@gmail.com  ·  686 544 922',mg,46);
+  doc.text('48220739C',mg,28);
+  doc.text('Carrer Badajoz 95',mg,33);
+  doc.text('Barcelona (08005), Barcelona, España',mg,38);
+  doc.text('valentinnlopez@gmail.com',mg,43);
+  doc.text('686544921',mg,48);
 
-  // Meta
-  doc.setDrawColor(212,105,30);
-  doc.setLineWidth(0.4);
-  doc.line(mg,52,W-mg,52);
+  // ── Título factura (derecha) ────────────────────────────
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(13);
+  doc.setTextColor(30,30,30);
+  doc.text('FACTURA SIMPLIFICADA #'+numFact,W-mg,22,{align:'right'});
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
   doc.setTextColor(80,80,80);
-  doc.setFontSize(9);
-  doc.text('Fecha de expedición: '+(rec.fecha||'—'),mg,58);
-  doc.text('Método de pago: '+(rec.notas||'—'),mg,63);
+  doc.text('Fecha: '+fecha,W-mg,29,{align:'right'});
+  doc.text('1/1',W-mg,35,{align:'right'});
 
-  // Cliente
-  let y=72;
+  // ── Cliente ─────────────────────────────────────────────
+  let y=58;
   if(cliente){
-    doc.setFillColor(248,245,241);
-    doc.roundedRect(mg,y-5,W-mg*2,14,2,2,'F');
     doc.setFont('helvetica','bold');
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.setTextColor(30,30,30);
-    doc.text('Cliente:',mg+3,y+2);
+    doc.text(cliente,mg,y);
     doc.setFont('helvetica','normal');
-    doc.text(cliente,mg+22,y+2);
-    y+=18;
+    doc.setFontSize(9);
+    doc.setTextColor(80,80,80);
+    y+=5;
+    doc.text('Total '+total.toFixed(2)+'€',mg,y);
+    y+=10;
+  } else {
+    y=62;
   }
 
-  // Table header
-  doc.setFillColor(212,105,30);
-  doc.rect(mg,y,W-mg*2,8,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(9);
-  doc.text('Concepto',mg+3,y+5.5);
-  doc.text('Importe',W-mg-3,y+5.5,{align:'right'});
+  // ── Separador ───────────────────────────────────────────
+  doc.setDrawColor(200,200,200);
+  doc.setLineWidth(0.3);
+  doc.line(mg,y,W-mg,y);
+  y+=6;
 
-  // Table row
-  y+=8;
+  // ── Cabecera tabla ──────────────────────────────────────
+  const cols={
+    concepto: mg,
+    precio:   mg+80,
+    uds:      mg+108,
+    subtotal: mg+122,
+    iva:      mg+142,
+    total:    W-mg
+  };
+  doc.setFillColor(240,240,240);
+  doc.rect(mg,y,W-mg*2,7,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(8);
+  doc.setTextColor(60,60,60);
+  doc.text('CONCEPTO',cols.concepto+2,y+5);
+  doc.text('PRECIO',cols.precio,y+5,{align:'left'});
+  doc.text('UNIDADES',cols.uds,y+5,{align:'left'});
+  doc.text('SUBTOTAL',cols.subtotal,y+5,{align:'left'});
+  doc.text('IVA',cols.iva,y+5,{align:'left'});
+  doc.text('TOTAL',cols.total,y+5,{align:'right'});
+  y+=7;
+
+  // ── Fila producto ───────────────────────────────────────
   doc.setFillColor(252,252,252);
   doc.rect(mg,y,W-mg*2,9,'F');
   doc.setDrawColor(220,220,220);
   doc.rect(mg,y,W-mg*2,9,'S');
-  doc.setTextColor(30,30,30);
   doc.setFont('helvetica','normal');
-  doc.setFontSize(9);
-  doc.text('Venta / servicio de cerámica',mg+3,y+6);
-  doc.text(base+' €',W-mg-3,y+6,{align:'right'});
-
-  // Totals
+  doc.setFontSize(8.5);
+  doc.setTextColor(30,30,30);
+  // Concepto (truncado si es muy largo)
+  const concTrunc=concepto.length>38?concepto.slice(0,36)+'…':concepto;
+  doc.text(concTrunc,cols.concepto+2,y+6);
+  doc.text(base.toFixed(2)+'€',cols.precio,y+6,{align:'left'});
+  doc.text('1',cols.uds+4,y+6,{align:'left'});
+  doc.text(base.toFixed(2)+'€',cols.subtotal,y+6,{align:'left'});
+  doc.text(pctIva+'%',cols.iva,y+6,{align:'left'});
+  doc.text(total.toFixed(2)+'€',cols.total,y+6,{align:'right'});
   y+=18;
+
+  // ── Totales (alineados a la derecha) ────────────────────
+  const tCol=W-mg-50;
   doc.setFontSize(9);
   doc.setTextColor(80,80,80);
-  doc.text('Base imponible:',W-mg-50,y);
+  doc.text('BASE IMPONIBLE',tCol,y);
   doc.setTextColor(30,30,30);
-  doc.text(base+' €',W-mg,y,{align:'right'});
+  doc.text(base.toFixed(2)+'€',W-mg,y,{align:'right'});
   y+=6;
   doc.setTextColor(80,80,80);
-  doc.text('IVA (21%):',W-mg-50,y);
+  doc.text('IVA '+pctIva+'%',tCol,y);
   doc.setTextColor(30,30,30);
-  doc.text(iva+' €',W-mg,y,{align:'right'});
+  doc.text(ivaAmt.toFixed(2)+'€',W-mg,y,{align:'right'});
   y+=2;
-  doc.setDrawColor(212,105,30);
-  doc.line(W-mg-50,y+1,W-mg,y+1);
-  y+=5;
+  doc.setDrawColor(180,180,180);
+  doc.line(tCol,y+1,W-mg,y+1);
+  y+=6;
   doc.setFont('helvetica','bold');
-  doc.setFontSize(12);
-  doc.setTextColor(212,105,30);
-  doc.text('TOTAL:',W-mg-50,y);
-  doc.text(total+' €',W-mg,y,{align:'right'});
+  doc.setFontSize(11);
+  doc.setTextColor(30,30,30);
+  doc.text('TOTAL',tCol,y);
+  doc.text(total.toFixed(2)+'€',W-mg,y,{align:'right'});
 
-  // Footer
+  // ── Footer ──────────────────────────────────────────────
   doc.setFont('helvetica','normal');
   doc.setFontSize(7.5);
   doc.setTextColor(150,150,150);
+  doc.setDrawColor(200,200,200);
   doc.line(mg,275,W-mg,275);
   doc.text('Factura simplificada emitida conforme al art. 7.1 del RD 1619/2012',W/2,280,{align:'center'});
-  doc.text('Régimen de estimación directa simplificada',W/2,284,{align:'center'});
+  doc.text('Régimen de estimación directa simplificada · IAE 861',W/2,284,{align:'center'});
 
   return doc.output('arraybuffer');
 }
@@ -5281,19 +5308,20 @@ function generateTicketPDF(rec){
 async function approveTicketWithDrive(t){
   const numFact=await getNextTicketNum();
   const bruto=t.importe||0;
-  const base=Math.round(bruto/1.21*100)/100;
+  const pctIva=parseFloat(t.pct_iva||21);
+  const base=Math.round(bruto/(1+pctIva/100)*100)/100;
   const iva=Math.round((bruto-base)*100)/100;
   const rec={
     tipo:'ingreso',
     doc_type:'ticket',
     proveedor_cliente:t.cliente||'Venta directa',
-    nif:'',
+    nif:t.cliente_nif||'',
     fecha:t.fecha||'',
-    concepto:'Venta / servicio de cerámica',
+    concepto:t.concepto||'Venta / servicio de cerámica',
     num_factura:numFact,
     operacion:'INT',
     base_iva:base,
-    pct_iva:21,
+    pct_iva:pctIva,
     cuota_iva:iva,
     base_irpf:base,
     retencion_pct:0,

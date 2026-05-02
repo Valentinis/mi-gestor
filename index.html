@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.322</div>
+    <div class="login-version">v5.324</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.322</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.324</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -805,7 +805,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.322</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.324</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2622,49 +2622,43 @@ function renderTicketsSubtab(searchQ=''){
   const sq=(searchQ||document.getElementById('fact-search-input')?.value||'').toLowerCase();
   const wrap=document.getElementById('tickets-subtab-wrap');
   if(!wrap) return;
-  let pending=ticketsPendientes||[];
+  let pending=[...(ticketsPendientes||[])];
   if(sq) pending=pending.filter(t=>(t.concepto||'').toLowerCase().includes(sq)||(t.fecha||'').includes(sq));
+  // Ordenar por fecha ascendente (más antigua primero)
+  pending.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
   let html=`<div style="padding-top:12px;">`;
-  // Botón analizar siempre visible arriba
-  html+=`<button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  html+=`<button onclick="openTicketModal()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     Analizar extracto / pago
   </button>`;
   if(!pending.length){
     html+=`<div style="padding:40px 0;text-align:center;opacity:0.4;">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;"><path d="M2 9a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4V9z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
-      <div style="font-size:13px;color:var(--text-3);">${sq?'Sin resultados':'Sin facturas pendientes'}</div>
+      <div style="font-size:13px;color:var(--text-3);">Sin facturas pendientes</div>
     </div>`;
   } else {
     html+=pending.map((t,i)=>{
+      const realIdx=ticketsPendientes.indexOf(t);
       const isDup=t._dup;
-      const border=isDup?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);';
-      const dupBadge=isDup?'<span style="font-size:10px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">posible dup.</span>':'';
+      const dupBadge=isDup?'<span style="font-size:9px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">dup.</span>':'';
       const metodoIcon={sumup:'💳',bizum:'📱',transferencia:'🏦'}[t.metodo]||'💰';
       const metodoLabel={sumup:'SumUp',bizum:'Bizum',transferencia:'Transferencia'}[t.metodo]||t.metodo||'—';
       const pctIva=t.pct_iva||21;
-      const bruto=t.importe||0;
+      // Fix rounding: use parseFloat to avoid floating point errors
+      const bruto=Math.round((t.importe||0)*100)/100;
       const base=Math.round(bruto/(1+pctIva/100)*100)/100;
       const iva=Math.round((bruto-base)*100)/100;
-      return `<div style="background:var(--bg-card);${border}border-radius:12px;padding:12px;margin-bottom:8px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${metodoIcon} ${t.concepto||'—'}${dupBadge}</div>
-            <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${fmtFecha(t.fecha)}${t.hora?' · '+t.hora:''}</div>
+      const border=isDup?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);';
+      return `<div style="background:var(--bg-card);${border}border-radius:10px;padding:10px 12px;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+          <div style="flex:1;min-width:0;overflow:hidden;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${metodoIcon} ${t.concepto||'—'}${dupBadge}</div>
           </div>
-          <div style="font-size:15px;font-weight:800;color:var(--green);flex-shrink:0;">+${bruto.toFixed(2).replace('.',',')} €</div>
+          <div style="font-size:14px;font-weight:800;color:var(--green);flex-shrink:0;">+${bruto.toFixed(2).replace('.',',')} €</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;">
-          ${t.cliente?`<span style="font-size:11px;color:var(--text-2);"><span style="color:var(--text-3);">Cliente</span> ${t.cliente}</span><span style="color:var(--text-3);font-size:10px;">·</span>`:''}
-          <span style="font-size:11px;color:var(--text-2);"><span style="color:var(--text-3);">Base</span> ${base.toFixed(2).replace('.',',')} €</span>
-          <span style="color:var(--text-3);font-size:10px;">·</span>
-          <span style="font-size:11px;color:var(--text-2);"><span style="color:var(--text-3);">IVA</span> ${pctIva}% (${iva.toFixed(2).replace('.',',')} €)</span>
-          <span style="color:var(--text-3);font-size:10px;">·</span>
-          <span style="font-size:11px;color:var(--text-2);">${metodoIcon} ${metodoLabel}</span>
-        </div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="approveTicket(${i});renderTicketsSubtab();" style="flex:1;background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aprobar</button>
-          <button onclick="discardTicket(${i});renderTicketsSubtab();" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
+        <div style="font-size:10px;color:var(--text-3);margin-bottom:6px;">${fmtFecha(t.fecha)}${t.hora?' · '+t.hora:''}${t.cliente?' · '+t.cliente:''} · Base ${base.toFixed(2).replace('.',',')}€ · IVA ${pctIva}% · ${metodoLabel}</div>
+        <div style="display:flex;gap:5px;">
+          <button onclick="approveTicket(${realIdx});renderTicketsSubtab();" style="flex:1;background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:7px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;">✓ Aprobar</button>
+          <button onclick="discardTicket(${realIdx});renderTicketsSubtab();" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">✕</button>
         </div>
       </div>`;
     }).join('');
@@ -5228,10 +5222,9 @@ function renderTicketsPendientes(){
   }).join('');
 }
 
-async function getNextTicketNum(){
-  // Read from Firestore, increment, save back
+async function getNextTicketNum(ticketFecha){
   const safeUid=getSafeUid();
-  const year=new Date().getFullYear();
+  const year=ticketFecha?new Date(ticketFecha).getFullYear():new Date().getFullYear();
   let num=1;
   if(token&&safeUid){
     try{
@@ -5409,7 +5402,7 @@ function getQuarterFromDate(fecha){
 }
 
 async function approveTicketWithDrive(t){
-  const numFact=await getNextTicketNum();
+  const numFact=await getNextTicketNum(t.fecha);
   const bruto=t.importe||0;
   const pctIva=parseFloat(t.pct_iva||21);
   const base=Math.round(bruto/(1+pctIva/100)*100)/100;

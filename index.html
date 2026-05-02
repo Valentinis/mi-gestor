@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.337</div>
+    <div class="login-version">v5.338</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.337</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.338</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -805,7 +805,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.337</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.338</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -4876,18 +4876,40 @@ async function saveTicketsPending(){
   if(!token||!getSafeUid()) return;
   const safeUid=getSafeUid();
   try{
-    await deleteAllFsTickets(safeUid);
+    // Get existing docs from Firestore
+    const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
+    const existing=new Set();
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+      if(r.ok){
+        const j=await r.json();
+        (j.documents||[]).forEach(d=>existing.add(d.name.split('/').pop()));
+      }
+    }catch(e){}
+
+    // Write/update current tickets
+    const currentIds=new Set();
     for(const t of ticketsPendientes){
       const docId='t_'+(t._fsId||Date.now()+'_'+Math.random().toString(36).slice(2));
       t._fsId=docId;
-      const url=`${FS_URL}/users/${safeUid}/tickets_pending/${docId}`;
+      currentIds.add(docId);
+      const docUrl=`${FS_URL}/users/${safeUid}/tickets_pending/${docId}`;
       const fields={};
       Object.entries(t).forEach(([k,v])=>{
         if(typeof v==='number') fields[k]={doubleValue:v};
         else if(typeof v==='boolean') fields[k]={booleanValue:v};
         else fields[k]={stringValue:String(v??'')};
       });
-      await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({fields})}).catch(()=>{});
+      await fetch(docUrl,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({fields})}).catch(()=>{});
+    }
+
+    // Delete only docs that are no longer in the list
+    for(const docId of existing){
+      if(!currentIds.has(docId)){
+        await fetch(`${FS_URL}/users/${safeUid}/tickets_pending/${docId}`,{
+          method:'DELETE',headers:{Authorization:'Bearer '+token}
+        }).catch(()=>{});
+      }
     }
   }catch(e){ console.warn('saveTicketsPending error:',e); }
 }
@@ -4901,7 +4923,7 @@ async function loadTicketsPending(){
     if(r.ok){
       const j=await r.json();
       if(j.documents&&j.documents.length){
-        ticketsPendientes=j.documents.map(doc=>{
+        const loaded=j.documents.map(doc=>{
           const f=doc.fields||{};
           const t={};
           Object.entries(f).forEach(([k,v])=>{
@@ -4909,7 +4931,16 @@ async function loadTicketsPending(){
             else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
             else t[k]=v.stringValue||'';
           });
+          t._fsId=doc.name.split('/').pop();
           return t;
+        });
+        // Dedup by _fsId
+        const seen=new Set();
+        ticketsPendientes=loaded.filter(t=>{
+          const key=t._fsId||((t.fecha||'')+'|'+(t.importe||0)+'|'+(t.concepto||''));
+          if(seen.has(key)) return false;
+          seen.add(key);
+          return true;
         });
       } else {
         ticketsPendientes=[];

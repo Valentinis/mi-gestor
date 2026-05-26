@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.374</div>
+    <div class="login-version">v5.377</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -410,6 +410,7 @@ img,video,iframe,table{max-width:100%;}
           <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Ret. %</div><input id="edit-ret" type="number" step="1" style="width:100%;padding:8px 6px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></div>
         </div>
         <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Justificación</div><select id="edit-just" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></select></div>
+        <div id="edit-cat-ing-wrap"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Categoría ingreso</div><select id="edit-cat-ing" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;display:none;"></select></div>
         <div><div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">Trimestre</div><select id="edit-quarter" style="width:100%;padding:8px 10px;background:var(--bg-raised);border:none;border-radius:8px;font-size:13px;color:var(--text);box-sizing:border-box;"></select></div>
       </div>
       <button onclick="saveModalEdit()" style="margin-top:12px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Revisar cambios →</button>
@@ -456,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.374</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.377</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -787,7 +788,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.374</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.377</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -1079,13 +1080,55 @@ let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, ticketsFId=null
 let claudeKey='', userPin='1234';
 
 const JUST_OPTIONS=[
-  '','Material de taller (arcilla, esmaltes, herramientas)','Mobiliario y equipamiento del taller (mesas, sillas, lámparas, almacenamiento)','Alquiler local de actividad','Suministros del local (luz, agua, gas)','Material fotográfico para documentar obra','Seguridad del local','Limpieza y mantenimiento del taller','Material de oficina y administración','Formación y desarrollo profesional','Marketing y promoción de la actividad','Equipamiento informático (uso profesional)','Servicio digital para la actividad','Servicios profesionales externos (autónomo con retención 15%)','Otro (especificar)'
+  '',
+  'Material de taller (arcilla, esmaltes, herramientas)',
+  'Consumibles del taller (cinta, spray, cubos, esponjas, pequeño material)',
+  'Mobiliario y equipamiento del taller (mesas, sillas, lámparas, estanterías)',
+  'Maquinaria y herramientas eléctricas (torno, bordadora, taladro...)',
+  'Textiles del taller (delantales, toallas, ropa de trabajo)',
+  'Atención a alumnos y clientes (café, agua, material didáctico)',
+  'Alquiler local de actividad',
+  'Suministros del local (luz, agua, gas)',
+  'Transporte para la actividad (metro, bus, desplazamientos)',
+  'Material fotográfico y audiovisual para documentar obra',
+  'Seguridad del local (extintores, alarma)',
+  'Limpieza y mantenimiento del taller',
+  'Reparación y mantenimiento de maquinaria',
+  'Material de oficina y administración',
+  'Equipamiento informático (uso profesional)',
+  'Servicio digital para la actividad',
+  'Marketing y promoción de la actividad',
+  'Formación y desarrollo profesional',
+  'Servicios profesionales externos (autónomo con retención 15%)',
+  'Seguro de actividad o responsabilidad civil',
+  'Otro (especificar)'
 ];
 const JUST_OPTIONS_ING=[
   '','Venta de cerámica','Taller o curso de cerámica','Venta online de cerámica','Encargo personalizado de cerámica','Comisión de venta (SumUp/TPV)','Otro ingreso (especificar)'
 ];
+const ING_CATEGORIAS=[
+  '','Clase','Taller grupal / experiencia','Venta de pieza cerámica','Encargo personalizado','Servicio B2B (empresa)','Merchandising','Regalo / donación','Otro'
+];
+function autoCategoria(f){
+  if(!f||f.tipo!=='ingreso') return '';
+  const conc=(f.concepto||'').toLowerCase();
+  const prov=(f.proveedor_cliente||'').toLowerCase();
+  if(prov.includes('sumup')||conc.includes('comis')||conc.includes('tpv')) return '';
+  if(conc.includes('b2b')||conc.includes('empresa')||conc.includes('s.l.')||conc.includes('s.a.')||conc.includes('audiovisual')||conc.includes('corporat')) return 'Servicio B2B (empresa)';
+  if(conc.includes('merch')||conc.includes('delantal')||conc.includes('bossa')||conc.includes('bolsa')||conc.includes('camiseta')||conc.includes('brod')) return 'Merchandising';
+  if(conc.includes('taller')||conc.includes('workshop')||conc.includes('grup')||conc.includes('grupo')||conc.includes('experienc')) return 'Taller grupal / experiencia';
+  if(conc.includes('encàrrec')||conc.includes('encargo')||conc.includes('personaliz')) return 'Encargo personalizado';
+  if(conc.includes('venda')||conc.includes('venta')||conc.includes('peça')||conc.includes('pieza')) return 'Venta de pieza cerámica';
+  if(conc.includes('regal')||conc.includes('regalo')||conc.includes('donaci')) return 'Regalo / donación';
+  // Empresas conocidas → B2B
+  if(prov.includes('devicers')||prov.includes('dalston')||prov.includes('coffee')||prov.includes('s.l')||prov.includes('s.a')) return 'Servicio B2B (empresa)';
+  return 'Clase';
+}
 
 // Auto-suggest justification based on record
+function buildIngCatOpts(selected){
+  return ING_CATEGORIAS.map(c=>'<option value="'+c+'"'+(c===selected?' selected':'')+'>'+( c||'— Seleccionar categoría —')+'</option>').join('');
+}
 function autoJust(f){
   if(!f) return '';
   const op=f.operacion||'';
@@ -1093,27 +1136,51 @@ function autoJust(f){
   const prov=(f.proveedor_cliente||'').toLowerCase();
   if(f.tipo==='ingreso'){
     if(prov.includes('sumup')||conc.includes('comis')) return 'Comisión de venta (SumUp/TPV)';
-    if(conc.includes('taller')||conc.includes('curs')||conc.includes('workshop')) return 'Taller o curso de cerámica';
+    if(conc.includes('taller')||conc.includes('curs')||conc.includes('workshop')||conc.includes('clase')||conc.includes('clases')) return 'Taller o curso de cerámica';
     if(conc.includes('venda')||conc.includes('venta')||conc.includes('ceràmica')||conc.includes('ceramica')) return 'Venta de cerámica';
     if(conc.includes('encàrrec')||conc.includes('encargo')) return 'Encargo personalizado de cerámica';
-    return 'Venta de cerámica';
+    return 'Taller o curso de cerámica';
   }
-  if(op==='ALQUILER'||(f.concepto||'').toLowerCase().includes('arrendamiento')) return 'Alquiler local de actividad';
+  if(op==='ALQUILER'||conc.includes('arrendament')||conc.includes('alquiler')) return 'Alquiler local de actividad';
   if(op==='PROF') return 'Servicios profesionales externos (autónomo con retención 15%)';
   if(op==='INTRA_S') return 'Servicio digital para la actividad';
-  if(prov.includes('endesa')||prov.includes('naturgy')||prov.includes('iberdrola')||conc.includes('llum')||conc.includes('luz')||conc.includes('elèctri')) return 'Suministros del local (luz, agua, gas)';
-  if(prov.includes('ikea')||conc.includes('mobi')||conc.includes('làmp')||conc.includes('caixa')||conc.includes('caja')||conc.includes('cadira')) return 'Mobiliario y equipamiento del taller (mesas, sillas, lámparas, almacenamiento)';
-  if(prov.includes('collet')||prov.includes('ceràm')||prov.includes('ceram')||conc.includes('argila')||conc.includes('arcilla')||conc.includes('esmalte')||conc.includes('pigment')) return 'Material de taller (arcilla, esmaltes, herramientas)';
-  if(prov.includes('amazon')||prov.includes('leroy')||prov.includes('brico')) return 'Material de taller (arcilla, esmaltes, herramientas)';
-  if(prov.includes('anthropic')||prov.includes('openai')||prov.includes('google')||prov.includes('adobe')||prov.includes('notion')) return 'Servicio digital para la actividad';
-  if(conc.includes('fotograf')||conc.includes('câmera')||conc.includes('camara')) return 'Material fotográfico para documentar obra';
+  // Suministros
+  if(prov.includes('endesa')||prov.includes('naturgy')||prov.includes('iberdrola')||prov.includes('lowi')||prov.includes('movistar')||prov.includes('orange')||conc.includes('llum')||conc.includes('luz')||conc.includes('elèctri')||conc.includes('fibra')||conc.includes('internet')) return 'Suministros del local (luz, agua, gas)';
+  // Transporte
+  if(prov.includes('tmb')||prov.includes('renfe')||prov.includes('metro')||conc.includes('transport')||conc.includes('metro')||conc.includes('bus ')||conc.includes('desplaçament')||conc.includes('desplazamiento')) return 'Transporte para la actividad (metro, bus, desplazamientos)';
+  // Maquinaria
+  if(prov.includes('dismak')||prov.includes('electro365')||conc.includes('torn')||conc.includes('torno')||conc.includes('maquinar')||conc.includes('bordador')||conc.includes('motor')||conc.includes('elèctric')||conc.includes('electr')) return 'Maquinaria y herramientas eléctricas (torno, bordadora, taladro...)';
+  // Mobiliario
+  if(prov.includes('ikea')||prov.includes('leroy')||prov.includes('decohome')||prov.includes('deco home')||conc.includes('mobi')||conc.includes('làmp')||conc.includes('lamp')||conc.includes('estant')||conc.includes('caixa')||conc.includes('caja')||conc.includes('cadira')||conc.includes('taul')||conc.includes('mesa')) return 'Mobiliario y equipamiento del taller (mesas, sillas, lámparas, estanterías)';
+  // Material cerámica
+  if(prov.includes('collet')||prov.includes('ceràm')||prov.includes('ceram')||prov.includes('debasa')||prov.includes('piera')||conc.includes('argila')||conc.includes('arcilla')||conc.includes('esmalte')||conc.includes('pigment')||conc.includes('vernís')) return 'Material de taller (arcilla, esmaltes, herramientas)';
+  // Textiles
+  if(conc.includes('davantal')||conc.includes('delantal')||conc.includes('tovallo')||conc.includes('toalla')||conc.includes('roba')||conc.includes('ropa')||prov.includes('lavadora')||prov.includes('secador')||conc.includes('textil')) return 'Textiles del taller (delantales, toallas, ropa de trabajo)';
+  // Atención alumnos
+  if(prov.includes('nomad')||prov.includes('café')||prov.includes('cafe')||conc.includes('cafè')||conc.includes('cafe')||conc.includes('alumne')||conc.includes('alumno')) return 'Atención a alumnos y clientes (café, agua, material didáctico)';
+  // Seguridad
+  if(prov.includes('semaprin')||conc.includes('extintor')||conc.includes('alarma')||conc.includes('segure')||conc.includes('seguri')) return 'Seguridad del local (extintores, alarma)';
+  // Reparación
+  if(conc.includes('repar')||conc.includes('mantenim')||conc.includes('correia')||conc.includes('correa')) return 'Reparación y mantenimiento de maquinaria';
+  // Limpieza
   if(conc.includes('netej')||conc.includes('limpiez')) return 'Limpieza y mantenimiento del taller';
-  if(conc.includes('segure')||conc.includes('seguri')) return 'Seguridad del local';
-  if(conc.includes('format')||conc.includes('curs')) return 'Formación y desarrollo profesional';
-  if(conc.includes('market')||conc.includes('publi')||conc.includes('xarxa')||conc.includes('red social')) return 'Marketing y promoción de la actividad';
-  if(conc.includes('inform')||conc.includes('portàtil')||conc.includes('portati')||conc.includes('tablet')) return 'Equipamiento informático (uso profesional)';
+  // Fotografía
+  if(conc.includes('fotograf')||conc.includes('càmera')||conc.includes('camara')||conc.includes('dji')||conc.includes('video')) return 'Material fotográfico y audiovisual para documentar obra';
+  // Informático
+  if(prov.includes('apple')||conc.includes('iphone')||conc.includes('inform')||conc.includes('portàtil')||conc.includes('portati')||conc.includes('tablet')||conc.includes('ordinador')) return 'Equipamiento informático (uso profesional)';
+  // Digital
+  if(prov.includes('anthropic')||prov.includes('openai')||prov.includes('google')||prov.includes('adobe')||prov.includes('notion')||prov.includes('sumup')||conc.includes('subscripci')||conc.includes('suscripci')||conc.includes('software')||conc.includes('comisi')) return 'Servicio digital para la actividad';
+  // Marketing
+  if(conc.includes('market')||conc.includes('publi')||conc.includes('xarxa')||conc.includes('red social')||conc.includes('web')) return 'Marketing y promoción de la actividad';
+  // Formación
+  if(conc.includes('format')||conc.includes('formaci')||conc.includes('curs')) return 'Formación y desarrollo profesional';
+  // Oficina
   if(conc.includes('oficin')||conc.includes('paper')||conc.includes('toner')) return 'Material de oficina y administración';
-  return '';
+  // Seguro
+  if(conc.includes('seguro')||conc.includes('assegura')||conc.includes('pòlissa')||conc.includes('poliza')) return 'Seguro de actividad o responsabilidad civil';
+  // Amazon y ferreterías → consumibles por defecto
+  if(prov.includes('amazon')||prov.includes('ferreteri')||prov.includes('brico')||prov.includes('bonet')||prov.includes('saturn')||prov.includes('optimus')||prov.includes('bolbar')||prov.includes('hierro')||prov.includes('abacus')||prov.includes('makro')||prov.includes('merca')) return 'Consumibles del taller (cinta, spray, cubos, esponjas, pequeño material)';
+  return 'Consumibles del taller (cinta, spray, cubos, esponjas, pequeño material)';
 }
 
 // ── CFG ──
@@ -1962,6 +2029,7 @@ async function handleClaudeFiles(files){
               ${justOpts}
             </select>
             <input class="just-input" type="text" id="${divId}_jo${i}" placeholder="Especifica el motivo..." style="display:none;margin-top:6px;" />
+            ${isIng?('<div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 5px;">Categ. ingreso</div><select id="'+divId+'_cat'+i+'" style="background:rgba(255,255,255,0.08);color:#F5EDE0;border:none;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;">'+buildIngCatOpts(autoCategoria(f))+'</select>'):''}
           </div>
         </div>`;
       }).join('');
@@ -2160,6 +2228,8 @@ function saveAnalysis(divId, count, fromGlobal=false){
     let just=jSel?jSel.value:'';
     if(just==='Otro (especificar)'&&jOth) just=jOth.value||'Otro';
     f.justificacion=just;
+    const catSel=document.getElementById(divId+'_cat'+i);
+    if(catSel&&f.tipo==='ingreso') f.categoria_ing=catSel.value||'';
     f._quarter=Q; f._id=Date.now()+Math.random();
     if(!data[Q]) data[Q]=[];
     if(isDuplicate(f)){
@@ -2909,6 +2979,24 @@ function renderStatsPanel(){
       </div>
     </div>`).join('');
 
+  // Desglose ingresos por categoria_ing
+  const ingCatMap={};
+  qFacts.filter(f=>f.tipo==='ingreso'&&f.categoria_ing).forEach(f=>{
+    ingCatMap[f.categoria_ing]=(ingCatMap[f.categoria_ing]||0)+(f.ingresos_brutos||f.base_iva||0);
+  });
+  const ingCatColors={'Clase':'#30D158','Taller grupal / experiencia':'#34C759','Venta de pieza cerámica':'#8B4513','Encargo personalizado':'#FF9F0A','Servicio B2B (empresa)':'#0A84FF','Merchandising':'#BF5AF2','Regalo / donación':'#FF375F','Otro':'#666'};
+  const totalIng2=Object.values(ingCatMap).reduce((a,b)=>a+b,0)||1;
+  const ingCatBars=Object.entries(ingCatMap).sort((a,b)=>b[1]-a[1]).map(([cat,val])=>`
+    <div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+        <span style="font-size:12px;color:var(--text);">${cat}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--text);">${fmt2(val)}€ <span style="color:var(--text-3);font-weight:400;">(${(val/totalIng2*100).toFixed(0)}%)</span></span>
+      </div>
+      <div style="height:6px;background:var(--bg-raised);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${(val/totalIng2*100).toFixed(1)}%;background:${ingCatColors[cat]||'#30D158'};border-radius:3px;"></div>
+      </div>
+    </div>`).join('');
+
   el.innerHTML=`
     <div style="margin-bottom:20px;">
       <div style="font-size:13px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">${Q}</div>
@@ -2935,6 +3023,7 @@ function renderStatsPanel(){
         <span>IRPF estimado: <b style="color:var(--text)">${fmt2(beneficio*0.07)}€</b></span>
       </div>
     </div>
+    ${ingCatBars?`<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Desglose ingresos</div>${ingCatBars}</div>`:''}
     ${catBars?`<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Desglose gastos</div>${catBars}</div>`:''}
   `;
 }
@@ -4277,7 +4366,7 @@ function renderList(){
         <div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:${getBarColor(f)};"></div>
         <div class="fact-main">
           <div class="fact-name">${f.proveedor_cliente||'—'}</div>
-          <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}</div>
+          <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}${isIng&&f.categoria_ing?` <span style="display:inline-block;background:rgba(48,209,88,0.15);color:#30D158;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;margin-left:3px;">${f.categoria_ing}</span>`:''}</div>
         </div>
         <div class="fact-right">
           <div class="fact-amount" style="color:${isIng?'var(--green)':'var(--red)'};font-weight:700;">${isIng?'+':'−'}${fmt(amount)}</div>
@@ -4313,6 +4402,7 @@ function openModal(id){
     ['% Retención', (f.retencion_pct||0)+'%'],
     ['Retención', fmt(f.retencion_importe)],
     ['Ingresos brutos', f.ingresos_brutos?fmt(f.ingresos_brutos):'—'],
+    ['Categoría', f.tipo==='ingreso'&&f.categoria_ing?f.categoria_ing:'—'],
     ['Justificación', f.justificacion||'—'],
     ['Notas', f.notas||'—'],
   ];
@@ -4388,6 +4478,13 @@ function openModal(id){
     const isIng2=f.tipo==='ingreso';
     const opts2=isIng2?JUST_OPTIONS_ING:JUST_OPTIONS;
     just2.innerHTML=opts2.map(o=>`<option value="${o}" ${o===(f.justificacion||'')?'selected':''}>${o===''?'— Seleccionar —':o}</option>`).join('');
+  }
+  const cat2=document.getElementById('edit-cat-ing');
+  if(cat2){
+    if(f.tipo==='ingreso'){
+      cat2.style.display='block';
+      cat2.innerHTML=ING_CATEGORIAS.map(c=>`<option value="${c}" ${c===(f.categoria_ing||'')?'selected':''}>${c||'— Categoría ingreso —'}</option>`).join('');
+    } else { cat2.style.display='none'; }
   }
   const driveBtn=document.getElementById('modal-drive-btn');
   if(driveFileId){ 
@@ -4553,6 +4650,7 @@ function saveModalEdit(){
   const newPiva=parseInt(document.getElementById('edit-piva')?.value||0);
   const newRet=parseInt(document.getElementById('edit-ret')?.value||0);
   const newJust=document.getElementById('edit-just')?.value||'';
+  const newCatIng=document.getElementById('edit-cat-ing')?.value||'';
   const newQ=document.getElementById('edit-quarter')?.value||'';
   const currentQ=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId))||Q;
   if(newConc!==f.concepto) changes.push(`Concepto: "${f.concepto}" → "${newConc}"`);
@@ -4570,6 +4668,7 @@ function saveModalEdit(){
   if(newPiva!==(f.pct_iva||0)){ f.pct_iva=newPiva; f.cuota_iva=Math.round((f.base_iva||0)*(newPiva/100)*100)/100; }
   if(newRet!==(f.retencion_pct||0)){ f.retencion_pct=newRet; f.retencion_importe=Math.round((f.base_iva||0)*(newRet/100)*100)/100; }
   if(newJust!==f.justificacion) f.justificacion=newJust;
+  if(f.tipo==='ingreso'&&newCatIng!==f.categoria_ing) f.categoria_ing=newCatIng;
   // Move to different quarter if changed
   if(newQ&&newQ!==currentQ){
     data[currentQ]=data[currentQ].filter(x=>x._id!=modalFacturaId);

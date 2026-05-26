@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.369</div>
+    <div class="login-version">v5.373</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.369</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.373</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -787,7 +787,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.369</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.373</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2121,25 +2121,29 @@ function saveAllSelected(){
   if(!list) return;
   const items=list.querySelectorAll('.analysis-item');
   let savedCount=0;
+  const savedDivIds=[];
   items.forEach(item=>{
     const divId=item.id;
-    // Count checked reviews in this item
     const checks=item.querySelectorAll('.factura-review');
     let hasChecked=false;
-    checks.forEach(r=>{
-      const cb=r.querySelector('input[type=checkbox]');
-      if(cb&&cb.checked) hasChecked=true;
-    });
+    checks.forEach(r=>{ const cb=r.querySelector('input[type=checkbox]'); if(cb&&cb.checked) hasChecked=true; });
     if(hasChecked){
-      // Count how many reviews this item has
       const count=checks.length;
-      savedCount+=saveAnalysis(divId, count, true);
+      const n=saveAnalysis(divId, count, true);
+      if(n>0){ savedCount+=n; savedDivIds.push(divId); }
     }
   });
-  if(savedCount>0) showToast(`✓ ${savedCount} factura(s) guardadas`,'success');
+  // Eliminar del modal los items guardados
+  savedDivIds.forEach(divId=>{
+    const el=document.getElementById(divId);
+    if(el) el.remove();
+    delete window['_file_'+divId];
+  });
   updateSaveBar();
-  // Close modal after saving
-  setTimeout(()=>closeAddModal(), 400);
+  if(savedCount>0) showToast(`✓ ${savedCount} factura(s) guardadas`,'success');
+  // Cerrar modal si no quedan items
+  const remaining=document.getElementById('analysis-list')?.querySelectorAll('.analysis-item').length||0;
+  if(remaining===0) setTimeout(()=>closeAddModal(), 400);
 }
 
 function saveAnalysis(divId, count, fromGlobal=false){
@@ -2663,7 +2667,7 @@ function switchSubTab(tab){
   if(navigator.vibrate) navigator.vibrate(8);
 }
 let subTabStartX=0, subTabStartY=0, subTabSwiping=false;
-function subTabTouchStart(e){ subTabStartX=e.touches[0].clientX; subTabStartY=e.touches[0].clientY; subTabSwiping=false; const t=document.getElementById('subtab-track'); if(t) t.style.transition='none'; }
+function subTabTouchStart(e){ if(e.target.closest('button,a,input,select,textarea')) return; subTabStartX=e.touches[0].clientX; subTabStartY=e.touches[0].clientY; subTabSwiping=false; const t=document.getElementById('subtab-track'); if(t) t.style.transition='none'; }
 function subTabTouchMove(e){
   const dx=e.touches[0].clientX-subTabStartX;
   const dy=e.touches[0].clientY-subTabStartY;
@@ -4899,13 +4903,15 @@ const isTouchDevice=()=>window.matchMedia('(hover:none)').matches||('ontouchstar
 
 function addSwipeToClose(sheetEl, closeFn){
   if(!isTouchDevice()) return;
-  let startY=0, currentY=0, dragging=false, moved=false;
+  let startY=0, currentY=0, dragging=false, moved=false, startedAtTop=false;
   sheetEl.addEventListener('touchstart',e=>{
     if(e.touches.length!==1) return;
     startY=e.touches[0].clientY;
     currentY=startY;
     dragging=true;
     moved=false;
+    // Solo activar swipe-to-close si el sheet estaba al principio (scrollTop<=2)
+    startedAtTop=sheetEl.scrollTop<=2;
     sheetEl.style.transition='none';
     e.stopPropagation();
   },{passive:true});
@@ -4913,7 +4919,9 @@ function addSwipeToClose(sheetEl, closeFn){
     if(!dragging) return;
     currentY=e.touches[0].clientY;
     const dy=currentY-startY;
-    if(dy>10) moved=true; // only mark as moved after 10px
+    // Solo si empezó arriba del todo y el gesto es hacia abajo
+    if(!startedAtTop) return;
+    if(dy>10) moved=true;
     if(dy>0 && moved){
       e.preventDefault();
       e.stopPropagation();
@@ -4926,7 +4934,7 @@ function addSwipeToClose(sheetEl, closeFn){
     e.stopPropagation();
     sheetEl.style.transition='transform .25s ease';
     const dy=currentY-startY;
-    if(moved && dy>120){ // increased threshold to 120px
+    if(startedAtTop && moved && dy>120){
       sheetEl.style.transform=`translateY(100%)`;
       setTimeout(()=>{ sheetEl.style.transform=''; closeFn(); },220);
     } else {
@@ -5152,6 +5160,31 @@ async function handleTicketText(){
       const importe=Math.abs(rounded-importeRaw)<0.02?rounded:importeRaw;
       const concepto=parts[5]||parts[4]||'Ingresos por SumUp';
       preResults.push({fecha,hora:'',importe,pct_iva:21,concepto,metodo:'sumup',cliente:''});
+    } else {
+      // ── Parser columnar: Nombre  Fecha  Base  IVA  [Método]  [Concepto] ──
+      // Detectar si col1 o col2 parece una fecha DD/MM/YYYY o D/M/YYYY
+      const parseNum=s=>parseFloat((s||'').replace(/[€\s]/g,'').replace(',','.'));
+      const parseDate=s=>{
+        const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if(!m) return null;
+        return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+      };
+      // col0=nombre, col1=fecha, col2=base, col3=IVA, col4=método, col5=concepto
+      const fecha=parseDate(parts[1]);
+      if(fecha){
+        const base=parseNum(parts[2]);
+        const iva=parseNum(parts[3]);
+        if(!isNaN(base)&&base>0&&!isNaN(iva)){
+          const importeRaw=Math.round((base+iva)*100)/100;
+          const rounded=Math.round(importeRaw);
+          const importe=Math.abs(rounded-importeRaw)<0.02?rounded:importeRaw;
+          const metodoRaw=(parts[4]||'').toLowerCase();
+          const metodo=metodoRaw.includes('bizum')?'bizum':metodoRaw.includes('sumup')||metodoRaw.includes('tarjeta')?'sumup':'transferencia';
+          const concepto=parts[5]||parts[4]||'Clases de cerámica';
+          const cliente=parts[0]||'';
+          preResults.push({fecha,hora:'',importe,pct_iva:21,concepto,metodo,cliente});
+        }
+      }
     }
   }
   if(preResults.length>0){
@@ -5880,7 +5913,7 @@ async function refreshFromDrive(){
       if(el.scrollTop>0) return; // something above is scrolled
       el=el.parentElement;
     }
-    if(e.target.closest('#add-modal,.add-sheet,#ticket-modal,.bottom-nav,#edit-modal,#fact-modal,#asesor-chat-sheet,#cal-detail-sheet,[id$="-modal"],[id$="-sheet"]')) return;
+    if(e.target.closest('#add-modal,.add-sheet,#ticket-modal,.bottom-nav,#edit-modal,#fact-modal,#asesor-chat-sheet,#cal-detail-sheet,[id$="-modal"],[id$="-sheet"],.top-bar,#header-left,#header-subtabs')) return;
     // Don't pull if any modal/sheet is open
     if(document.querySelector('.modal[style*="block"],.sheet[style*="block"],[id$="-modal"][style*="block"],[id$="-sheet"][style*="block"]')) return;
     startY=e.touches[0].clientY;

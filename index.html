@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.391</div>
+    <div class="login-version">v5.393</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.391</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.393</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -583,6 +583,11 @@ img,video,iframe,table{max-width:100%;}
   <!-- FAB container for add -->
 
   <div id="fab-container" style="position:fixed;bottom:calc(130px + env(safe-area-inset-bottom));right:16px;z-index:9997;display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+    <!-- Review FAB (solo visible si hay issues) -->
+    <button id="fab-review" onclick="openReviewModal()" style="display:none;width:44px;height:44px;border-radius:50%;background:#FFD060;border:none;cursor:pointer;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 12px rgba(0,0,0,0.3);position:relative;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1208" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="fab-review-badge" style="position:absolute;top:-4px;right:-4px;background:#E53935;color:#fff;border-radius:10px;min-width:20px;height:20px;padding:0 5px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;"></span>
+    </button>
     <!-- Main FAB -->
     <button id="fab-add" onclick="openAddModal()" style="width:52px;height:52px;border-radius:50%;background:#F0844A;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform .2s cubic-bezier(0.34,1.56,0.64,1);">
       <svg id="fab-add-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -798,7 +803,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.391</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.393</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -1503,8 +1508,53 @@ CASOS QUE DEBEN MARCARSE COMO _confidence:"baja":
 
 Es PREFERIBLE marcar baja confianza y avisar, que devolver datos incorrectos sin avisar.
 
+CLASIFICACIÓN DE JUSTIFICACIÓN (solo para GASTOS):
+Decide qué categoría encaja mejor según los CONCEPTOS reales de la factura. Lee qué se está comprando, no solo el proveedor. Devuelve EXACTAMENTE uno de estos textos (copia literal, sin variaciones):
+
+- "Material de taller (arcilla, esmaltes, herramientas)" — arcilla, esmaltes, pigmentos, óxidos, engobes, herramientas específicas de cerámica (tornetas, vaciadores, esponjas naturales, palillos modelar), pinceles cerámicos, moldes, cocción
+- "Consumibles del taller (cinta, spray, cubos, esponjas, pequeño material)" — cinta adhesiva, spray, cubos plástico, palanganas, esponjas genéricas, bayetas, guantes, mascarillas, bolsas, papel, film, productos de un solo uso
+- "Mobiliario y equipamiento del taller (mesas, sillas, lámparas, estanterías)" — muebles fijos, lámparas, estanterías, taburetes, mesas, perchas, organizadores grandes, decoración del espacio (velas, plantas), cuadros
+- "Maquinaria y herramientas eléctricas (torno, bordadora, taladro...)" — torno alfarero, torno metálico, bordadora, taladro, decapadores, secadores eléctricos, aire acondicionado, lavadora, secadora, equipos de >100€ que se enchufan
+- "Textiles del taller (delantales, toallas, ropa de trabajo)" — delantales, toallas, paños, ropa de trabajo, manteles
+- "Atención a alumnos y clientes (café, agua, material didáctico)" — café, té, agua, snacks, material didáctico para clases
+- "Alquiler local de actividad" — alquileres mensuales del local
+- "Suministros del local (luz, agua, gas)" — Endesa, Naturgy, Iberdrola, Lowi/internet, agua, gas
+- "Transporte para la actividad (metro, bus, desplazamientos)" — TMB, metro, bus, taxi, parking ligado a la actividad
+- "Material fotográfico y audiovisual para documentar obra" — cámara, DJI, micrófonos, trípodes, software de edición foto/vídeo
+- "Seguridad del local (extintores, alarma)" — extintores, alarma, mantenimiento de seguridad
+- "Limpieza y mantenimiento del taller" — productos de limpieza, escobas, fregonas, jabones
+- "Reparación y mantenimiento de maquinaria" — correas, repuestos, reparaciones de torno/bordadora/etc.
+- "Material de oficina y administración" — papel, tinta impresora, archivadores, sobres, sellos
+- "Equipamiento informático (uso profesional)" — ordenadores, iPhone, iPad, tablets, accesorios informáticos
+- "Servicio digital para la actividad" — software SaaS, suscripciones (Anthropic/OpenAI/Adobe/Google/Notion), comisiones SumUp/TPV, web hosting
+- "Marketing y promoción de la actividad" — anuncios, web, redes sociales, diseño gráfico, branding
+- "Formación y desarrollo profesional" — cursos, libros profesionales, talleres a los que asiste Valentín
+- "Servicios profesionales externos (autónomo con retención 15%)" — facturas de otros autónomos con retención IRPF: diseñadores, fotógrafos, traductores, contables, abogados
+- "Seguro de actividad o responsabilidad civil" — pólizas de seguro
+- "Otro (especificar)" — solo si NADA de lo anterior encaja razonablemente
+
+REGLAS CLAVE:
+- Para distinguir "Material de taller" vs "Consumibles": si es algo ESPECÍFICO de cerámica → Material. Si es de ferretería/Amazon genérico (cubo, esponja común, cinta) → Consumibles.
+- Velas: van a Mobiliario (decoración del espacio).
+- Esponjas: si son naturales de cerámica → Material de taller. Si son genéricas → Consumibles.
+- Palanganas/cubos: → Consumibles.
+- Lee la factura completa antes de decidir, no te quedes solo con el proveedor.
+
+CLASIFICACIÓN DE CATEGORÍA INGRESO (solo para INGRESOS):
+Devuelve EXACTAMENTE uno de estos textos:
+- "Clase" — clase individual o pequeño grupo
+- "Taller grupal / experiencia" — taller con varias personas, experiencia puntual
+- "Venta de pieza cerámica" — venta de piezas
+- "Encargo personalizado" — encargos a medida
+- "Servicio B2B (empresa)" — facturas a empresas (S.L., S.A., negocios, cafeterías)
+- "Merchandising" — delantales, bolsas, camisetas con marca Flama Workshop
+- "Regalo / donación" — donaciones
+- "Otro"
+
+Si es comisión SumUp/TPV, deja categoria_ing vacío.
+
 Responde SOLO con JSON sin markdown:
-{"tipo":"gasto|ingreso","proveedor_cliente":"","nif":"","fecha":"YYYY-MM-DD","num_factura":"","concepto":"","base_iva":0.00,"pct_iva":21,"cuota_iva":0.00,"base_irpf":0.00,"retencion_pct":0,"retencion_importe":0.00,"ingresos_brutos":0.00,"notas":"","_confidence":"alta|media|baja","_warnings":[]}
+{"tipo":"gasto|ingreso","proveedor_cliente":"","nif":"","fecha":"YYYY-MM-DD","num_factura":"","concepto":"","base_iva":0.00,"pct_iva":21,"cuota_iva":0.00,"base_irpf":0.00,"retencion_pct":0,"retencion_importe":0.00,"ingresos_brutos":0.00,"notas":"","justificacion":"","categoria_ing":"","_confidence":"alta|media|baja","_warnings":[]}
 Si hay múltiples facturas devuelve array JSON.`;
 
 // ── CLASIFICACIÓN FISCAL (lógica de la app, no de la IA) ──
@@ -2021,7 +2071,7 @@ async function handleClaudeFiles(files){
         const isIng=f.tipo==='ingreso';
         const total=isIng?(f.ingresos_brutos||f.base_iva||0):((f.base_iva||0)+(f.cuota_iva||0)-(f.retencion_importe||0));
         const opts=isIng?JUST_OPTIONS_ING:JUST_OPTIONS;
-        const suggested=autoJust(f);
+        const suggested=f.justificacion||autoJust(f);
         const justOpts=opts.map(o=>`<option value="${o}" ${o===suggested&&suggested?'selected':o===''&&!suggested?'selected':''}>${o===''?'— Seleccionar justificación —':o}</option>`).join('');
         const ops=['INT','PROF','ALQUILER','INTRA_S','EXENTO'];
         const opPills=ops.map(o=>`<button type="button" onclick="setOpReview('${divId}',${i},'${o}',this)" style="padding:4px 10px;font-size:11px;font-weight:600;border:none;border-radius:20px;cursor:pointer;background:${f.operacion===o?'#F0844A':'rgba(255,255,255,0.1)'};color:${f.operacion===o?'#fff':'rgba(255,255,255,0.6)'};">${o}</button>`).join('');
@@ -2084,7 +2134,7 @@ async function handleClaudeFiles(files){
               ${justOpts}
             </select>
             <input class="just-input" type="text" id="${divId}_jo${i}" placeholder="Especifica el motivo..." style="display:none;margin-top:6px;" />
-            ${isIng?('<div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 5px;">Categ. ingreso</div><select id="'+divId+'_cat'+i+'" style="background:rgba(255,255,255,0.08);color:#F5EDE0;border:none;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;">'+buildIngCatOpts(autoCategoria(f))+'</select>'):''}
+            ${isIng?('<div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 5px;">Categ. ingreso</div><select id="'+divId+'_cat'+i+'" style="background:rgba(255,255,255,0.08);color:#F5EDE0;border:none;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;">'+buildIngCatOpts(f.categoria_ing||autoCategoria(f))+'</select>'):''}
           </div>
         </div>`;
       }).join('');
@@ -3437,6 +3487,269 @@ async function auditDrive(){
     auditLog('✕ ERROR FATAL: '+e.message,'err');
     setAuditActions(`<button onclick="closeAuditModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">Cerrar</button>`);
   }
+}
+
+
+// ── REVIEW SYSTEM ──
+function dateToQuarter(fecha){
+  if(!fecha) return null;
+  const m=parseInt(fecha.slice(5,7));
+  const y=fecha.slice(0,4);
+  if(!m||!y) return null;
+  return (m<=3?'1T':m<=6?'2T':m<=9?'3T':'4T')+' '+y;
+}
+
+function detectReviewIssues(){
+  const issues=[];
+  const allRecords=[];
+  Object.keys(data).forEach(q=>{
+    (data[q]||[]).forEach(r=>{ allRecords.push({...r, _q:q, _ref:r}); });
+  });
+
+  // 1. Facturas sin archivo en Drive (sin tick verde)
+  allRecords.forEach(r=>{
+    if(r._reviewIgnored?.noDrive) return;
+    if(r.doc_type==='ticket') return; // tickets simplificados se generan en Drive
+    const hasDrive=r._driveLink||r._driveFileId||driveFiles.some(d=>d.name&&r.fecha&&d.name.startsWith((r.fecha||'').slice(0,10)));
+    if(!hasDrive){
+      issues.push({type:'noDrive', icon:'☁️', label:'Sin archivo en Drive', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`});
+    }
+  });
+
+  // 2. Facturas con confianza baja sin revisar
+  allRecords.forEach(r=>{
+    if(r._reviewIgnored?.lowConf) return;
+    if(r._confidence==='baja'){
+      issues.push({type:'lowConf', icon:'⚠️', label:'Confianza baja del análisis', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`,
+        extra:(r._warnings||[]).join(' · ')});
+    }
+  });
+
+  // 3. Archivos huérfanos en Drive (sin registro)
+  driveFiles.forEach(df=>{
+    if(df._reviewIgnored) return;
+    const linkedRecord=allRecords.find(r=>r._driveFileId===df.id||r._driveLink===df.link);
+    if(!linkedRecord){
+      issues.push({type:'orphan', icon:'🗑', label:'Archivo huérfano en Drive', driveFile:df,
+        description:`${df.name||'(sin nombre)'}${df.quarter?' · '+df.quarter:''}`});
+    }
+  });
+
+  // 4. Posibles duplicados (mismo proveedor + fecha + importe)
+  const seenKeys={};
+  allRecords.forEach(r=>{
+    if(r._reviewIgnored?.duplicate) return;
+    const key=`${(r.proveedor_cliente||'').toLowerCase()}|${r.fecha||''}|${(r.base_iva||0).toFixed(2)}`;
+    if(!seenKeys[key]) seenKeys[key]=[];
+    seenKeys[key].push(r);
+  });
+  Object.values(seenKeys).forEach(group=>{
+    if(group.length>1){
+      group.slice(1).forEach(r=>{ // a partir del segundo
+        issues.push({type:'duplicate', icon:'👥', label:'Posible duplicado', record:r._ref, qActual:r._q,
+          description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`,
+          extra:`Hay ${group.length} registros idénticos`});
+      });
+    }
+  });
+
+  // 5. Facturas sin número de factura
+  allRecords.forEach(r=>{
+    if(r._reviewIgnored?.noNumFactura) return;
+    if(r.doc_type==='ticket') return; // tickets propios tienen numeración generada
+    if(!r.num_factura||r.num_factura.trim()===''||r.num_factura==='—'){
+      issues.push({type:'noNumFactura', icon:'🔢', label:'Sin número de factura', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`});
+    }
+  });
+
+  // 6. Facturas sin justificación / categoría
+  allRecords.forEach(r=>{
+    if(r._reviewIgnored?.noJust) return;
+    if(r.tipo==='gasto' && (!r.justificacion||r.justificacion.trim()==='')){
+      issues.push({type:'noJust', icon:'🏷', label:'Gasto sin justificación', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`});
+    }
+    if(r.tipo==='ingreso' && !r.categoria_ing){
+      issues.push({type:'noJust', icon:'🏷', label:'Ingreso sin categoría', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`});
+    }
+  });
+
+  // 7. Trimestre desajustado (fecha vs trimestre asignado)
+  allRecords.forEach(r=>{
+    if(r._reviewIgnored?.wrongQ) return;
+    const expectedQ=dateToQuarter(r.fecha);
+    if(expectedQ && r._q && expectedQ!==r._q){
+      issues.push({type:'wrongQ', icon:'📅', label:'Trimestre desajustado', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`,
+        extra:`Está en ${r._q}, pero la fecha indica ${expectedQ}`,
+        suggestedQ:expectedQ});
+    }
+  });
+
+  // 8. Errores de upload pendientes
+  allRecords.forEach(r=>{
+    if(r._reviewIgnored?.uploadError) return;
+    if(r._driveError){
+      issues.push({type:'uploadError', icon:'❌', label:'Error subiendo a Drive', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`});
+    }
+  });
+
+  return issues;
+}
+
+function updateReviewBadge(){
+  const issues=detectReviewIssues();
+  const fab=document.getElementById('fab-review');
+  const badge=document.getElementById('fab-review-badge');
+  if(!fab||!badge) return;
+  if(issues.length===0){ fab.style.display='none'; return; }
+  fab.style.display='flex';
+  badge.textContent=issues.length>99?'99+':String(issues.length);
+}
+
+function openReviewModal(){
+  let m=document.getElementById('review-modal');
+  if(!m){
+    m=document.createElement('div');
+    m.id='review-modal';
+    m.style.cssText='position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.92);display:flex;align-items:flex-end;justify-content:center;';
+    m.innerHTML=`
+      <div style="background:var(--bg-card);border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:14px 16px;border-bottom:0.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--text);">🔍 Review</div>
+            <div id="review-count" style="font-size:11px;color:var(--text-3);margin-top:2px;"></div>
+          </div>
+          <button onclick="closeReviewModal()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
+        </div>
+        <div id="review-list" style="flex:1;overflow-y:auto;padding:8px 16px 20px;-webkit-overflow-scrolling:touch;"></div>
+      </div>`;
+    document.body.appendChild(m);
+  } else {
+    m.style.display='flex';
+  }
+  renderReviewList();
+}
+
+function closeReviewModal(){
+  const m=document.getElementById('review-modal');
+  if(m) m.style.display='none';
+  updateReviewBadge();
+}
+
+function renderReviewList(){
+  const issues=detectReviewIssues();
+  const list=document.getElementById('review-list');
+  const count=document.getElementById('review-count');
+  if(count) count.textContent=`${issues.length} problema(s) detectado(s)`;
+  if(!list) return;
+  if(!issues.length){
+    list.innerHTML=`<div style="text-align:center;padding:40px 20px;color:var(--text-3);">
+      <div style="font-size:48px;margin-bottom:12px;">✨</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);">Todo en orden</div>
+      <div style="font-size:12px;margin-top:6px;">No hay nada que revisar.</div>
+    </div>`;
+    return;
+  }
+  // Agrupar por tipo
+  const groups={};
+  issues.forEach(i=>{ if(!groups[i.type]) groups[i.type]=[]; groups[i.type].push(i); });
+  const typeOrder=['noDrive','lowConf','uploadError','duplicate','wrongQ','noNumFactura','noJust','orphan'];
+  const typeLabels={
+    noDrive:'Sin archivo en Drive',
+    lowConf:'Confianza baja',
+    uploadError:'Errores de upload',
+    duplicate:'Posibles duplicados',
+    wrongQ:'Trimestre desajustado',
+    noNumFactura:'Sin número de factura',
+    noJust:'Sin justificación/categoría',
+    orphan:'Huérfanos en Drive'
+  };
+  let html='';
+  typeOrder.forEach(t=>{
+    if(!groups[t]||!groups[t].length) return;
+    html+=`<div style="margin:14px 0 6px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;">${typeLabels[t]} · ${groups[t].length}</div>
+    </div>`;
+    groups[t].forEach((i,idx)=>{
+      const issueKey=`${t}_${idx}_${(i.record?._id||i.driveFile?.id||'')}`;
+      html+=`<div style="background:var(--bg-raised);border:0.5px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:6px;">
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <div style="font-size:16px;flex-shrink:0;">${i.icon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;">${i.description||''}</div>
+            ${i.extra?`<div style="font-size:11px;color:var(--text-3);margin-top:3px;word-break:break-word;">${i.extra}</div>`:''}
+            ${i.qActual?`<div style="font-size:10px;color:var(--text-3);margin-top:3px;">📍 ${i.qActual}</div>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;">
+          ${i.record?`<button onclick="reviewOpenRecord('${i.record._id}')" style="flex:1;min-width:80px;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:8px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;">Abrir</button>`:''}
+          ${i.record?`<button onclick="reviewDeleteRecord('${i.record._id}')" style="flex:1;min-width:80px;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;">Borrar</button>`:''}
+          ${i.driveFile?`<button onclick="reviewDeleteOrphan('${i.driveFile.id}')" style="flex:1;min-width:80px;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;">Borrar de Drive</button>`:''}
+          <button onclick="reviewIgnore('${t}',${i.record?`'${i.record._id}'`:'null'},${i.driveFile?`'${i.driveFile.id}'`:'null'})" style="flex:1;min-width:80px;background:var(--bg-input);color:var(--text-3);border:0.5px solid var(--line);border-radius:8px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;">Ignorar</button>
+        </div>
+      </div>`;
+    });
+  });
+  list.innerHTML=html;
+}
+
+function reviewOpenRecord(id){
+  closeReviewModal();
+  setTimeout(()=>openModal(id), 200);
+}
+
+async function reviewDeleteRecord(id){
+  if(!confirm('¿Borrar este registro definitivamente?')) return;
+  const q=Object.keys(data).find(qq=>data[qq]&&data[qq].find(x=>String(x._id)===String(id)));
+  if(!q) return;
+  const f=data[q].find(x=>String(x._id)===String(id));
+  let fileId=f&&f._driveFileId||null;
+  if(!fileId&&f&&f._driveLink){ const df=driveFiles.find(x=>x.link===f._driveLink); if(df) fileId=df.id; }
+  data[q]=data[q].filter(x=>String(x._id)!==String(id));
+  saveLocal(); renderAll();
+  if(token){
+    saveDataToDrive(q).catch(()=>{});
+    if(fileId) await deleteDriveFileIfOrphan(f._driveLink, fileId);
+  }
+  renderReviewList();
+  updateReviewBadge();
+  showToast('🗑 Registro eliminado','success');
+}
+
+async function reviewDeleteOrphan(fileId){
+  if(!confirm('¿Borrar este archivo huérfano de Drive?')) return;
+  try{
+    await driveReq('https://www.googleapis.com/drive/v3/files/'+fileId,{method:'DELETE'});
+    driveFiles=driveFiles.filter(f=>f.id!==fileId);
+    showToast('🗑 Archivo borrado de Drive','success');
+  }catch(e){ showToast('Error borrando','error'); }
+  renderReviewList();
+  updateReviewBadge();
+}
+
+function reviewIgnore(type, recordId, driveFileId){
+  if(recordId&&recordId!=='null'){
+    const f=Object.values(data).flat().find(x=>String(x._id)===String(recordId));
+    if(f){
+      if(!f._reviewIgnored) f._reviewIgnored={};
+      f._reviewIgnored[type]=true;
+      saveLocal();
+      const q=Object.keys(data).find(qq=>data[qq]&&data[qq].find(x=>x._id===f._id));
+      if(q&&token) saveDataToDrive(q).catch(()=>{});
+    }
+  } else if(driveFileId&&driveFileId!=='null'){
+    const df=driveFiles.find(x=>x.id===driveFileId);
+    if(df) df._reviewIgnored=true;
+  }
+  renderReviewList();
+  updateReviewBadge();
+  showToast('✓ Marcado como ignorar','success');
 }
 
 // ── BULK MODE ──
@@ -4809,6 +5122,9 @@ function renderAll(){
   renderList(); recalc(); updateSI(); renderRegistros();
   updateFactSearchBar();
   if(document.getElementById('tab-insights')?.classList.contains('active')&&currentInsightsTab==='calendario') renderCalendario();
+  // Actualizar badge de Review (debounced)
+  clearTimeout(window._reviewBadgeTimer);
+  window._reviewBadgeTimer=setTimeout(()=>{ try{ updateReviewBadge(); }catch(e){} }, 300);
 }
 function skeletonItems(n){
   return Array(n).fill(0).map(()=>`

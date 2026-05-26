@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.377</div>
+    <div class="login-version">v5.382</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -416,7 +416,7 @@ img,video,iframe,table{max-width:100%;}
       <button onclick="saveModalEdit()" style="margin-top:12px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Revisar cambios →</button>
     </div>
     <div style="padding:12px 16px;border-top:0.5px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;" id="modal-footer">
-      <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:none;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Drive</button>
+      <button id="modal-drive-btn" onclick="openDriveFile()" style="flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg> <span id="modal-drive-btn-label">Ver factura</span></button>
       <button onclick="toggleModalEdit()" id="modal-edit-btn" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>
       <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> Reprocesar</button>
       <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Eliminar</button>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.377</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.382</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -669,6 +669,15 @@ img,video,iframe,table{max-width:100%;}
       </select>
     </div>
   </div>
+  <!-- Bulk action bar -->
+  <div id="bulk-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#1C1814;border-top:0.5px solid var(--line);box-shadow:0 -4px 20px rgba(0,0,0,0.4);">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="bulk-count" style="font-size:13px;font-weight:700;color:var(--text);flex:1;"></span>
+      <button onclick="bulkChangeQuarter()" style="background:var(--bg-raised);color:var(--text);border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;">📅 Trimestre</button>
+      <button onclick="bulkDelete()" style="background:rgba(255,90,72,0.15);color:#FF5A48;border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Borrar</button>
+      <button onclick="exitBulkMode()" style="background:none;color:var(--text-3);border:none;border-radius:10px;padding:9px 10px;font-size:13px;cursor:pointer;">✕</button>
+    </div>
+  </div>
   </div><!-- end tab-facturas -->
   <!-- CALENDARIO TAB -->
   <div id="tab-calendario" class="tab-pane" style="padding-bottom:80px;">
@@ -759,7 +768,8 @@ img,video,iframe,table{max-width:100%;}
         <div><div style="font-size:14px;font-weight:600;color:var(--text);" id="drive-user-name">—</div><div style="font-size:12px;color:var(--text-2);" id="drive-user-email">—</div></div>
         <button class="btn-sec" onclick="syncDrive()">Sincronizar</button>
       </div>
-      <div style="font-size:11px;color:var(--text-3);" id="drive-last-sync">Sin sincronizar</div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:10px;" id="drive-last-sync">Sin sincronizar</div>
+      <button onclick="auditDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🧹 Auditar y limpiar Drive</button>
     </div>
     <div class="section-label">Archivos subidos</div>
     <div class="card"><div id="drive-files-list"><div class="empty">Sin archivos</div></div></div>
@@ -788,7 +798,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.377</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.382</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -1465,8 +1475,36 @@ CASOS ESPECIALES:
 
 NO decides operacion, NO calculas trimestre. Solo extrae datos.
 
+SISTEMA DE CONFIANZA (MUY IMPORTANTE):
+Para cada factura debes evaluar tu propia confianza en cada campo extraído. Si tienes la MÁS MÍNIMA duda en algo, debes marcarlo. Es mejor pecar de precavido que dejar pasar un error.
+
+Añade dos campos al JSON:
+- _confidence: "alta" | "media" | "baja"
+  * "alta": estás 100% seguro de todos los campos, la factura es legible y nítida
+  * "media": algún campo no es del todo claro pero lo más probable es que sea correcto
+  * "baja": hay campos que no se leen bien, hay ambigüedad, o la factura está incompleta/borrosa
+- _warnings: array de strings con avisos específicos sobre qué campos revisar. Ejemplos:
+  * "La fecha no se lee con claridad — verificar manualmente"
+  * "El número de factura podría ser X o Y"
+  * "El total no cuadra con base+IVA — revisar retención"
+  * "Hay un sello/marca encima del importe que dificulta la lectura"
+  * "La factura está en alemán y algunos campos son ambiguos"
+  * "NIF/CIF incompleto o poco legible"
+  * "Concepto poco descriptivo — verificar si encaja con la actividad"
+  * "Esta factura no parece ser de un gasto profesional habitual de un ceramista"
+
+CASOS QUE DEBEN MARCARSE COMO _confidence:"baja":
+- Factura escaneada borrosa o con baja resolución
+- Texto manuscrito difícil de leer
+- Sello/marca tapando información crítica
+- Total no cuadra con la suma de conceptos
+- Múltiples interpretaciones posibles del concepto/fecha/importe
+- Factura en idioma poco familiar (no español/catalán/inglés/francés/alemán básico)
+
+Es PREFERIBLE marcar baja confianza y avisar, que devolver datos incorrectos sin avisar.
+
 Responde SOLO con JSON sin markdown:
-{"tipo":"gasto|ingreso","proveedor_cliente":"","nif":"","fecha":"YYYY-MM-DD","num_factura":"","concepto":"","base_iva":0.00,"pct_iva":21,"cuota_iva":0.00,"base_irpf":0.00,"retencion_pct":0,"retencion_importe":0.00,"ingresos_brutos":0.00,"notas":""}
+{"tipo":"gasto|ingreso","proveedor_cliente":"","nif":"","fecha":"YYYY-MM-DD","num_factura":"","concepto":"","base_iva":0.00,"pct_iva":21,"cuota_iva":0.00,"base_irpf":0.00,"retencion_pct":0,"retencion_importe":0.00,"ingresos_brutos":0.00,"notas":"","_confidence":"alta|media|baja","_warnings":[]}
 Si hay múltiples facturas devuelve array JSON.`;
 
 // ── CLASIFICACIÓN FISCAL (lógica de la app, no de la IA) ──
@@ -1586,7 +1624,7 @@ async function analyzeWithClaude(file){
   const content=isPDF
     ?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Lee este documento completo y extrae los datos fiscales. IMPORTANTE: Lee los números EXACTAMENTE como aparecen en el documento, no uses valores de memoria ni de otros documentos. El IMPORTE/BASE que ves en este documento es el correcto. Extrae todos los datos siguiendo las reglas del sistema.'}]
     :[{type:'image',source:{type:'base64',media_type:mt,data:base64}},{type:'text',text:'Analiza esta factura y extrae los datos fiscales. Lee los números EXACTAMENTE como aparecen en la imagen, no uses valores de memoria.'}];
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-beta':'pdfs-2024-09-25,interleaved-thinking-2025-05-14','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:8000,thinking:{type:'enabled',budget_tokens:5000},system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-beta':'pdfs-2024-09-25,interleaved-thinking-2025-05-14','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-7',max_tokens:8000,thinking:{type:'enabled',budget_tokens:8000},system:SYSTEM_PROMPT,messages:[{role:'user',content}]})});
   const d=await resp.json();
   if(d.error) throw new Error(d.error.message);
   const textBlock=d.content.find(b=>b.type==='text');
@@ -1983,7 +2021,14 @@ async function handleClaudeFiles(files){
         // Modelos afectados
         const modelos=getModelosAfectados(f);
         const modeloChips=''; // replaced by buttons below
-        return `<div class="factura-review" id="${divId}_r${i}" data-tipo="${f.tipo}" data-op="${f.operacion||'INT'}">
+        const conf=f._confidence||'alta';
+        const warnings=Array.isArray(f._warnings)?f._warnings:[];
+        const confColor=conf==='baja'?'#FF5A48':conf==='media'?'#FFD060':'';
+        const confBg=conf==='baja'?'rgba(255,90,72,0.15)':conf==='media'?'rgba(255,214,10,0.12)':'';
+        const confIcon=conf==='baja'?'⚠️':conf==='media'?'⚠':'';
+        const confLabel=conf==='baja'?'REVISAR — confianza baja':conf==='media'?'Revisar — confianza media':'';
+        return `<div class="factura-review" id="${divId}_r${i}" data-tipo="${f.tipo}" data-op="${f.operacion||'INT'}" ${conf!=='alta'?`style="border:1.5px solid ${confColor};"`:''}>
+          ${conf!=='alta'?`<div style="background:${confBg};color:${confColor};font-size:12px;font-weight:700;padding:8px 12px;border-bottom:0.5px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:6px;"><span style="font-size:14px;">${confIcon}</span> ${confLabel}</div>${warnings.length?`<div style="background:${confBg};color:#F5EDE0;font-size:11px;padding:6px 12px;border-bottom:0.5px solid rgba(255,255,255,0.1);"><div style="font-weight:600;color:${confColor};margin-bottom:3px;">Avisos:</div>${warnings.map(w=>'• '+w).join('<br>')}</div>`:''}`:''}
           <div class="factura-review-hdr">
             <input type="checkbox" checked onchange="toggleReview('${divId}_r${i}',this.checked)" />
             <span class="factura-review-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;display:inline-block;vertical-align:middle;">${(f.proveedor_cliente||'—').split(' ').slice(0,3).join(' ')} · ${fmtFecha(f.fecha)}</span>
@@ -2188,6 +2233,33 @@ function saveAllSelected(){
   const list=document.getElementById('analysis-list');
   if(!list) return;
   const items=list.querySelectorAll('.analysis-item');
+  // Count checked items
+  let totalChecked=0;
+  items.forEach(item=>{
+    item.querySelectorAll('.factura-review').forEach(r=>{ const cb=r.querySelector('input[type=checkbox]'); if(cb&&cb.checked) totalChecked++; });
+  });
+  if(!totalChecked) return;
+  // Check low-confidence items
+  let lowConfCount=0;
+  items.forEach(item=>{
+    item.querySelectorAll('.factura-review').forEach(r=>{
+      const cb=r.querySelector('input[type=checkbox]');
+      if(cb&&cb.checked){
+        const divId=item.id;
+        const idx=parseInt(r.id.replace(divId+'_r',''));
+        const itm=(window['_analysis_'+divId]||[])[idx];
+        if(itm&&itm._confidence==='baja') lowConfCount++;
+      }
+    });
+  });
+  if(lowConfCount>0){
+    if(!confirm(`⚠️ ${lowConfCount} factura(s) tienen confianza BAJA y deberían revisarse manualmente.\n\n¿Guardar de todas formas?`)) return;
+  }
+  // Confirm trimestre
+  if(!confirm(`Guardar ${totalChecked} factura(s) en ${Q}\n\n¿Es correcto el trimestre?`)) return;
+  // Disable save button
+  const saveBtn=document.getElementById('analysis-save-btn');
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='Guardando...'; saveBtn.style.opacity='0.6'; }
   let savedCount=0;
   items.forEach(item=>{
     const divId=item.id;
@@ -2195,12 +2267,12 @@ function saveAllSelected(){
     let hasChecked=false;
     checks.forEach(r=>{ const cb=r.querySelector('input[type=checkbox]'); if(cb&&cb.checked) hasChecked=true; });
     if(hasChecked){
-      const count=checks.length;
-      // fromGlobal=false para que saveAnalysis gestione el DOM (upload + eliminar)
-      savedCount+=saveAnalysis(divId, count, false);
+      savedCount+=saveAnalysis(divId, count=checks.length, false);
     }
   });
-  if(savedCount>0) showToast(`✓ ${savedCount} factura(s) guardadas`,'success');
+  if(savedCount>0) showToast(`✓ ${savedCount} factura(s) guardadas en ${Q}`,'success');
+  // Re-enable button after short delay (in case items remain)
+  setTimeout(()=>{ if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent=`Guardar seleccionadas en ${Q}`; saveBtn.style.opacity='1'; } updateSaveBar(); },800);
 }
 
 function saveAnalysis(divId, count, fromGlobal=false){
@@ -2381,6 +2453,30 @@ async function uploadFileToDrive(file,q,tipo='gasto'){
   renderDriveTab(); 
   return created; 
 }
+
+// Mueve un archivo de Drive a la carpeta del nuevo trimestre (cambia parents)
+async function moveFileToQuarter(fileId, newQ, tipo='gasto'){
+  if(!token||!facturasFId||!fileId) return null;
+  try{
+    // 1. Obtener parents actuales
+    const r1=await driveReq(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents,name,webViewLink`);
+    const info=await r1.json();
+    const oldParents=(info.parents||[]).join(',');
+    // 2. Crear/encontrar la carpeta destino
+    const parentFId=(tipo==='ingreso'&&ingresosFId)?ingresosFId:(gastosFId||facturasFId);
+    const newFolderId=await findOrCreate(newQ, parentFId);
+    if(!newFolderId) return null;
+    // 3. Si ya está en la carpeta correcta, no hacer nada
+    if(oldParents===newFolderId) return {id:fileId, webViewLink:info.webViewLink, name:info.name};
+    // 4. PATCH cambiando parents
+    const r2=await driveReq(`https://www.googleapis.com/drive/v3/files/${fileId}?addParents=${newFolderId}&removeParents=${oldParents}&fields=id,name,webViewLink,parents`,{method:'PATCH'});
+    const moved=await r2.json();
+    // 5. Actualizar driveFiles cache local
+    const df=driveFiles.find(f=>f.id===fileId);
+    if(df){ df.quarter=newQ; if(moved.webViewLink) df.link=moved.webViewLink; }
+    return moved;
+  }catch(e){ console.error('moveFileToQuarter error:',e); return null; }
+}
 async function syncDrive(){ setDS('sync','Sincronizando...'); try{ await Promise.all(Object.keys(data).filter(q=>data[q]&&data[q].length).map(q=>saveDataToDrive(q))); setDS('ok','Drive OK'); document.getElementById('drive-last-sync').textContent='Última sync: '+new Date().toLocaleTimeString('es'); renderDriveTab(); }catch(e){setDS('err','Error sync');} }
 function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
 
@@ -2527,40 +2623,81 @@ async function confirmReset(type, value){
   for(const link of unique){ await deleteDriveFileIfOrphan(link); }
   if(unique.length>0) renderDriveTab();
 }
-async function deleteDriveFileIfOrphan(driveLink){
-  if(!driveLink||!token) return;
-  const stillUsed=Object.values(data).flat().some(f=>f._driveLink===driveLink);
-  if(stillUsed) return;
-  const df=driveFiles.find(f=>f.link===driveLink);
-  if(!df||!df.id) return;
-  try{ await driveReq('https://www.googleapis.com/drive/v3/files/'+df.id,{method:'DELETE'}); driveFiles=driveFiles.filter(f=>f.id!==df.id); }catch(e){}
+async function deleteDriveFileIfOrphan(driveLinkOrFileId, fileId){
+  // Acepta link, fileId, o ambos
+  if(!token) return false;
+  const driveLink=driveLinkOrFileId&&driveLinkOrFileId.startsWith&&driveLinkOrFileId.startsWith('http')?driveLinkOrFileId:null;
+  let fid=fileId||null;
+  if(!fid&&driveLink){
+    const df=driveFiles.find(f=>f.link===driveLink);
+    if(df) fid=df.id;
+  }
+  // Si llaman con fileId directamente como primer argumento
+  if(!fid&&driveLinkOrFileId&&!driveLink) fid=driveLinkOrFileId;
+  if(!fid) return false;
+  // Comprobar si otro registro aún usa este archivo
+  const stillUsed=Object.values(data).flat().some(f=>f._driveLink===driveLink||f._driveFileId===fid);
+  if(stillUsed) return false;
+  try{
+    const r=await driveReq('https://www.googleapis.com/drive/v3/files/'+fid,{method:'DELETE'});
+    driveFiles=driveFiles.filter(f=>f.id!==fid);
+    console.log('Drive file deleted:', fid);
+    return true;
+  }catch(e){
+    console.error('Error deleting Drive file:', e);
+    return false;
+  }
 }
-function delR(id){
+async function delR(id){
   const f=(data[Q]||[]).find(x=>x._id==id);
   const driveLink=f&&f._driveLink||null;
+  let fileId=f&&f._driveFileId||null;
+  if(!fileId&&driveLink){ const df=driveFiles.find(x=>x.link===driveLink); if(df) fileId=df.id; }
   data[Q]=(data[Q]||[]).filter(x=>x._id!==id);
   saveLocal(); renderAll();
-  haptic('delete'); showToast('Registro eliminado','error');
-  if(token){ saveDataToDrive(Q).catch(()=>{}); if(driveLink) deleteDriveFileIfOrphan(driveLink); }
+  haptic('delete');
+  if(token){
+    saveDataToDrive(Q).catch(()=>{});
+    if(fileId){ await deleteDriveFileIfOrphan(driveLink, fileId); }
+  }
+  showToast('Registro eliminado','success');
 }
-function deleteFromModal(){
+async function deleteFromModal(){
   if(!modalFacturaId) return;
   if(!confirm('¿Eliminar este registro?')) return;
   const q=Object.keys(data).find(q=>data[q]&&data[q].find(f=>f._id==modalFacturaId));
-  if(q){
-    const f=data[q].find(x=>x._id==modalFacturaId);
-    const driveLink=f&&f._driveLink||null;
-    data[q]=data[q].filter(x=>x._id!=modalFacturaId);
-    saveLocal();
-    renderAll();
-    haptic('delete');
-    showToast('Registro eliminado','error');
-    if(token){
-      saveDataToDrive(q).catch(()=>{});
-      if(driveLink) deleteDriveFileIfOrphan(driveLink);
-    }
+  if(!q){ closeModal(); return; }
+  const f=data[q].find(x=>x._id==modalFacturaId);
+  // Capturar todas las referencias al archivo en Drive ANTES de borrar el registro
+  const driveLink=f&&f._driveLink||null;
+  let fileId=f&&f._driveFileId||null;
+  if(!fileId&&driveLink){
+    const df=driveFiles.find(x=>x.link===driveLink);
+    if(df) fileId=df.id;
   }
+  // Si tampoco lo encuentra, intentar por fecha+nombre
+  if(!fileId&&f&&f.fecha){
+    const df=driveFiles.find(x=>x.name&&x.name.startsWith((f.fecha||'').slice(0,10)));
+    if(df) fileId=df.id;
+  }
+  // Borrar registro
+  data[q]=data[q].filter(x=>x._id!=modalFacturaId);
+  saveLocal();
+  renderAll();
+  haptic('delete');
   closeModal();
+  if(token){
+    saveDataToDrive(q).catch(()=>{});
+    if(fileId){
+      showToast('Eliminando archivo en Drive...','info');
+      const ok=await deleteDriveFileIfOrphan(driveLink, fileId);
+      showToast(ok?'✓ Registro y archivo eliminados':'⚠ Registro eliminado pero archivo no encontrado en Drive', ok?'success':'error');
+    } else {
+      showToast('✓ Registro eliminado (sin archivo en Drive)','success');
+    }
+  } else {
+    showToast('Registro eliminado','success');
+  }
 }
 
 // ── RENDER ──
@@ -3026,6 +3163,224 @@ function renderStatsPanel(){
     ${ingCatBars?`<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Desglose ingresos</div>${ingCatBars}</div>`:''}
     ${catBars?`<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Desglose gastos</div>${catBars}</div>`:''}
   `;
+}
+
+
+
+// ── AUDITAR Y LIMPIAR DRIVE ──
+async function auditDrive(){
+  if(!token||!facturasFId){ alert('Conecta a Drive primero.'); return; }
+  if(!confirm('Esto va a escanear toda la carpeta MiGestor/facturas/ en Drive.\n\nSe puede tardar unos segundos. Continuar?')) return;
+  showToast('Escaneando Drive...','info');
+  try{
+    // 1. Escanear estructura completa: gastos/{trimestre}/* e ingresos/{trimestre}/*
+    const driveAll=[]; // {id, name, link, type:'gasto'|'ingreso', quarter}
+    for(const [tipo, rootFolderId] of [['gasto', gastosFId], ['ingreso', ingresosFId]]){
+      if(!rootFolderId) continue;
+      // Listar trimestres (subcarpetas)
+      const qFolders=encodeURIComponent(`'${rootFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+      const rqf=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qFolders}&fields=files(id,name)&pageSize=100`);
+      const qfj=await rqf.json();
+      const quarters=qfj.files||[];
+      for(const qf of quarters){
+        // Listar archivos del trimestre
+        let pageToken=null;
+        do {
+          const qFiles=encodeURIComponent(`'${qf.id}' in parents and mimeType!='application/vnd.google-apps.folder' and trashed=false`);
+          let url=`https://www.googleapis.com/drive/v3/files?q=${qFiles}&fields=files(id,name,webViewLink),nextPageToken&pageSize=100`;
+          if(pageToken) url+='&pageToken='+pageToken;
+          const r=await driveReq(url);
+          const j=await r.json();
+          (j.files||[]).forEach(f=>{
+            driveAll.push({id:f.id, name:f.name, link:f.webViewLink, type:tipo, quarter:qf.name});
+          });
+          pageToken=j.nextPageToken;
+        } while(pageToken);
+      }
+      // También archivos sueltos directamente en gastos/ o ingresos/ (sin trimestre)
+      const qLoose=encodeURIComponent(`'${rootFolderId}' in parents and mimeType!='application/vnd.google-apps.folder' and trashed=false`);
+      const rl=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qLoose}&fields=files(id,name,webViewLink)&pageSize=100`);
+      const jl=await rl.json();
+      (jl.files||[]).forEach(f=>{
+        driveAll.push({id:f.id, name:f.name, link:f.webViewLink, type:tipo, quarter:null}); // sin trimestre
+      });
+    }
+    console.log('Drive scan:', driveAll.length, 'archivos encontrados');
+    // 2. Cruzar con registros en MiGestor
+    const allRecords=[];
+    Object.keys(data).forEach(q=>{
+      (data[q]||[]).forEach(r=>{ allRecords.push({...r, _q:q}); });
+    });
+    // 3. Clasificar archivos de Drive
+    const orphans=[]; // archivos sin registro en MiGestor
+    const misplaced=[]; // archivos en trimestre incorrecto según MiGestor
+    const correctlyPlaced=[];
+    driveAll.forEach(df=>{
+      // Buscar registro que apunta a este archivo (por _driveFileId o _driveLink)
+      const rec=allRecords.find(r=>r._driveFileId===df.id||r._driveLink===df.link);
+      if(!rec){
+        orphans.push(df);
+      } else if(rec._q!==df.quarter){
+        misplaced.push({drive:df, record:rec, expectedQuarter:rec._q});
+      } else {
+        correctlyPlaced.push(df);
+      }
+    });
+    // 4. Mostrar reporte y pedir confirmación
+    const msg=`AUDITORÍA DRIVE:\n\n`+
+      `✓ ${correctlyPlaced.length} archivo(s) correctamente ubicado(s)\n`+
+      `↔ ${misplaced.length} archivo(s) en trimestre INCORRECTO (se moverán)\n`+
+      `🗑 ${orphans.length} archivo(s) HUÉRFANO(S) sin registro en MiGestor (se borrarán)\n\n`+
+      (misplaced.length?`MOVER:\n${misplaced.slice(0,8).map(m=>`• ${m.drive.name.slice(0,40)} (${m.drive.quarter||'sin trim.'} → ${m.expectedQuarter})`).join('\n')}${misplaced.length>8?`\n... y ${misplaced.length-8} más`:''}\n\n`:'')+
+      (orphans.length?`BORRAR:\n${orphans.slice(0,8).map(o=>`• ${o.name.slice(0,50)} (en ${o.type}/${o.quarter||'sin trim.'})`).join('\n')}${orphans.length>8?`\n... y ${orphans.length-8} más`:''}\n\n`:'')+
+      `¿Proceder?`;
+    if(!misplaced.length&&!orphans.length){
+      alert(`✓ Todo está correctamente sincronizado.\n\n${correctlyPlaced.length} archivo(s) en su sitio.`);
+      return;
+    }
+    if(!confirm(msg)) return;
+    // 5. Mover misplaced
+    showToast(`Moviendo ${misplaced.length} archivo(s)...`,'info');
+    let movedOk=0, movedErr=0;
+    for(const m of misplaced){
+      try{
+        const r=await moveFileToQuarter(m.drive.id, m.expectedQuarter, m.drive.type);
+        if(r){
+          if(r.webViewLink) m.record._driveLink=r.webViewLink;
+          movedOk++;
+        } else movedErr++;
+      }catch(e){ movedErr++; }
+    }
+    // 6. Borrar orphans
+    showToast(`Borrando ${orphans.length} huérfano(s)...`,'info');
+    let delOk=0, delErr=0;
+    for(const o of orphans){
+      try{
+        await driveReq('https://www.googleapis.com/drive/v3/files/'+o.id,{method:'DELETE'});
+        driveFiles=driveFiles.filter(f=>f.id!==o.id);
+        delOk++;
+      }catch(e){ delErr++; }
+    }
+    // 7. Guardar datos actualizados (links pueden haber cambiado)
+    saveLocal();
+    if(token){
+      const qsAffected=new Set(misplaced.map(m=>m.expectedQuarter));
+      qsAffected.forEach(q=>saveDataToDrive(q).catch(()=>{}));
+    }
+    renderAll();
+    alert(`LIMPIEZA COMPLETADA:\n\n✓ ${movedOk} archivo(s) movidos${movedErr?' ('+movedErr+' con error)':''}\n🗑 ${delOk} huérfano(s) borrados${delErr?' ('+delErr+' con error)':''}`);
+  }catch(e){
+    console.error('Error auditando Drive:', e);
+    alert('Error: '+e.message);
+  }
+}
+
+// ── BULK MODE ──
+let bulkMode=false;
+let bulkSelected=new Set();
+
+function enterBulkMode(){
+  bulkMode=true;
+  bulkSelected=new Set();
+  renderList();
+  document.getElementById('bulk-bar').style.display='block';
+  document.getElementById('fact-search-bar').style.display='none';
+  if(navigator.vibrate) navigator.vibrate([10,30,10]);
+}
+function exitBulkMode(){
+  bulkMode=false;
+  bulkSelected=new Set();
+  document.getElementById('bulk-bar').style.display='none';
+  renderList();
+}
+function toggleBulkItem(id){
+  if(bulkSelected.has(id)) bulkSelected.delete(id);
+  else bulkSelected.add(id);
+  updateBulkBar();
+  // Update checkbox visual
+  const cb=document.getElementById('bulk-cb-'+id);
+  if(cb) cb.checked=bulkSelected.has(id);
+}
+function updateBulkBar(){
+  const n=bulkSelected.size;
+  const span=document.getElementById('bulk-count');
+  if(span) span.textContent=n===0?'Selecciona facturas':n+' seleccionada'+(n===1?'':'s');
+}
+async function bulkChangeQuarter(){
+  if(!bulkSelected.size){alert('Selecciona al menos una factura.');return;}
+  const quarters=['1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026','1T 2027'];
+  const q=prompt('Nuevo trimestre:\n'+quarters.join(' | ')+'\n\nEscribe el trimestre:');
+  if(!q||!quarters.includes(q)){if(q) alert('Trimestre no válido. Formato: 1T 2026'); return;}
+  if(!confirm(`Mover ${bulkSelected.size} factura(s) a ${q}?`)) return;
+  const all=Object.values(data).flat();
+  const affectedOldQs=new Set();
+  const filesToMove=[]; // {fileId, tipo, recordRef}
+  bulkSelected.forEach(id=>{
+    const f=all.find(x=>String(x._id)===String(id));
+    if(!f) return;
+    const oldQ=Object.keys(data).find(k=>data[k]&&data[k].find(x=>String(x._id)===String(id)));
+    if(oldQ&&oldQ!==q){
+      data[oldQ]=data[oldQ].filter(x=>String(x._id)!==String(id));
+      if(!data[q]) data[q]=[];
+      f._quarter=q;
+      data[q].push(f);
+      affectedOldQs.add(oldQ);
+      const driveFileId=f._driveFileId||(driveFiles.find(x=>x.link===f._driveLink)||{}).id;
+      if(driveFileId) filesToMove.push({fileId:driveFileId, tipo:f.tipo||'gasto', record:f});
+    }
+  });
+  saveLocal(); renderAll();
+  if(token){
+    affectedOldQs.forEach(oq=>saveDataToDrive(oq).catch(()=>{}));
+    saveDataToDrive(q).catch(()=>{});
+    if(filesToMove.length){
+      showToast(`Moviendo ${filesToMove.length} archivo(s) en Drive...`,'info');
+      let moved=0, errors=0;
+      for(const item of filesToMove){
+        try{
+          const r=await moveFileToQuarter(item.fileId, q, item.tipo);
+          if(r){ if(r.webViewLink) item.record._driveLink=r.webViewLink; moved++; }
+          else errors++;
+        }catch(e){ errors++; }
+      }
+      saveLocal();
+      saveDataToDrive(q).catch(()=>{});
+      showToast(`✓ ${moved} archivo(s) movidos${errors?', '+errors+' con error':''}`,'success');
+    }
+  }
+  showToast(`✓ ${bulkSelected.size} factura(s) movidas a ${q}`,'success');
+  exitBulkMode();
+}
+async function bulkDelete(){
+  if(!bulkSelected.size){alert('Selecciona al menos una factura.');return;}
+  if(!confirm(`¿Borrar ${bulkSelected.size} factura(s) definitivamente?`)) return;
+  const delFiles=token?confirm('¿Borrar también los archivos en Drive?\n\nOK = Sí, borrar todo\nCancelar = Solo registros, mantener archivos'):false;
+  const all=Object.values(data).flat();
+  const affectedQs=new Set();
+  const fileIdsToDelete=[];
+  bulkSelected.forEach(id=>{
+    const f=all.find(x=>String(x._id)===String(id));
+    const oldQ=Object.keys(data).find(k=>data[k]&&data[k].find(x=>String(x._id)===String(id)));
+    if(oldQ){
+      if(delFiles&&f){
+        const fid=f._driveFileId||(driveFiles.find(x=>x.link===f._driveLink)||{}).id;
+        if(fid) fileIdsToDelete.push(fid);
+      }
+      data[oldQ]=data[oldQ].filter(x=>String(x._id)!==String(id));
+      affectedQs.add(oldQ);
+    }
+  });
+  saveLocal(); renderAll();
+  if(token){
+    affectedQs.forEach(q=>saveDataToDrive(q).catch(()=>{}));
+    if(delFiles&&fileIdsToDelete.length){
+      for(const fid of fileIdsToDelete){
+        try{ await driveReq('https://www.googleapis.com/drive/v3/files/'+fid,{method:'DELETE'}); driveFiles=driveFiles.filter(d=>d.id!==fid); }catch(e){}
+      }
+    }
+  }
+  showToast(`🗑 ${bulkSelected.size} factura(s) eliminadas${delFiles&&fileIdsToDelete.length?' + '+fileIdsToDelete.length+' archivo(s) Drive':''}`,'success');
+  exitBulkMode();
 }
 
 let fabOpen=false;
@@ -4273,7 +4628,7 @@ function renderList(){
   // Search — use unified search bar input
   const searchInput=document.getElementById('fact-search-input');
   const q=(searchInput&&searchInput.value)||(document.getElementById('fact-search')||{}).value||'';
-  if(q) fs=fs.filter(f=>(f.proveedor_cliente||'').toLowerCase().includes(q.toLowerCase())||(f.concepto||'').toLowerCase().includes(q.toLowerCase()));
+  if(q){ const ql=q.toLowerCase(); fs=fs.filter(f=>(f.proveedor_cliente||'').toLowerCase().includes(ql)||(f.concepto||'').toLowerCase().includes(ql)||(f.num_factura||'').toLowerCase().includes(ql)||(f.fecha||'').includes(ql)||(f.nif||'').toLowerCase().includes(ql)||(f.justificacion||'').toLowerCase().includes(ql)); }
   const rcf2=document.getElementById('rc-f'); if(rcf2) rcf2.textContent=fs.length+' reg.';
   // Summary — always calculated on full quarter, not filtered set
   const allFs=getF(Q);
@@ -4362,17 +4717,26 @@ function renderList(){
           <div class="fact-date">${fmtFecha(f.fecha)}</div>
         </div>
       </div>`;
-      return `<div class="fact-item" onclick="openModal('${fid}')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);">
-        <div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:${getBarColor(f)};"></div>
-        <div class="fact-main">
-          <div class="fact-name">${f.proveedor_cliente||'—'}</div>
+      const isBulkSel=bulkSelected.has(fid);
+      return `<div class="fact-item" 
+          onclick="${bulkMode?`toggleBulkItem('${fid}')`:`openModal('${fid}')`}"
+          ontouchstart="if(!bulkMode){this._lpt=setTimeout(()=>{this._lpt=null;enterBulkMode();toggleBulkItem('${fid}');},500)}"
+          ontouchend="clearTimeout(this._lpt)"
+          ontouchmove="clearTimeout(this._lpt)"
+          style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);${isBulkSel?'background:rgba(240,132,74,0.08);':''}" >
+        ${bulkMode?`<input id="bulk-cb-${fid}" type="checkbox" ${isBulkSel?'checked':''} onclick="event.stopPropagation();toggleBulkItem('${fid}')" style="flex-shrink:0;width:18px;height:18px;accent-color:var(--accent);">`:`<div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:${getBarColor(f)};"></div>`}
+        <div class="fact-main" style="min-width:0;flex:1;">
+          <div style="display:flex;align-items:baseline;gap:5px;min-width:0;">
+            <div class="fact-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
+            ${f.num_factura?`<span style="font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0;">${f.num_factura}</span>`:''}
+          </div>
           <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}${isIng&&f.categoria_ing?` <span style="display:inline-block;background:rgba(48,209,88,0.15);color:#30D158;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;margin-left:3px;">${f.categoria_ing}</span>`:''}</div>
         </div>
         <div class="fact-right">
           <div class="fact-amount" style="color:${isIng?'var(--green)':'var(--red)'};font-weight:700;">${isIng?'+':'−'}${fmt(amount)}</div>
           <div class="fact-date">${fmtFecha(f.fecha)}</div>
         </div>
-        <div style="flex-shrink:0;" onclick="event.stopPropagation()">${driveIcon(f)}</div>
+        ${bulkMode?'':`<div style="flex-shrink:0;" onclick="event.stopPropagation()">${driveIcon(f)}</div>`}
       </div>`;
     }).join('');
     return header+rows;
@@ -4487,16 +4851,32 @@ function openModal(id){
     } else { cat2.style.display='none'; }
   }
   const driveBtn=document.getElementById('modal-drive-btn');
-  if(driveFileId){ 
-    driveBtn.style.display='flex'; driveBtn.textContent='Ver en Drive'; 
-    driveBtn._link=driveFiles.find(x=>x.id===driveFileId)?.link||f._driveLink||null;
-    driveBtn.onclick=()=>openDriveFile(); 
-  } else if(f._driveLink){
-    driveBtn.style.display='flex'; driveBtn.textContent='Ver en Drive';
-    driveBtn._link=f._driveLink;
+  const driveBtnLabel=document.getElementById('modal-drive-btn-label');
+  driveBtn.style.display='flex';
+  // Priorizar: _driveFileId (más fiable) > _driveLink (puede estar) > búsqueda en cache
+  let resolvedFileId=f._driveFileId||driveFileId||null;
+  let resolvedLink=f._driveLink||null;
+  if(!resolvedLink&&resolvedFileId){
+    const df=driveFiles.find(x=>x.id===resolvedFileId);
+    if(df) resolvedLink=df.link;
+  }
+  if(f._driveUploading){
+    if(driveBtnLabel) driveBtnLabel.textContent='Subiendo...';
+    driveBtn._link=null;
+    driveBtn.onclick=null;
+    driveBtn.style.opacity='0.6';
+  } else if(resolvedLink||resolvedFileId){
+    if(driveBtnLabel) driveBtnLabel.textContent='Ver factura';
+    driveBtn._link=resolvedLink||('https://drive.google.com/file/d/'+resolvedFileId+'/view');
+    driveBtn._fileId=resolvedFileId;
     driveBtn.onclick=()=>openDriveFile();
-  } else { 
-    driveBtn.style.display='flex'; driveBtn._link=null; driveBtn.textContent='Subir a Drive'; driveBtn.onclick=()=>uploadFromModal(); 
+    driveBtn.style.opacity='1';
+  } else {
+    if(driveBtnLabel) driveBtnLabel.textContent='Subir a Drive';
+    driveBtn._link=null;
+    driveBtn._fileId=null;
+    driveBtn.onclick=()=>uploadFromModal();
+    driveBtn.style.opacity='1';
   }
   document.getElementById('factura-modal').style.display='block';
   document.body.style.overflow='hidden';
@@ -4673,9 +5053,22 @@ function saveModalEdit(){
   if(newQ&&newQ!==currentQ){
     data[currentQ]=data[currentQ].filter(x=>x._id!=modalFacturaId);
     if(!data[newQ]) data[newQ]=[];
+    f._quarter=newQ;
     data[newQ].push(f);
     saveLocal(); renderAll();
-    if(token){ saveDataToDrive(currentQ).catch(()=>{}); saveDataToDrive(newQ).catch(()=>{}); }
+    if(token){
+      saveDataToDrive(currentQ).catch(()=>{});
+      saveDataToDrive(newQ).catch(()=>{});
+      // Mover archivo físico en Drive
+      const driveFileId=f._driveFileId||(driveFiles.find(x=>x.link===f._driveLink)||{}).id;
+      if(driveFileId){
+        showToast('Moviendo archivo en Drive...','info');
+        moveFileToQuarter(driveFileId, newQ, f.tipo||'gasto').then(moved=>{
+          if(moved&&moved.webViewLink){ f._driveLink=moved.webViewLink; saveLocal(); saveDataToDrive(newQ).catch(()=>{}); }
+          showToast(moved?'✓ Archivo movido en Drive':'⚠ No se pudo mover el archivo en Drive','success');
+        }).catch(()=>showToast('⚠ Error moviendo archivo','error'));
+      }
+    }
     closeModal(); return;
   }
   saveLocal(); renderAll();
@@ -4727,7 +5120,7 @@ function showReprocessOptions(f){
 function restoreModalButtons(){
   const footer=document.getElementById('modal-reprocess-btn')?.parentElement||document.querySelector('#factura-modal .modal-footer');
   if(footer) footer.innerHTML=`
-    <button id="modal-drive-btn" onclick="openDriveFile()" style="display:none;flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">📂 Drive</button>
+    <button id="modal-drive-btn" onclick="openDriveFile()" style="flex:1;background:var(--blue-bg);color:var(--blue);border:0.5px solid var(--blue-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;"><span id="modal-drive-btn-label">Ver factura</span></button>
     <button onclick="toggleJustEdit()" style="flex:1;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line-2);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;" id="modal-just-btn">✏️ Justificación</button>
     <button id="modal-reprocess-btn" onclick="reprocessFromModal()" style="flex:1;background:var(--accent-dim);color:var(--accent);border:0.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Reprocesar</button>
     <button onclick="deleteFromModal()" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:var(--r-sm);padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Eliminar</button>`;

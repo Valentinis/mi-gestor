@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.394</div>
+    <div class="login-version">v5.397</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.394</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.397</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -803,7 +803,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.394</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.397</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -3032,7 +3032,7 @@ function renderTicketsSubtab(searchQ=''){
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       Analizar extracto / pago
     </button>
-    ${pending.length>0?`<button onclick="approveAllChronological()" title="Aprobar todo" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;">✓✓</button>`:''}
+    ${pending.length>0?`<button id="approve-all-btn" onclick="approveAllChronological()" title="Aprobar todo" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;">✓✓</button>`:''}
     ${pending.length>0?`<button onclick="clearAllTicketsPending()" title="Vaciar lista" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;">🗑</button>`:''}
   </div>`;
   if(!pending.length){
@@ -6142,13 +6142,25 @@ async function loadTicketsFromFlama(){
       if(get('uid')!==safeUid) return;
       if(get('processed')===true||f.processed?.booleanValue===true) return;
       const flamaId=doc.name.split('/').pop();
+      const importeNum=parseFloat(get('importe'))||0;
+      const fechaStr=get('fecha')||'';
+      const clienteStr=get('cliente')||'';
+      // Detectar si ya existe esta factura en data (duplicado)
+      const existingFacturas=Object.values(data).flat();
+      const isDup=existingFacturas.some(rec=>
+        rec.doc_type==='ticket' &&
+        rec.fecha===fechaStr &&
+        Math.abs((rec.ingresos_brutos||0)-importeNum)<0.01 &&
+        (clienteStr===''||rec.proveedor_cliente===clienteStr)
+      );
       flamaPayments.push({
-        _fsId:'flama_'+flamaId, // prefijo para distinguir
+        _fsId:'flama_'+flamaId,
         _flamaDocId:flamaId,
         _source:'flama',
-        cliente:get('cliente')||'',
-        importe:parseFloat(get('importe'))||0,
-        fecha:get('fecha')||'',
+        _dup:isDup,
+        cliente:clienteStr,
+        importe:importeNum,
+        fecha:fechaStr,
         hora:get('hora')||'',
         metodo:(get('metodo')||'transferencia').toLowerCase(),
         concepto:get('concepto')||'Clases de cerámica',
@@ -6609,10 +6621,36 @@ function renderTicketsPendientes(){
   }).join('');
 }
 
+// Lock global para evitar race conditions en numeración
+let _getNextTicketLock=Promise.resolve();
 async function getNextTicketNum(ticketFecha){
+  // Encadenar las llamadas para que sean secuenciales
+  const prev=_getNextTicketLock;
+  let release;
+  _getNextTicketLock=new Promise(r=>{release=r;});
+  try{ await prev; }catch(e){}
+  try{
+    return await _getNextTicketNumCore(ticketFecha);
+  } finally {
+    release();
+  }
+}
+
+async function _getNextTicketNumCore(ticketFecha){
   const safeUid=getSafeUid();
   const year=ticketFecha?new Date(ticketFecha).getFullYear():new Date().getFullYear();
-  let num=1;
+  // Calcular el máximo número ya usado en data[Q] para este año
+  let maxUsed=0;
+  Object.values(data).flat().forEach(f=>{
+    if(f.doc_type==='ticket'&&f.num_factura){
+      const m=f.num_factura.match(/^T(\d{2})(\d{4})$/);
+      if(m && '20'+m[1]===String(year)){
+        const n=parseInt(m[2]);
+        if(n>maxUsed) maxUsed=n;
+      }
+    }
+  });
+  let num=maxUsed+1;
   if(token&&safeUid){
     try{
       const url=`${FS_URL}/users/${safeUid}/config/prefs`;
@@ -6620,8 +6658,9 @@ async function getNextTicketNum(ticketFecha){
       if(r.ok){
         const j=await r.json();
         const f=j.fields||{};
-        const stored=f['lastTicketNum_'+year]?.integerValue||f['lastTicketNum_'+year]?.doubleValue||0;
-        num=parseInt(stored)+1;
+        const stored=parseInt(f['lastTicketNum_'+year]?.integerValue||f['lastTicketNum_'+year]?.doubleValue||0);
+        // Usar el máximo entre lo guardado en Firestore y lo ya emitido en data
+        num=Math.max(stored+1, maxUsed+1);
       }
     }catch(e){}
     // Save back
@@ -6633,7 +6672,8 @@ async function getNextTicketNum(ticketFecha){
   } else {
     // Fallback: localStorage counter
     const k='_tk_num_'+year;
-    num=parseInt(localStorage.getItem(k)||'0')+1;
+    const stored=parseInt(localStorage.getItem(k)||'0');
+    num=Math.max(stored+1, maxUsed+1);
     localStorage.setItem(k,num);
   }
   return 'T'+String(year).slice(2)+String(num).padStart(4,'0');
@@ -6867,17 +6907,79 @@ function ticketToRecord(t){
 
 async function approveAllChronological(){
   if(!ticketsPendientes.length) return;
-  if(!confirm(`¿Aprobar los ${ticketsPendientes.length} tickets en orden cronológico?`)) return;
   if(window._approvingTicket) return;
+  if(!confirm(`¿Aprobar los ${ticketsPendientes.length} tickets en orden cronológico?\n\nSi alguno está duplicado te preguntaré antes de crearlo.`)) return;
+
   window._approvingTicket=true;
+  const btn=document.getElementById('approve-all-btn');
+  // Bloquear botón y mostrar estado "Guardando..."
+  const restoreBtn=()=>{
+    if(!btn) return;
+    btn.disabled=false;
+    btn.style.opacity='1';
+    btn.style.cursor='pointer';
+    btn.style.pointerEvents='auto';
+    btn.innerHTML='✓✓';
+  };
+  if(btn){
+    btn.disabled=true;
+    btn.style.opacity='0.55';
+    btn.style.cursor='not-allowed';
+    btn.style.pointerEvents='none';
+  }
 
   // Ordenar por fecha ascendente
   const sorted=[...ticketsPendientes].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
   switchSubTab('facturas');
-  showToast(`Aprobando ${sorted.length} tickets...`);
 
-  for(const t of sorted){
-    // Insertar placeholder
+  let aprobados=0;
+  let omitidos=0;
+  let cancelado=false;
+
+  for(let idx=0;idx<sorted.length;idx++){
+    const t=sorted[idx];
+    if(btn) btn.innerHTML=`⏳ ${idx+1}/${sorted.length}`;
+
+    // Re-comprobar duplicado en tiempo real (data puede haber cambiado en iteraciones previas)
+    const allFacts=Object.values(data).flat();
+    const cliMatch=(t.cliente||'').trim().toLowerCase();
+    const existing=allFacts.find(f=>
+      f.doc_type==='ticket' &&
+      f.fecha===t.fecha &&
+      Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01 &&
+      (cliMatch===''||(f.proveedor_cliente||'').trim().toLowerCase()===cliMatch)
+    );
+
+    if(existing){
+      const choice=window.confirm(
+        `⚠️ DUPLICADO en ticket ${idx+1}/${sorted.length}\n\n` +
+        `Pago entrante:\n` +
+        `  • ${t.cliente||'—'}\n` +
+        `  • ${fmtFecha(t.fecha)}  ·  ${fmt(t.importe||0)}\n\n` +
+        `Ya existe:\n` +
+        `  • Nº ${existing.num_factura||'(sin nº)'}\n` +
+        `  • ${existing.proveedor_cliente||'—'}\n` +
+        `  • ${fmtFecha(existing.fecha)}  ·  ${fmt(existing.ingresos_brutos||0)}\n\n` +
+        `Aceptar = Crear igualmente   |   Cancelar = Omitir este\n\n` +
+        `(Si quieres detener todo el proceso, pulsa Cancelar y luego confirma en el siguiente diálogo)`
+      );
+      if(!choice){
+        // Omitir este: si viene de Flama, marcarlo como procesado
+        if(t._source==='flama'&&t._flamaDocId){
+          await markFlamaPaymentProcessed(t._flamaDocId).catch(()=>{});
+        }
+        omitidos++;
+        // Preguntar si quiere cancelar todo el proceso restante
+        if(idx<sorted.length-1){
+          const stopAll=window.confirm(`¿Quieres CANCELAR todo el proceso?\n\nAceptar = Cancelar todo (quedan ${sorted.length-idx-1} pendientes)\nCancelar = Continuar con el siguiente`);
+          if(stopAll){ cancelado=true; break; }
+        }
+        continue;
+      }
+      // Si dijo aceptar: crear igualmente, sigue al flujo normal
+    }
+
+    // Insertar placeholder y procesar
     const ticketQ=getQuarterFromDate(t.fecha)||Q;
     const tempId='processing_'+Date.now()+'_'+Math.random().toString(36).slice(2);
     const placeholder={_id:tempId,_quarter:ticketQ,_processing:true,tipo:'ingreso',doc_type:'ticket',
@@ -6896,18 +6998,34 @@ async function approveAllChronological(){
       data[ticketQ].push(rec);
       saveLocal(); renderAll();
       if(token) saveDataToDrive(ticketQ).catch(()=>{});
+      aprobados++;
+      // Quitar de pendientes y marcar Flama processed
+      const idxInPending=ticketsPendientes.findIndex(x=>x._fsId===t._fsId);
+      if(idxInPending>=0) ticketsPendientes.splice(idxInPending,1);
+      if(t._source==='flama'&&t._flamaDocId){
+        markFlamaPaymentProcessed(t._flamaDocId).catch(()=>{});
+      }
     }catch(e){
       if(data[ticketQ]) data[ticketQ]=data[ticketQ].filter(x=>x._id!==tempId);
       renderAll();
+      omitidos++;
     }
   }
 
-  ticketsPendientes=[];
   await saveTicketsPending();
   window._approvingTicket=false;
+  restoreBtn();
   renderTicketsSubtab();
-  showToast(`✓ ${sorted.length} tickets aprobados`,'success');
-  haptic('success');
+
+  // Resumen final
+  const partes=[];
+  if(aprobados>0) partes.push(`${aprobados} aprobado${aprobados===1?'':'s'}`);
+  if(omitidos>0) partes.push(`${omitidos} omitido${omitidos===1?'':'s'}`);
+  let resumen=partes.join(' · ');
+  if(cancelado) resumen='⛔ Cancelado · '+resumen;
+  if(!resumen) resumen='Sin cambios';
+  showToast(resumen, aprobados>0?'success':'info');
+  haptic(aprobados>0?'success':'warning');
 }
 
 async function clearAllTicketsPending(){
@@ -6943,8 +7061,38 @@ async function approveTicket(i){
   const t=ticketsPendientes[i];
   if(!t){ window._approvingTicket=false; return; }
 
-  if(t._dup){
-    const ok=confirm(`⚠️ Posible duplicado\n\nYa existe una factura de "${t.cliente||t.concepto||'este cliente'}" con la misma fecha e importe en el historial.\n\n¿Aprobar igualmente?`);
+  // Re-comprobar duplicados en el momento real de aprobar (más fiable que el flag _dup)
+  const allFacts=Object.values(data).flat();
+  const cliMatch=(t.cliente||'').trim().toLowerCase();
+  const existing=allFacts.find(f=>
+    f.doc_type==='ticket' &&
+    f.fecha===t.fecha &&
+    Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01 &&
+    (cliMatch===''||(f.proveedor_cliente||'').trim().toLowerCase()===cliMatch)
+  );
+  if(existing){
+    const msg = `⚠️ DUPLICADO DETECTADO\n\n` +
+      `Ya existe esta factura:\n` +
+      `• Nº: ${existing.num_factura||'(sin nº)'}\n` +
+      `• Cliente: ${existing.proveedor_cliente||'—'}\n` +
+      `• Fecha: ${fmtFecha(existing.fecha)}\n` +
+      `• Importe: ${fmt(existing.ingresos_brutos||0)}\n\n` +
+      `¿Aprobar igualmente y crear OTRO ticket?`;
+    const ok=confirm(msg);
+    if(!ok){
+      window._approvingTicket=false;
+      // Si viene de Flama, marcarlo como procesado para que no reaparezca
+      if(t._source==='flama'&&t._flamaDocId){
+        markFlamaPaymentProcessed(t._flamaDocId);
+        ticketsPendientes.splice(i,1);
+        saveTicketsPending();
+      }
+      renderTicketsSubtab();
+      return;
+    }
+  } else if(t._dup){
+    // Fallback al flag (poco probable que llegue aquí)
+    const ok=confirm(`⚠️ Posible duplicado\n\nYa existe una factura similar.\n\n¿Aprobar igualmente?`);
     if(!ok){ window._approvingTicket=false; renderTicketsSubtab(); return; }
   }
 

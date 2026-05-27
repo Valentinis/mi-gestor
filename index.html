@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.393</div>
+    <div class="login-version">v5.394</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.393</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.394</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -803,7 +803,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.393</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.394</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -3055,7 +3055,7 @@ function renderTicketsSubtab(searchQ=''){
       return `<div style="background:var(--bg-card);${border}border-radius:10px;padding:10px 12px;margin-bottom:6px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
           <div style="flex:1;min-width:0;overflow:hidden;">
-            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${metodoIcon} ${t.concepto||'—'}${dupBadge}</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${metodoIcon} ${t.concepto||'—'}${dupBadge}${t._source==='flama'?' <span style="display:inline-block;background:rgba(29,158,117,0.2);color:#1D9E75;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;">FLAMA</span>':''}</div>
           </div>
           <div style="font-size:14px;font-weight:800;color:var(--green);flex-shrink:0;">+${bruto.toFixed(2).replace('.',',')} €</div>
         </div>
@@ -6120,16 +6120,68 @@ async function saveTicketsPending(){
   }catch(e){ console.warn('saveTicketsPending error:',e); }
 }
 
+// URL de Flama Workshop para leer pagos enviados
+const FLAMA_PAYMENTS_URL='https://firestore.googleapis.com/v1/projects/flama-workshop/databases/(default)/documents/payments_to_migestor';
+const FLAMA_API_KEY='AIzaSyDKGmdOZ4kaflBHKuRkqJxkXp2_t7sBfsk'; // mismo FB_KEY de Flama
+
+async function loadTicketsFromFlama(){
+  // Lee de Flama Workshop los pagos NO procesados
+  if(!getSafeUid()) return [];
+  try{
+    const safeUid=getSafeUid();
+    const url=`${FLAMA_PAYMENTS_URL}?key=${FLAMA_API_KEY}&pageSize=100`;
+    const r=await fetch(url);
+    if(!r.ok) return [];
+    const j=await r.json();
+    if(!j.documents||!j.documents.length) return [];
+    const flamaPayments=[];
+    j.documents.forEach(doc=>{
+      const f=doc.fields||{};
+      const get=(k)=>{ const v=f[k]; if(!v) return ''; return v.stringValue||v.doubleValue||v.integerValue||v.booleanValue||''; };
+      // Solo los del usuario actual y NO procesados
+      if(get('uid')!==safeUid) return;
+      if(get('processed')===true||f.processed?.booleanValue===true) return;
+      const flamaId=doc.name.split('/').pop();
+      flamaPayments.push({
+        _fsId:'flama_'+flamaId, // prefijo para distinguir
+        _flamaDocId:flamaId,
+        _source:'flama',
+        cliente:get('cliente')||'',
+        importe:parseFloat(get('importe'))||0,
+        fecha:get('fecha')||'',
+        hora:get('hora')||'',
+        metodo:(get('metodo')||'transferencia').toLowerCase(),
+        concepto:get('concepto')||'Clases de cerámica',
+        pct_iva:21,
+        cliente_nif:''
+      });
+    });
+    return flamaPayments;
+  }catch(e){ console.warn('Error cargando pagos Flama:',e); return []; }
+}
+
+async function markFlamaPaymentProcessed(flamaDocId){
+  try{
+    const url=`${FLAMA_PAYMENTS_URL}/${flamaDocId}?updateMask.fieldPaths=processed&key=${FLAMA_API_KEY}`;
+    await fetch(url,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({fields:{processed:{booleanValue:true}}})
+    });
+  }catch(e){ console.warn('Error marcando Flama processed:',e); }
+}
+
 async function loadTicketsPending(){
   if(!token||!getSafeUid()){ ticketsPendientes=[]; renderTicketsPendientes(); return; }
   try{
     const safeUid=getSafeUid();
     const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
     const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+    let loaded=[];
     if(r.ok){
       const j=await r.json();
       if(j.documents&&j.documents.length){
-        const loaded=j.documents.map(doc=>{
+        loaded=j.documents.map(doc=>{
           const f=doc.fields||{};
           const t={};
           Object.entries(f).forEach(([k,v])=>{
@@ -6140,21 +6192,21 @@ async function loadTicketsPending(){
           t._fsId=doc.name.split('/').pop();
           return t;
         });
-        // Dedup by _fsId
-        const seen=new Set();
-        ticketsPendientes=loaded.filter(t=>{
-          const key=t._fsId||((t.fecha||'')+'|'+(t.importe||0)+'|'+(t.concepto||''));
-          if(seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
-      } else {
-        ticketsPendientes=[];
       }
-    } else {
-      ticketsPendientes=[];
     }
-  }catch(e){ ticketsPendientes=[]; }
+    // Cargar también de Flama Workshop
+    const flamaTickets=await loadTicketsFromFlama();
+    // Combinar
+    const all=loaded.concat(flamaTickets);
+    // Dedup
+    const seen=new Set();
+    ticketsPendientes=all.filter(t=>{
+      const key=t._fsId||((t.fecha||'')+'|'+(t.importe||0)+'|'+(t.concepto||''));
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }catch(e){ ticketsPendientes=[]; console.warn(e); }
   renderTicketsPendientes();
 }
 
@@ -6876,6 +6928,10 @@ async function discardTicket(i){
   if(!t) return;
   ticketsPendientes.splice(i,1);
   await saveTicketsPending();
+  // Si viene de Flama, marcarlo como procesado allí
+  if(t._source==='flama'&&t._flamaDocId){
+    markFlamaPaymentProcessed(t._flamaDocId);
+  }
   haptic('delete');
   renderTicketsSubtab();
   showToast('Pago descartado');
@@ -6895,6 +6951,10 @@ async function approveTicket(i){
   // 1. Quitar de pendientes y navegar a Historial INMEDIATAMENTE
   ticketsPendientes.splice(i,1);
   saveTicketsPending();
+  // Si viene de Flama, marcarlo como procesado allí
+  if(t._source==='flama'&&t._flamaDocId){
+    markFlamaPaymentProcessed(t._flamaDocId);
+  }
   switchSubTab('facturas');
   haptic('success');
 

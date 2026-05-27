@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.397</div>
+    <div class="login-version">v5.398</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.397</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.398</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -803,7 +803,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.397</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.398</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -6582,32 +6582,64 @@ Ejemplo: [{"fecha":"2026-01-30","hora":"","importe":100.00,"pct_iva":21,"concept
   return JSON.parse(clean);
 }
 
+let ticketBulkSelected=new Set();
+
 function renderTicketsPendientes(){
   const wrap=document.getElementById('tickets-pending-wrap');
   const empty=document.getElementById('tickets-empty');
   if(!ticketsPendientes.length){
     wrap.style.display='none';
     empty.style.display='block';
+    ticketBulkSelected.clear();
     return;
   }
   empty.style.display='none';
   wrap.style.display='block';
-  // Ordenar por fecha descendente (más reciente primero)
   const sorted=[...ticketsPendientes].sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
   const list=document.getElementById('tickets-pending-list');
-  list.innerHTML=sorted.map((t,i)=>{
+
+  // Bulk bar
+  const hasSel=ticketBulkSelected.size>0;
+  let bulkHtml='';
+  if(hasSel){
+    bulkHtml=`<div style="background:var(--bg-raised);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;">${ticketBulkSelected.size} seleccionado(s)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <select id="ticket-bulk-cat" style="flex:1;min-width:120px;background:var(--bg-input);color:var(--text);border:0.5px solid var(--line);border-radius:8px;padding:6px;font-size:12px;">
+          <option value="">Categoría de ingreso...</option>
+          <option value="Clase">Clase</option>
+          <option value="Taller grupal / experiencia">Taller grupal / experiencia</option>
+          <option value="Venta de pieza cerámica">Venta de pieza cerámica</option>
+          <option value="Encargo personalizado">Encargo personalizado</option>
+          <option value="Servicio B2B (empresa)">Servicio B2B (empresa)</option>
+          <option value="Merchandising">Merchandising</option>
+          <option value="Otro">Otro</option>
+        </select>
+        <button onclick="applyTicketBulkCat()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Aplicar</button>
+        <button onclick="ticketBulkSelected.clear();renderTicketsPendientes();" style="background:var(--bg-input);color:var(--text-3);border:0.5px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Deselect.</button>
+      </div>
+    </div>`;
+  }
+
+  list.innerHTML=bulkHtml+sorted.map((t,i)=>{
     const realIdx=ticketsPendientes.indexOf(t);
     const isDup=t._dup;
-    const border=isDup?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);';
+    const isSel=ticketBulkSelected.has(realIdx);
+    const border=isSel?'border:1.5px solid var(--accent);':(isDup?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);');
+    const bg=isSel?'background:rgba(240,132,74,0.06);':'background:var(--bg-card);';
     const dupBadge=isDup?'<span style="font-size:10px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">posible dup.</span>':'';
+    const flamaBadge=t._source==='flama'?' <span style="display:inline-block;background:rgba(29,158,117,0.2);color:#1D9E75;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;">FLAMA</span>':'';
     const metodoIcon={sumup:'💳',bizum:'📱',transferencia:'🏦'}[t.metodo]||'💰';
-    return `<div style="background:var(--bg-card);${border}border-radius:12px;padding:12px;margin-bottom:8px;">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+    const catLabel=t.categoria_ing?`<span style="font-size:10px;background:rgba(29,158,117,0.12);color:#1D9E75;border-radius:4px;padding:1px 5px;font-weight:600;">${t.categoria_ing}</span>`:'';
+    return `<div style="${bg}${border}border-radius:12px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;align-items:flex-start;gap:8px;">
+        <input type="checkbox" ${isSel?'checked':''} onchange="toggleTicketBulk(${realIdx})" style="margin-top:3px;flex-shrink:0;width:18px;height:18px;accent-color:var(--accent);" />
         <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
-            ${metodoIcon} <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.concepto||'—'}</span>${dupBadge}
+          <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${metodoIcon} ${t.concepto||'—'}${dupBadge}${flamaBadge}
           </div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${fmtFecha(t.fecha)}${t.hora?' · '+t.hora:''}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${fmtFecha(t.fecha)}${t.hora?' · '+t.hora:''} · ${t.cliente||'—'} · Base ${fmt(t.importe/(1+(t.pct_iva||21)/100))} · IVA ${t.pct_iva||21}% · ${(t.metodo||'—').charAt(0).toUpperCase()+(t.metodo||'').slice(1)}</div>
+          <div style="margin-top:3px;">${catLabel}</div>
         </div>
         <div style="text-align:right;flex-shrink:0;">
           <div style="font-size:15px;font-weight:800;color:var(--green);">+${(t.importe||0).toFixed(2).replace('.',',')} €</div>
@@ -6619,6 +6651,28 @@ function renderTicketsPendientes(){
       </div>
     </div>`;
   }).join('');
+}
+
+function toggleTicketBulk(idx){
+  if(ticketBulkSelected.has(idx)) ticketBulkSelected.delete(idx);
+  else ticketBulkSelected.add(idx);
+  renderTicketsPendientes();
+}
+
+function applyTicketBulkCat(){
+  const sel=document.getElementById('ticket-bulk-cat');
+  if(!sel||!sel.value){ showToast('Selecciona una categoría','error'); return; }
+  const cat=sel.value;
+  let count=0;
+  ticketBulkSelected.forEach(idx=>{
+    if(ticketsPendientes[idx]){
+      ticketsPendientes[idx].categoria_ing=cat;
+      count++;
+    }
+  });
+  ticketBulkSelected.clear();
+  renderTicketsPendientes();
+  showToast(`✓ Categoría "${cat}" aplicada a ${count} ticket(s)`,'success');
 }
 
 // Lock global para evitar race conditions en numeración
@@ -6851,6 +6905,8 @@ async function approveTicketWithDrive(t){
     retencion_importe:0,
     ingresos_brutos:bruto,
     notas:'Pago '+(t.metodo||''),
+    justificacion:t.justificacion||'',
+    categoria_ing:t.categoria_ing||'Clase',
     _id:Date.now()+Math.random()
   };
   classifyRecord(rec);

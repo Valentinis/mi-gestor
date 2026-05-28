@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.406</div>
+    <div class="login-version">v5.407</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.406</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.407</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -803,7 +803,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.406</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.407</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -4558,16 +4558,25 @@ async function showAsesorHistory(){
     list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px;">Sin conversaciones guardadas</div>';
     return;
   }
+  // Guardar chats en mapa global para acceder por id sin JSON.stringify en onclick
+  window._asesorChatsMap={};
+  chats.forEach(c=>{ window._asesorChatsMap[c.id]=c; });
   list.innerHTML=chats.map(c=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid rgba(255,255,255,0.06);cursor:pointer;" onclick="loadAsesorChat(${JSON.stringify(c)})">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid rgba(255,255,255,0.06);cursor:pointer;" onclick="loadAsesorChatById('${c.id}')">
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.title}</div>
-        <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${c.updatedAt?new Date(c.updatedAt).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${c.updatedAt?new Date(c.updatedAt).toLocaleDateString('es-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''} · ${c.messages?.length||0} mensajes</div>
       </div>
       <button onclick="event.stopPropagation();confirmDeleteChat('${c.id}')" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px;flex-shrink:0;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
       </button>
     </div>`).join('');
+}
+
+function loadAsesorChatById(id){
+  const chat=window._asesorChatsMap&&window._asesorChatsMap[id];
+  if(!chat){ showToast('Chat no encontrado','error'); return; }
+  loadAsesorChat(chat);
 }
 
 function loadAsesorChat(chat){
@@ -4578,11 +4587,23 @@ function loadAsesorChat(chat){
   const msgs=document.getElementById('asesor-messages');
   if(!msgs) return;
   msgs.innerHTML='';
+  // Mostrar indicador de chat retomado
+  if(asesorHistory.length>0){
+    const badge=document.createElement('div');
+    badge.style.cssText='text-align:center;font-size:11px;color:var(--text-3);padding:8px 0 4px;';
+    badge.textContent='— Conversación retomada —';
+    msgs.appendChild(badge);
+  }
   asesorHistory.forEach(m=>{
     const text=typeof m.content==='string'?m.content:m.content?.find?.(c=>c.type==='text')?.text||'[adjunto]';
     appendAsesorMsg(m.role, text);
   });
   scrollAsesorToBottom();
+  // Enfocar el input para poder escribir
+  setTimeout(()=>{
+    const input=document.getElementById('asesor-input');
+    if(input) input.focus();
+  }, 300);
 }
 
 async function confirmDeleteChat(id){

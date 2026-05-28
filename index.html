@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.402</div>
+    <div class="login-version">v5.406</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.402</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.406</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -803,7 +803,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.402</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.406</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -4632,28 +4632,36 @@ function appendAsesorMsg(role, text){
 }
 
 function buildFinancialContext(){
-  const allFacts=Object.values(data).flat();
-  const byQ={};
-  allFacts.forEach(f=>{
-    const q=f._quarter||'?';
-    if(!byQ[q]) byQ[q]={ingresos:[],gastos:[]};
-    if(f.tipo==='ingreso') byQ[q].ingresos.push(f);
-    else byQ[q].gastos.push(f);
+  // Pasar TODAS las facturas de TODOS los trimestres con detalle completo
+  const lines=[];
+  lines.push('Autónomo: Valentín López Pérez, NIF 48220739C, ceramista Barcelona, IAE 86.2, estimación directa simplificada.');
+  lines.push('Trimestre activo en la app: '+Q);
+  lines.push('');
+
+  const quarters=Object.keys(data).sort();
+  quarters.forEach(q=>{
+    const facts=data[q]||[];
+    if(!facts.length) return;
+    const ingresos=facts.filter(f=>f.tipo==='ingreso');
+    const gastos=facts.filter(f=>f.tipo==='gasto');
+    const sumIng=ingresos.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
+    const sumGas=gastos.reduce((a,f)=>a+(f.base_iva||0),0);
+    lines.push(`=== ${q} (${ingresos.length} ingresos, ${gastos.length} gastos) ===`);
+    lines.push(`Resumen: ingresos ${sumIng.toFixed(2)}€, gastos ${sumGas.toFixed(2)}€, beneficio ${(sumIng-sumGas).toFixed(2)}€`);
+    lines.push('INGRESOS:');
+    ingresos.forEach(f=>{
+      lines.push(`  ${fmtFecha(f.fecha)} | ${f.num_factura||'—'} | ${f.proveedor_cliente||'—'} | ${f.concepto||'—'} | base ${(f.base_iva||0).toFixed(2)}€ | IVA ${(f.cuota_iva||0).toFixed(2)}€ | bruto ${(f.ingresos_brutos||0).toFixed(2)}€ | ret ${(f.retencion_importe||0).toFixed(2)}€ | ${f.operacion||''} | ${f.categoria_ing||''}`);
+    });
+    lines.push('GASTOS:');
+    gastos.forEach(f=>{
+      lines.push(`  ${fmtFecha(f.fecha)} | ${f.num_factura||'—'} | ${f.proveedor_cliente||'—'} | ${f.concepto||'—'} | base ${(f.base_iva||0).toFixed(2)}€ | IVA ${(f.cuota_iva||0).toFixed(2)}€ | ret ${(f.retencion_importe||0).toFixed(2)}€ | ${f.operacion||''} | ${f.justificacion||''}`);
+    });
+    lines.push('');
   });
-  const summary=Object.entries(byQ).map(([q,v])=>{
-    const ing=v.ingresos.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
-    const gas=v.gastos.reduce((a,f)=>a+(f.base_iva||0),0);
-    const iva_rep=v.ingresos.reduce((a,f)=>a+(f.cuota_iva||0),0);
-    const iva_sop=v.gastos.reduce((a,f)=>a+(f.cuota_iva||0),0);
-    const ret=v.ingresos.reduce((a,f)=>a+(f.retencion_importe||0),0);
-    return `${q}: ingresos ${ing.toFixed(2)}€, gastos ${gas.toFixed(2)}€, beneficio ${(ing-gas).toFixed(2)}€, IVA rep ${iva_rep.toFixed(2)}€, IVA sop ${iva_sop.toFixed(2)}€, retenciones ${ret.toFixed(2)}€`;
-  }).join('\n');
-  const currentFacts=(data[Q]||[]).map(f=>
-    `[${fmtFecha(f.fecha)}] ${f.tipo}|${f.proveedor_cliente||''}|${f.concepto||''}|base ${f.base_iva||0}€|IVA ${f.cuota_iva||0}€|ret ${f.retencion_importe||0}€|op:${f.operacion||''}`
-  ).join('\n');
-  return `Autónomo: Valentín López Pérez, NIF 48220739C, ceramista Barcelona, IAE 86.2, estimación directa simplificada.\nTrimestre activo: ${Q}\n\nRESUMEN POR TRIMESTRES:\n${summary}\n\nFACTURAS ${Q}:\n${currentFacts}`;
+  return lines.join('\n');
 }
 
+// ── ASESOR CHAT (función única) ──
 async function sendAsesorMessage(){
   const input=document.getElementById('asesor-input');
   const text=(input?.value||'').trim();
@@ -4676,13 +4684,18 @@ async function sendAsesorMessage(){
   const loadDiv=appendAsesorMsg('assistant','…');
 
   try{
+    const ctx=buildFinancialContext();
+    const systemPrompt=`Eres el asesor fiscal personal de Valentín López Pérez, autónomo ceramista en Barcelona (NIF 48220739C, IAE 86.2, estimación directa simplificada). Tienes acceso completo a TODAS sus facturas e ingresos/gastos de todos los trimestres. Responde siempre en español, de forma concisa y práctica. Cuando calcules importes sé preciso. Puedes consultar cualquier factura, hacer cálculos fiscales, comparar trimestres, o ayudar a preparar declaraciones.
+
+DATOS FINANCIEROS COMPLETOS:
+${ctx}`;
     const resp=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:1500,
-        system:`Eres el asesor fiscal personal de Valentín López Pérez, autónomo ceramista en Barcelona. Tienes acceso completo a sus datos financieros. Responde en español, de forma concisa y práctica. Cuando calcules importes sé preciso.\n\nDATOS FINANCIEROS:\n${buildFinancialContext()}`,
+        model:'claude-opus-4-7',
+        max_tokens:2000,
+        system:systemPrompt,
         messages:asesorHistory.map(m=>({role:m.role,content:m.content}))
       })
     });
@@ -4690,7 +4703,6 @@ async function sendAsesorMessage(){
     const reply=d.content?.[0]?.text||'Sin respuesta';
     if(loadDiv) loadDiv.textContent=reply;
     asesorHistory.push({role:'assistant',content:reply});
-    // Auto-save to Firestore after each exchange
     saveAsesorChat();
   }catch(e){
     if(loadDiv) loadDiv.textContent='Error al conectar. Verifica tu API key en Config.';
@@ -4739,96 +4751,7 @@ function appendAsesorMsg(role, text){
   return div;
 }
 
-function buildFinancialContext(){
-  const allFacts=Object.values(data).flat();
-  const byQ={};
-  allFacts.forEach(f=>{
-    const q=f._quarter||'?';
-    if(!byQ[q]) byQ[q]={ingresos:[],gastos:[]};
-    if(f.tipo==='ingreso') byQ[q].ingresos.push(f);
-    else byQ[q].gastos.push(f);
-  });
-  const summary=Object.entries(byQ).map(([q,v])=>{
-    const ing=v.ingresos.reduce((a,f)=>a+(f.ingresos_brutos||f.base_iva||0),0);
-    const gas=v.gastos.reduce((a,f)=>a+(f.base_iva||0),0);
-    const iva_rep=v.ingresos.reduce((a,f)=>a+(f.cuota_iva||0),0);
-    const iva_sop=v.gastos.reduce((a,f)=>a+(f.cuota_iva||0),0);
-    const ret=v.ingresos.reduce((a,f)=>a+(f.retencion_importe||0),0);
-    return `${q}: ingresos ${ing.toFixed(2)}€, gastos ${gas.toFixed(2)}€, beneficio ${(ing-gas).toFixed(2)}€, IVA repercutido ${iva_rep.toFixed(2)}€, IVA soportado ${iva_sop.toFixed(2)}€, retenciones ${ret.toFixed(2)}€`;
-  }).join('\n');
-  const currentFacts=(data[Q]||[]).map(f=>
-    `[${fmtFecha(f.fecha)}] ${f.tipo} | ${f.proveedor_cliente||''} | ${f.concepto||''} | base ${f.base_iva||0}€ | IVA ${f.cuota_iva||0}€ | ret ${f.retencion_importe||0}€ | op:${f.operacion||''}`
-  ).join('\n');
-  return `Autónomo: Valentín López Pérez, NIF 48220739C, ceramista Barcelona, IAE 86.2, estimación directa simplificada.
-Trimestre activo: ${Q}
 
-RESUMEN POR TRIMESTRES:
-${summary}
-
-FACTURAS ${Q} (${(data[Q]||[]).length} registros):
-${currentFacts}`;
-}
-
-async function sendAsesorMessage(){
-  const input=document.getElementById('asesor-input');
-  const text=(input?.value||'').trim();
-  if(!text&&!asesorAttachment) return;
-
-  // Show user message
-  const displayText=text+(asesorAttachment?` [📎 ${asesorAttachment.name}]`:'');
-  appendAsesorMsg('user', displayText);
-  if(input) { input.value=''; input.style.height='auto'; }
-
-  // Build message content
-  const content=[];
-  if(asesorAttachment){
-    const b64=await new Promise((res,rej)=>{
-      const r=new FileReader();
-      r.onload=()=>res(r.result.split(',')[1]);
-      r.onerror=rej;
-      r.readAsDataURL(asesorAttachment);
-    });
-    const mt=asesorAttachment.type||'application/pdf';
-    if(mt.startsWith('image/')){
-      content.push({type:'image',source:{type:'base64',media_type:mt,data:b64}});
-    } else {
-      content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}});
-    }
-    removeAsesorAttachment();
-  }
-  if(text) content.push({type:'text',text});
-
-  asesorHistory.push({role:'user',content:content.length===1&&content[0].type==='text'?text:content});
-
-  // Loading indicator
-  const loadDiv=appendAsesorMsg('assistant','…');
-
-  try {
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':claudeKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:1500,
-        system:`Eres el asesor fiscal personal de Valentín López Pérez, autónomo ceramista en Barcelona. Tienes acceso completo a sus datos financieros. Responde en español, de forma concisa y práctica. Cuando calcules importes sé preciso. Si adjunta un documento, analízalo en el contexto de sus finanzas.\n\nDATO FINANCIEROS ACTUALES:\n${buildFinancialContext()}`,
-        messages:asesorHistory
-      })
-    });
-    const data2=await resp.json();
-    const reply=data2.content?.[0]?.text||'Sin respuesta';
-    if(loadDiv) loadDiv.textContent=reply;
-    asesorHistory.push({role:'assistant',content:reply});
-  } catch(e) {
-    if(loadDiv) loadDiv.textContent='Error al conectar con el asesor. Verifica tu API key en Config.';
-  }
-  scrollAsesorToBottom();
-}
-// ── FIN ASESOR CHAT ──
 function openAdvisor(){
   document.getElementById('advisor-modal').style.display='block';
   document.body.style.overflow='hidden';
@@ -6157,6 +6080,25 @@ async function loadTicketsFromFlama(){
         Math.abs((rec.ingresos_brutos||0)-importeNum)<0.01 &&
         (clienteStr===''||rec.proveedor_cliente===clienteStr)
       );
+      var docType=get('type')||'payment';
+      if(docType==='edit'){
+        // Solicitud de edición de ticket ya aprobado
+        flamaPayments.push({
+          _fsId:'flama_edit_'+flamaId,
+          _flamaDocId:flamaId,
+          _source:'flama',
+          _type:'edit',
+          originalTicketId:f.originalTicketId?f.originalTicketId.stringValue:'',
+          originalFlamaDocId:f.originalFlamaDocId?f.originalFlamaDocId.stringValue:'',
+          cliente:clienteStr,
+          importe:importeNum,
+          fecha:fechaStr,
+          metodo:(get('metodo')||'transferencia').toLowerCase(),
+          concepto:get('concepto')||'',
+          nota:get('nota')||'',
+          pct_iva:21
+        });
+      } else {
       flamaPayments.push({
         _fsId:'flama_'+flamaId,
         _flamaDocId:flamaId,
@@ -6171,6 +6113,7 @@ async function loadTicketsFromFlama(){
         pct_iva:21,
         cliente_nif:''
       });
+      }
     });
     return flamaPayments;
   }catch(e){ console.warn('Error cargando pagos Flama:',e); return []; }
@@ -6638,6 +6581,32 @@ function renderTicketsPendientes(){
     const realIdx=ticketsPendientes.indexOf(t);
     const isDup=t._dup;
     const isSel=ticketBulkSelected.has(realIdx);
+    const isEdit=t._type==='edit';
+
+    if(isEdit){
+      const orig=Object.values(data).flat().find(f=>f._id===t.originalTicketId||f.num_factura===t.originalTicketId);
+      const origInfo=orig?`${orig.num_factura||'—'} · ${fmtFecha(orig.fecha)} · ${fmt(orig.ingresos_brutos||0)}`:'(ticket original no encontrado)';
+      return `<div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.3);border-radius:12px;padding:12px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:700;background:rgba(139,92,246,0.15);color:#8B5CF6;border-radius:4px;padding:2px 6px;">✏️ EDICIÓN</span>
+          <span style="font-size:11px;color:var(--text-3);">Solicitada desde Flama</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;">Ticket original: ${origInfo}</div>
+        <div style="font-size:11px;color:var(--text-2);line-height:1.8;">
+          ${t.cliente?'👤 '+t.cliente+'<br>':''}
+          ${t.importe?'💰 '+fmt(t.importe)+'<br>':''}
+          ${t.metodo?'💳 '+t.metodo+'<br>':''}
+          ${t.fecha?'📅 '+fmtFecha(t.fecha)+'<br>':''}
+          ${t.concepto?'📝 '+t.concepto+'<br>':''}
+          ${t.nota?'🗒 '+t.nota:''}
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <button onclick="approveEditTicket(${realIdx})" style="flex:1;background:rgba(139,92,246,0.15);color:#8B5CF6;border:0.5px solid rgba(139,92,246,0.4);border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aplicar edición</button>
+          <button onclick="discardTicket(${realIdx})" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;">✕</button>
+        </div>
+      </div>`;
+    }
+
     const border=isSel?'border:1.5px solid var(--accent);':(isDup?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);');
     const bg=isSel?'background:rgba(240,132,74,0.06);':'background:var(--bg-card);';
     const dupBadge=isDup?'<span style="font-size:10px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">posible dup.</span>':'';
@@ -6893,6 +6862,74 @@ function getQuarterFromDate(fecha){
   const y=d.getFullYear();
   const qt=m<=3?'1T':m<=6?'2T':m<=9?'3T':'4T';
   return qt+' '+y;
+}
+
+async function approveEditTicket(i){
+  const t=ticketsPendientes[i];
+  if(!t||t._type!=='edit') return;
+
+  const allQ=Object.keys(data);
+  let origRec=null, origQ=null;
+  for(const q of allQ){
+    const found=(data[q]||[]).find(f=>f._id===t.originalTicketId||f.num_factura===t.originalTicketId);
+    if(found){ origRec=found; origQ=q; break; }
+  }
+  if(!origRec){ showToast('Ticket original no encontrado','error'); return; }
+  if(!confirm('¿Aplicar edición al ticket '+(origRec.num_factura||'—')+'?\n\nSe actualizarán los datos y se regenerará el PDF en Drive.')) return;
+
+  const btn=document.querySelector('[onclick="approveEditTicket('+i+')"]');
+  if(btn){ btn.disabled=true; btn.style.opacity='0.5'; btn.textContent='Aplicando...'; }
+
+  try{
+    showToast('1/4 Actualizando datos...');
+    if(t.importe){ origRec.ingresos_brutos=t.importe; origRec.base_iva=parseFloat((t.importe/1.21).toFixed(2)); origRec.cuota_iva=parseFloat((t.importe-origRec.base_iva).toFixed(2)); }
+    if(t.metodo) origRec.metodo_pago=t.metodo;
+    if(t.fecha) origRec.fecha=t.fecha;
+    if(t.concepto) origRec.concepto=t.concepto;
+    if(t.nota) origRec.notas=t.nota;
+    classifyRecord(origRec);
+    saveLocal(); renderAll();
+
+    showToast('2/4 Guardando en Drive...');
+    if(token) await saveDataToDrive(origQ).catch(()=>{});
+
+    if(token&&origRec._driveFileId){
+      showToast('3/4 Regenerando PDF...');
+      try{
+        const pdfBlob=await generateTicketPDF(origRec);
+        if(pdfBlob) await uploadTicketPDFToDrive(pdfBlob, origRec._driveFileId);
+      }catch(e){ showToast('⚠️ PDF no actualizado: '+e.message,'error'); }
+    }
+
+    showToast('4/4 Finalizando...');
+    ticketsPendientes.splice(i,1);
+    await saveTicketsPending();
+    if(t._flamaDocId) await markFlamaPaymentStatus(t._flamaDocId,'approved');
+
+    renderAll(); renderTicketsSubtab();
+    showToast('✓ Edición aplicada a '+(origRec.num_factura||'ticket'),'success');
+    haptic('success');
+  }catch(e){
+    showToast('Error: '+e.message,'error');
+    if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.textContent='✓ Aplicar edición'; }
+  }
+}
+async function generateTicketPDF(rec){
+  // Reutilizar la misma lógica de generación de tickets existente
+  // Buscar la función generateTicketHtml o similar
+  const ticketHtml=buildTicketHtml(rec);
+  if(!ticketHtml) return null;
+  return new Blob([ticketHtml],{type:'text/html'});
+}
+
+async function uploadTicketPDFToDrive(blob, fileId){
+  if(!token||!fileId) return;
+  const url=`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`;
+  await fetch(url,{
+    method:'PATCH',
+    headers:{'Authorization':'Bearer '+token,'Content-Type':blob.type||'text/html'},
+    body:blob
+  });
 }
 
 async function approveTicketWithDrive(t){

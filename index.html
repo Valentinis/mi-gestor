@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.417</div>
+    <div class="login-version">v5.418</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.417</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.418</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -732,7 +732,7 @@ img,video,iframe,table{max-width:100%;}
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b111')"><div class="mod-left"><span class="mod-code">111</span><span class="mod-name">Retenciones profesionales</span></div><div class="mod-res pagar" id="r111">—</div></div><div class="mod-body" id="b111"><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Nº perceptores</span><span class="cas-base"></span><span class="cas-cuota" id="m111-n">—</span></div><div class="cas-row"><span class="cas-num">04</span><span class="cas-desc">Base retenciones PROF</span><span class="cas-base"></span><span class="cas-cuota" id="m111-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">06</span><span class="cas-desc">Retenciones 15%</span><span class="cas-base"></span><span class="cas-cuota" id="m111-c">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')""><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
-    <button onclick="recalc();forceModelRepaint();" style="margin-bottom:8px;background:#F0844A !important;color:#fff !important;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Recalcular modelos</button>
+    <button onclick="recalc()" style="margin-bottom:8px;background:#F0844A !important;color:#fff !important;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Recalcular modelos</button>
     <div class="mod-card" style="margin-bottom:8px;">
       <div class="mod-hdr" onclick="openBienesModal()" style="cursor:pointer;">
         <div class="mod-left"><span class="mod-code" style="background:#8B5CF6;">📦</span><span class="mod-name">Bienes de inversión</span></div>
@@ -809,7 +809,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.417</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.418</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -5084,26 +5084,15 @@ function setQFromHeader(q){
   const nl=document.getElementById('nav-q-label'); if(nl) nl.textContent=q;
   const hd=document.getElementById('header-q-display'); if(hd) hd.textContent=q;
   renderAll();
-  forceModelRepaint();
-  // DIAGNÓSTICO: ¿el DOM tiene el valor nuevo?
-  setTimeout(()=>{
-    const dom303=document.getElementById('r303')?.textContent||'?';
-    const dom130=document.getElementById('r130')?.textContent||'?';
-    if(typeof showToast==='function') showToast('DOM dice: 303='+dom303+' 130='+dom130,'info');
-  },400);
 }
 
 function forceModelRepaint(){
   const mt=document.getElementById('tab-modelos');
   if(!mt||!mt.classList.contains('active')) return;
-  // Método definitivo iOS: ocultar y restaurar en el siguiente frame fuerza repaint total
+  // Forzar repaint SIN recalcular de nuevo (eso pisaba los valores)
   mt.style.display='none';
-  void mt.offsetHeight; // reflow forzado
-  requestAnimationFrame(()=>{
-    mt.style.display='';
-    // segundo recalc por si el primero quedó en frame oculto
-    try{ recalc(); }catch(e){}
-  });
+  void mt.offsetHeight;
+  mt.style.display='';
 }
 function setQY(t,btn,ns){
   const year=document.getElementById('year-'+ns)?.value||'2026';

@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.423</div>
+    <div class="login-version">v5.424</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.423</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.424</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -809,7 +809,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.423</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.424</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -5083,12 +5083,17 @@ function setQFromHeader(q){
   const qs=document.getElementById('header-q-select'); if(qs) qs.value=q;
   const nl=document.getElementById('nav-q-label'); if(nl) nl.textContent=q;
   const hd=document.getElementById('header-q-display'); if(hd) hd.textContent=q;
-  // Re-render completo: llamar switchNav con la pestaña activa actual
+  // Re-render según pestaña activa
   const activeBtn=document.querySelector('.nav-btn.active');
   const activePaneId=(document.querySelector('.tab-pane.active')||{}).id||'';
   const activeId=activePaneId.replace('tab-','');
-  if(activeId) switchNav(activeId, activeBtn);
-  else renderAll();
+  // Stats e insights: switchNav completo (resuelve el repintado iOS)
+  // Resto: renderAll normal (switchNav resetea subtabs y causa problemas)
+  if(activeId==='insights'||activeId==='stats'){
+    switchNav(activeId, activeBtn);
+  } else {
+    renderAll();
+  }
 }
 
 function forceModelRepaint(){

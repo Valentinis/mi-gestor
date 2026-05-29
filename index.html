@@ -369,7 +369,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.408</div>
+    <div class="login-version">v5.410</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -457,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.408</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.410</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -728,11 +728,17 @@ img,video,iframe,table{max-width:100%;}
       <div class="sum-card"><div class="sum-label">111 Ret.Prof.</div><div class="sum-val warn" id="s111">—</div></div>
     </div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b303')"><div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div><div class="mod-res pagar" id="r303">—</div></div><div class="mod-body" id="b303"><div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div><div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div><div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div><div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div><div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div><div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div><div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b130')"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div><div class="mod-body" id="b130"><div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div><div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div><div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div><div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b130')"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div><div class="mod-body" id="b130"><div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div><div class="cas-row" id="m130-amort-row" style="opacity:0.85;"><span class="cas-num">└</span><span class="cas-desc">de los cuales, amortizaciones</span><span class="cas-base"></span><span class="cas-cuota" id="m130-amort">—</span></div><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div><div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div><div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div><div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b111')"><div class="mod-left"><span class="mod-code">111</span><span class="mod-name">Retenciones profesionales</span></div><div class="mod-res pagar" id="r111">—</div></div><div class="mod-body" id="b111"><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Nº perceptores</span><span class="cas-base"></span><span class="cas-cuota" id="m111-n">—</span></div><div class="cas-row"><span class="cas-num">04</span><span class="cas-desc">Base retenciones PROF</span><span class="cas-base"></span><span class="cas-cuota" id="m111-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">06</span><span class="cas-desc">Retenciones 15%</span><span class="cas-base"></span><span class="cas-cuota" id="m111-c">—</span></div></div></div>
     <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')""><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
     <button onclick="recalc()" style="margin-bottom:8px;background:#F0844A !important;color:#fff !important;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Recalcular modelos</button>
+    <div class="mod-card" style="margin-bottom:8px;">
+      <div class="mod-hdr" onclick="openBienesModal()" style="cursor:pointer;">
+        <div class="mod-left"><span class="mod-code" style="background:#8B5CF6;">📦</span><span class="mod-name">Bienes de inversión</span></div>
+        <span id="bienes-count" style="font-size:12px;color:var(--text-3);">—</span>
+      </div>
+    </div>
     <div class="mod-card" style="margin-top:12px;">
       <div class="mod-hdr" onclick="tog('b-anual')">
         <div class="mod-left"><span class="mod-code" style="font-size:11px;background:var(--text-3);">AÑO</span><span class="mod-name">Resumen anual estimado</span></div>
@@ -803,7 +809,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.408</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.410</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -1090,6 +1096,7 @@ const FS_URL=`https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databas
 // Auto-detect current quarter
 function currentQuarter(){ const m=new Date().getMonth(); const q=m<3?'1T':m<6?'2T':m<9?'3T':'4T'; return q+' 2026'; }
 let pin='', Q=currentQuarter(), data={}, token=null, user=null, driveLoaded=false;
+let bienesInversion=[]; // Bienes de inversión / amortizaciones
 let regQ=currentQuarter(), regView='gastos', regQScrollInit=false;
 let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, ticketsFId=null, gastosFId=null, ingresosFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
@@ -2508,6 +2515,36 @@ async function loadDriveFiles(){
   }catch(e){ console.error('loadDriveFiles error:',e); }
 }
 async function saveDataToDrive(q){ if(!token||!dataFId) return; const fn=q.replace(' ','_')+'.json',content=JSON.stringify(data[q]||[],null,2); const qr=encodeURIComponent(`name='${fn}' and '${dataFId}' in parents and trashed=false`); const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`); const j=await r.json(); const blob=new Blob([content],{type:'application/json'}); if(j.files&&j.files.length){ await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content}); } else { const f=new FormData(); f.append('metadata',new Blob([JSON.stringify({name:fn,parents:[dataFId]})],{type:'application/json'})); f.append('file',blob); await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f}); } }
+async function saveBienesToDrive(){
+  if(!token||!dataFId) return;
+  const content=JSON.stringify(bienesInversion,null,2);
+  const qr=encodeURIComponent(`name='bienes_inversion.json' and '${dataFId}' in parents and trashed=false`);
+  const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`);
+  const j=await r.json();
+  if(j.files&&j.files.length){
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${j.files[0].id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:content});
+  } else {
+    const f=new FormData();
+    f.append('metadata',new Blob([JSON.stringify({name:'bienes_inversion.json',parents:[dataFId]})],{type:'application/json'}));
+    f.append('file',new Blob([content],{type:'application/json'}));
+    await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:f});
+  }
+}
+
+async function loadBienesFromDrive(){
+  if(!token||!dataFId) return;
+  try{
+    const qr=encodeURIComponent(`name='bienes_inversion.json' and '${dataFId}' in parents and trashed=false`);
+    const r=await driveReq(`https://www.googleapis.com/drive/v3/files?q=${qr}&fields=files(id)`);
+    const j=await r.json();
+    if(j.files&&j.files.length){
+      const fr=await driveReq(`https://www.googleapis.com/drive/v3/files/${j.files[0].id}?alt=media`);
+      const recs=await fr.json();
+      bienesInversion=Array.isArray(recs)?recs:[];
+    }
+  }catch(e){ console.warn('Error loading bienes:',e); }
+}
+
 async function loadFromDrive(){
   if(!token||!dataFId) return;
   try{
@@ -2526,6 +2563,7 @@ async function loadFromDrive(){
       }
     }
   }catch(e){ console.error('loadFromDrive error:',e); }
+  await loadBienesFromDrive();
   saveLocal();
   // NO resetear Q al trimestre actual — respetar el trimestre que el usuario tenía seleccionado
   // El reset solo debe ocurrir en el primer login/pin (que ya lo hace explícitamente)
@@ -5062,8 +5100,219 @@ function updateYearQ(ns){
   }
 }
 function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); const qb=document.getElementById('qbadge'); if(qb) qb.textContent=q; const hs=document.getElementById('header-q-select'); if(hs) hs.value=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); updateSaveBar(); }
+// ── UI MÓDULO BIENES DE INVERSIÓN ──
+let bienesEditId=null;
+
+function updateBienesCount(){
+  const el=document.getElementById('bienes-count');
+  if(!el) return;
+  const activos=bienesInversion.filter(b=>!b.fecha_baja).length;
+  el.textContent=activos>0?activos+' bien'+(activos>1?'es':''):'Añadir';
+}
+
+function openBienesModal(){
+  let m=document.getElementById('bienes-modal');
+  if(!m){
+    m=document.createElement('div');
+    m.id='bienes-modal';
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:50001;display:flex;align-items:flex-end;justify-content:center;';
+    m.onclick=e=>{if(e.target===m)closeBienesModal();};
+    document.body.appendChild(m);
+  }
+  m.innerHTML=renderBienesListHTML();
+  m.style.display='flex';
+}
+function closeBienesModal(){ const m=document.getElementById('bienes-modal'); if(m) m.style.display='none'; }
+
+function renderBienesListHTML(){
+  const totalInv=bienesInversion.reduce((a,b)=>a+(b.valor_adquisicion||0)+(b.gastos_adicionales||0),0);
+  let totalAmort=0,totalVNC=0;
+  bienesInversion.forEach(b=>{
+    if(b.es_escaso_valor) return;
+    const s=calcAmortSchedule(b);
+    const hoy=new Date();
+    let acum=0;
+    s.apuntes.forEach(a=>{ const d=new Date(a.ejercicio,({'1T':2,'2T':5,'3T':8,'4T':11}[a.periodo]),28); if(d<=hoy) acum=a.acumulada; });
+    totalAmort+=acum;
+    totalVNC+=(s.valorAmort-acum);
+  });
+  const items=bienesInversion.length?bienesInversion.map((b,i)=>{
+    const s=calcAmortSchedule(b);
+    const grupo=GRUPOS_AMORT.find(g=>g.id===b.grupo);
+    const hoy=new Date();
+    let acum=0;
+    s.apuntes.forEach(a=>{ const d=new Date(a.ejercicio,({'1T':2,'2T':5,'3T':8,'4T':11}[a.periodo]),28); if(d<=hoy) acum=a.acumulada; });
+    const vnc=s.valorAmort-acum;
+    const estado=b.fecha_baja?'baja':(vnc<=0.01?'amortizado':'activo');
+    const estCol={activo:'#1D9E75',amortizado:'#888',baja:'#d63b3b'}[estado];
+    return `<div onclick="openBienDetalle(${i})" style="background:var(--bg-card);border:0.5px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);">${b.descripcion||'Sin nombre'}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${grupo?grupo.nombre:'—'} · ${b.coeficiente_anual||grupo?.coef||0}% · ${fmtFecha(b.fecha_inicio)}</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;color:${estCol};background:${estCol}22;padding:2px 6px;border-radius:4px;flex-shrink:0;">${estado.toUpperCase()}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;">
+        <span style="color:var(--text-3);">Valor: <b style="color:var(--text);">${fmt(s.valorAmort)}</b></span>
+        <span style="color:var(--text-3);">Amort.: <b style="color:var(--text);">${fmt(acum)}</b></span>
+        <span style="color:var(--text-3);">VNC: <b style="color:var(--text);">${fmt(vnc)}</b></span>
+      </div>
+    </div>`;
+  }).join(''):'<div style="text-align:center;color:var(--text-3);padding:30px;font-size:13px;">Sin bienes de inversión.<br>Añade tu primer bien (horno, torno, equipo...).</div>';
+
+  return `<div style="background:#0E0C0A;border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--text);margin:0;">📦 Bienes de inversión</h2>
+      <button onclick="closeBienesModal()" style="background:none;border:none;color:var(--text-3);font-size:24px;cursor:pointer;">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg-card);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:15px;font-weight:800;color:var(--text);">${fmt(totalInv)}</div><div style="font-size:10px;color:var(--text-3);">Invertido</div></div>
+      <div style="background:var(--bg-card);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:15px;font-weight:800;color:#c07800;">${fmt(totalAmort)}</div><div style="font-size:10px;color:var(--text-3);">Amortizado</div></div>
+      <div style="background:var(--bg-card);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:15px;font-weight:800;color:#1D9E75;">${fmt(totalVNC)}</div><div style="font-size:10px;color:var(--text-3);">VNC</div></div>
+    </div>
+    <button onclick="openBienForm()" style="width:100%;background:#8B5CF6;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;">+ Nuevo bien</button>
+    ${items}
+  </div>`;
+}
+
+function openBienForm(bien){
+  bienesEditId=bien?bienesInversion.indexOf(bien):null;
+  const b=bien||{grupo:3,coeficiente_anual:12,valor_residual:0,gastos_adicionales:0,porcentaje_afectacion:100,metodo:'lineal_trimestral'};
+  const m=document.getElementById('bienes-modal');
+  const grupoOpts=GRUPOS_AMORT.map(g=>`<option value="${g.id}" ${b.grupo===g.id?'selected':''}>${g.id}. ${g.nombre} (${g.coef}% · ${g.anos}a)</option>`).join('');
+  m.innerHTML=`<div style="background:#0E0C0A;border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--text);margin:0;">${bien?'Editar':'Nuevo'} bien</h2>
+      <button onclick="openBienesModal()" style="background:none;border:none;color:var(--text-3);font-size:24px;cursor:pointer;">×</button>
+    </div>
+    <label style="font-size:11px;color:var(--text-3);">Descripción *</label>
+    <input id="bf-desc" value="${b.descripcion||''}" placeholder="Horno cerámico Nabertherm" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;">
+    <label style="font-size:11px;color:var(--text-3);">Proveedor</label>
+    <input id="bf-prov" value="${b.proveedor||''}" placeholder="Proveedor" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;">
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;"><label style="font-size:11px;color:var(--text-3);">Valor adquisición (sin IVA) *</label>
+      <input id="bf-valor" type="number" step="0.01" value="${b.valor_adquisicion||''}" placeholder="4120" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;"></div>
+      <div style="flex:1;"><label style="font-size:11px;color:var(--text-3);">IVA soportado</label>
+      <input id="bf-iva" type="number" step="0.01" value="${b.iva_soportado||''}" placeholder="865.20" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;"><label style="font-size:11px;color:var(--text-3);">Gastos adicionales</label>
+      <input id="bf-gastos" type="number" step="0.01" value="${b.gastos_adicionales||0}" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;"></div>
+      <div style="flex:1;"><label style="font-size:11px;color:var(--text-3);">Valor residual</label>
+      <input id="bf-residual" type="number" step="0.01" value="${b.valor_residual||0}" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;"></div>
+    </div>
+    <label style="font-size:11px;color:var(--text-3);">Fecha factura</label>
+    <input id="bf-fechafact" type="date" value="${b.fecha_factura||''}" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;">
+    <label style="font-size:11px;color:var(--text-3);">Fecha puesta en funcionamiento * (inicia amortización)</label>
+    <input id="bf-fechainicio" type="date" value="${b.fecha_inicio||b.fecha_factura||''}" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;">
+    <label style="font-size:11px;color:var(--text-3);">Grupo (tabla simplificada) *</label>
+    <select id="bf-grupo" onchange="bfGrupoChange()" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:13px;margin:4px 0 10px;">${grupoOpts}</select>
+    <label style="font-size:11px;color:var(--text-3);">Coeficiente anual (%) — máx del grupo</label>
+    <input id="bf-coef" type="number" step="0.01" value="${b.coeficiente_anual||12}" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 10px;">
+    <label style="font-size:11px;color:var(--text-3);">% afectación a la actividad (100 = total)</label>
+    <input id="bf-afect" type="number" step="1" value="${b.porcentaje_afectacion||100}" style="width:100%;background:var(--bg-card);border:0.5px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font-size:14px;margin:4px 0 16px;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="openBienesModal()" style="flex:1;background:var(--bg-card);color:var(--text-3);border:0.5px solid var(--line);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">Cancelar</button>
+      <button onclick="saveBien()" style="flex:2;background:#8B5CF6;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Guardar</button>
+    </div>
+  </div>`;
+}
+
+function bfGrupoChange(){
+  const g=GRUPOS_AMORT.find(x=>x.id===parseInt(document.getElementById('bf-grupo').value));
+  if(g) document.getElementById('bf-coef').value=g.coef;
+}
+
+async function saveBien(){
+  const desc=document.getElementById('bf-desc').value.trim();
+  const valor=parseFloat(document.getElementById('bf-valor').value)||0;
+  const fechaInicio=document.getElementById('bf-fechainicio').value;
+  const grupo=parseInt(document.getElementById('bf-grupo').value);
+  const coef=parseFloat(document.getElementById('bf-coef').value)||0;
+  if(!desc){ alert('La descripción es obligatoria'); return; }
+  if(!valor){ alert('El valor de adquisición es obligatorio'); return; }
+  if(!fechaInicio){ alert('La fecha de puesta en funcionamiento es obligatoria'); return; }
+  const g=GRUPOS_AMORT.find(x=>x.id===grupo);
+  if(g&&coef>g.coef){ if(!confirm(`El coeficiente ${coef}% supera el máximo legal del grupo (${g.coef}%). ¿Continuar igualmente?`)) return; }
+  const bien={
+    descripcion:desc,
+    proveedor:document.getElementById('bf-prov').value.trim(),
+    valor_adquisicion:valor,
+    iva_soportado:parseFloat(document.getElementById('bf-iva').value)||0,
+    gastos_adicionales:parseFloat(document.getElementById('bf-gastos').value)||0,
+    valor_residual:parseFloat(document.getElementById('bf-residual').value)||0,
+    fecha_factura:document.getElementById('bf-fechafact').value,
+    fecha_inicio:fechaInicio,
+    grupo:grupo,
+    coeficiente_anual:coef,
+    porcentaje_afectacion:parseFloat(document.getElementById('bf-afect').value)||100,
+    metodo:'lineal_trimestral',
+    _id:bienesEditId!==null?bienesInversion[bienesEditId]._id:Date.now()+Math.random()
+  };
+  if(bienesEditId!==null){ bienesInversion[bienesEditId]=bien; }
+  else { bienesInversion.push(bien); }
+  bienesEditId=null;
+  if(token) await saveBienesToDrive();
+  updateBienesCount();
+  recalc();
+  openBienesModal();
+  showToast('✓ Bien guardado','success');
+}
+
+function openBienDetalle(i){
+  const b=bienesInversion[i];
+  const s=calcAmortSchedule(b);
+  const grupo=GRUPOS_AMORT.find(g=>g.id===b.grupo);
+  const m=document.getElementById('bienes-modal');
+  const filas=s.apuntes.map(a=>{
+    const esActual=(a.ejercicio+' '+a.periodo)===(()=>{const [p,y]=Q.split(' ');return y+' '+p;})()||false;
+    return `<tr style="${a.ejercicio+' '+a.periodo===Q.split(' ')[1]+' '+Q.split(' ')[0]?'background:rgba(139,92,246,0.1);':''}">
+      <td style="padding:5px 8px;font-size:12px;">${a.periodo} ${a.ejercicio}</td>
+      <td style="padding:5px 8px;font-size:12px;text-align:right;">${a.dias}d</td>
+      <td style="padding:5px 8px;font-size:12px;text-align:right;font-weight:600;">${fmt(a.importe)}</td>
+      <td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--text-3);">${fmt(a.acumulada)}</td>
+      <td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--text-3);">${fmt(a.vnc)}</td>
+    </tr>`;
+  }).join('');
+  m.innerHTML=`<div style="background:#0E0C0A;border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 style="font-size:17px;font-weight:700;color:var(--text);margin:0;">${b.descripcion}</h2>
+      <button onclick="openBienesModal()" style="background:none;border:none;color:var(--text-3);font-size:24px;cursor:pointer;">×</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">${grupo?grupo.nombre:''} · ${b.coeficiente_anual}% anual · inicio ${fmtFecha(b.fecha_inicio)}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div style="background:var(--bg-card);border-radius:8px;padding:8px;"><div style="font-size:11px;color:var(--text-3);">Valor amortizable</div><div style="font-size:14px;font-weight:700;color:var(--text);">${fmt(s.valorAmort)}</div></div>
+      <div style="background:var(--bg-card);border-radius:8px;padding:8px;"><div style="font-size:11px;color:var(--text-3);">Amort. anual</div><div style="font-size:14px;font-weight:700;color:var(--text);">${fmt(s.amortAnual)}</div></div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;">Cuadro de amortización</div>
+    <div style="background:var(--bg-card);border-radius:10px;overflow:hidden;margin-bottom:14px;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="border-bottom:0.5px solid var(--line);"><th style="padding:6px 8px;font-size:10px;color:var(--text-3);text-align:left;">PERIODO</th><th style="padding:6px 8px;font-size:10px;color:var(--text-3);text-align:right;">DÍAS</th><th style="padding:6px 8px;font-size:10px;color:var(--text-3);text-align:right;">DOTAC.</th><th style="padding:6px 8px;font-size:10px;color:var(--text-3);text-align:right;">ACUM.</th><th style="padding:6px 8px;font-size:10px;color:var(--text-3);text-align:right;">VNC</th></tr></thead>
+        <tbody>${filas}</tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="openBienForm(bienesInversion[${i}])" style="flex:1;background:var(--bg-card);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;">Editar</button>
+      <button onclick="deleteBien(${i})" style="flex:1;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;">Eliminar</button>
+    </div>
+  </div>`;
+}
+
+async function deleteBien(i){
+  if(!confirm('¿Eliminar este bien de inversión?\nSe perderá su cuadro de amortización.')) return;
+  bienesInversion.splice(i,1);
+  if(token) await saveBienesToDrive();
+  updateBienesCount();
+  recalc();
+  openBienesModal();
+  showToast('Bien eliminado');
+}
+
+
 function renderAll(){
   renderList(); recalc(); updateSI(); renderRegistros();
+  try{ updateBienesCount(); }catch(e){}
   updateFactSearchBar();
   if(document.getElementById('tab-insights')?.classList.contains('active')&&currentInsightsTab==='calendario') renderCalendario();
   // Actualizar badge de Review (debounced)
@@ -5738,6 +5987,76 @@ function driveIcon(f){
 function mkChips(f){ const r=[],om={INT:'chip-INT',INTRA_S:'chip-INTRA_S',EXENTO:'chip-EXENTO',ALQUILER:'chip-ALQUILER',PROF:'chip-PROF'}; if(f.operacion) r.push({l:f.operacion,c:om[f.operacion]||'chip-INT'}); if(f.tipo==='ingreso') r.push({l:'Ingreso',c:'chip-ing'}); if(f.cuota_iva>0) r.push({l:'IVA '+f.cuota_iva.toFixed(2)+'€',c:'chip-amt'}); if(f.base_irpf>0) r.push({l:'Base '+f.base_irpf.toFixed(2)+'€',c:'chip-amt'}); if(f.retencion_importe>0) r.push({l:'Ret '+f.retencion_importe.toFixed(2)+'€',c:'chip-ret'}); return r; }
 
 // ── MODELOS ──
+
+// ── MÓDULO BIENES DE INVERSIÓN / AMORTIZACIONES ──
+const GRUPOS_AMORT=[
+  {id:1,nombre:'Edificios y construcciones',coef:3,anos:68,ej:'Locales, naves'},
+  {id:2,nombre:'Instalaciones, mobiliario, enseres',coef:10,anos:20,ej:'Estanterías, mesas, vitrinas'},
+  {id:3,nombre:'Maquinaria',coef:12,anos:18,ej:'Hornos, tornos de alfarero, prensas, extrusoras'},
+  {id:4,nombre:'Elementos de transporte',coef:16,anos:14,ej:'Furgoneta, coche'},
+  {id:5,nombre:'Equipos informáticos y software',coef:26,anos:10,ej:'Ordenador, tablet, software'},
+  {id:6,nombre:'Útiles y herramientas',coef:30,anos:8,ej:'Herramientas de mano, moldes'},
+  {id:7,nombre:'Ganado vacuno/porcino/ovino',coef:16,anos:14,ej:'—'},
+  {id:8,nombre:'Ganado equino y frutales no cítricos',coef:8,anos:25,ej:'—'},
+  {id:9,nombre:'Frutales cítricos y viñedos',coef:4,anos:50,ej:'—'},
+  {id:10,nombre:'Olivar',coef:2,anos:100,ej:'—'}
+];
+
+function calcAmortSchedule(bien){
+  if(!bien||typeof bien!=='object') return {valorAmort:0,amortAnual:0,amortDiaria:0,apuntes:[]};
+  const valorAmort=Math.round(((bien.valor_adquisicion||0)+(bien.gastos_adicionales||0)-(bien.valor_residual||0))*100)/100;
+  const grupo=GRUPOS_AMORT.find(g=>g.id===bien.grupo)||{coef:100};
+  const coefEfectivo=Math.min((bien.coeficiente_anual||grupo.coef)*(bien.acelerada?2:1),grupo.coef*(bien.acelerada?2:1));
+  const amortAnual=valorAmort*(coefEfectivo/100);
+  const amortDiaria=amortAnual/365;
+  if(!bien.fecha_inicio) return {valorAmort,amortAnual,amortDiaria,apuntes:[]};
+  const inicio=new Date(bien.fecha_inicio+'T00:00:00');
+  const fechaBaja=bien.fecha_baja?new Date(bien.fecha_baja+'T00:00:00'):null;
+  const apuntes=[];
+  let acumulada=0;
+  const year=inicio.getFullYear();
+  const maxYears=Math.ceil(100/coefEfectivo)+2;
+  for(let y=year;y<=year+maxYears&&acumulada<valorAmort-0.005;y++){
+    for(let q=0;q<4;q++){
+      const qStart=new Date(y,q*3,1);
+      const qEnd=new Date(y,q*3+3,0);
+      if(qEnd<inicio) continue;
+      if(fechaBaja&&qStart>fechaBaja) break;
+      const periodStart=inicio>qStart?inicio:qStart;
+      const periodEnd=(fechaBaja&&fechaBaja<qEnd)?fechaBaja:qEnd;
+      const dias=Math.round((periodEnd-periodStart)/(1000*60*60*24))+1;
+      let importe=Math.round(amortDiaria*dias*100)/100;
+      if(acumulada+importe>=valorAmort){importe=Math.round((valorAmort-acumulada)*100)/100;}
+      if(importe<=0) continue;
+      acumulada=Math.round((acumulada+importe)*100)/100;
+      apuntes.push({ejercicio:y,periodo:(q+1)+'T',dias,importe,acumulada,vnc:Math.round((valorAmort-acumulada)*100)/100});
+      if(acumulada>=valorAmort-0.005) break;
+    }
+  }
+  return {valorAmort,amortAnual,amortDiaria,coefEfectivo,apuntes};
+}
+
+// Suma de amortización deducible de un trimestre concreto (ej: '1T 2026')
+function amortizacionDelTrimestre(q){
+  try{
+    if(!Array.isArray(bienesInversion)||!bienesInversion.length) return 0;
+    const parts=(q||'').split(' ');
+    if(parts.length<2) return 0;
+    const per=parts[0], yr=parseInt(parts[1]);
+    let total=0;
+    bienesInversion.forEach(b=>{
+      if(!b||b.es_escaso_valor) return;
+      const sched=calcAmortSchedule(b);
+      const ap=sched.apuntes.find(a=>a.ejercicio===yr&&a.periodo===per);
+      if(ap){
+        const afect=(b.porcentaje_afectacion||100)/100;
+        total+=ap.importe*afect;
+      }
+    });
+    return Math.round(total*100)/100;
+  }catch(e){ console.warn('amortizacionDelTrimestre error:',e); return 0; }
+}
+
 function recalc(){
   const fs=getF(Q);
   let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0,profB=0,profR=0,profN=0;
@@ -5755,11 +6074,18 @@ function recalc(){
       if(f.operacion==='PROF'&&f.retencion_importe>0){profN++;profB+=f.base_irpf||f.base_iva||0;profR+=f.retencion_importe||0;}
     }
   }
-  const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gas,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0);
+  const amort=amortizacionDelTrimestre(Q);
+  const gasConAmort=gas+amort;
+  const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gasConAmort,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0);
   tx('c07b',fmt(c07b));tx('c07q',fmt(c07q));tx('c10b',fmt(c10b));tx('c10q',fmt(c10q));tx('c27',fmt(c27));tx('c28b',fmt(c28b));tx('c28q',fmt(c28q));tx('c36b',fmt(c36b));tx('c36q',fmt(c36q));tx('c45',fmt(c45));tx('c46',fmt(c46));tx('r303',fmt(c46));tx('s303',fmt(c46));
   document.getElementById('r303').className='mod-res '+(c46>=0?'pagar':'devolver');
   document.getElementById('s303').className='sum-val '+(c46>0?'warn':'good');
-  tx('m130-i',fmt(ing));tx('m130-g',fmt(gas));tx('m130-n',fmt(net));tx('m130-20',fmt(v20));tx('m130-r',fmt(ret));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));
+  tx('m130-i',fmt(ing));tx('m130-g',fmt(gasConAmort));tx('m130-n',fmt(net));tx('m130-20',fmt(v20));tx('m130-r',fmt(ret));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));
+  // Mostrar línea de amortización en el 130 si existe
+  const amortRow=document.getElementById('m130-amort-row');
+  if(amort>0){
+    if(amortRow) tx('m130-amort',fmt(amort));
+  }
   document.getElementById('s130').className='sum-val '+(res>0?'warn':'good');
   tx('m115-b',fmt(ab));tx('m115-c',fmt(ac));tx('r115',fmt(ac));tx('s115',fmt(ac));
   document.getElementById('s115').className='sum-val '+(ac>0?'warn':'good');
@@ -5799,8 +6125,9 @@ function calcAnual(){
       }
     });
     tot390+=qIVA;
-    const n=qIng-qGas; tot130+=Math.max(0,Math.max(0,n*.2)-qRet);
-    totIng+=qIng; totGas+=qGas; totRet+=qRet;
+    const qAmort=amortizacionDelTrimestre(q);
+    const n=qIng-(qGas+qAmort); tot130+=Math.max(0,Math.max(0,n*.2)-qRet);
+    totIng+=qIng; totGas+=(qGas+qAmort); totRet+=qRet;
   });
   tot111=tot190;
   const net=totIng-totGas;

@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.432</div>
+    <div class="login-version">v5.433</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -427,6 +427,7 @@ img,video,iframe,table{max-width:100%;}
 
 <div id="main-screen">
   <div id="ptr-indicator">↻ Actualizando...</div>
+<div id="debug-badge" style="position:fixed;top:env(safe-area-inset-top);left:0;right:0;z-index:99999;background:#8B5CF6;color:#fff;font-size:11px;font-weight:700;text-align:center;padding:3px;pointer-events:none;">debug</div>
   <div id="app-toast"></div>
   <div class="top-bar" style="display:flex;flex-direction:column;padding:calc(8px + env(safe-area-inset-top)) 0 0;background:#0E0C0A;">
     <!-- Single row: dynamic left | always-right avatar -->
@@ -456,7 +457,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.432</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.433</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -808,7 +809,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.432</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.433</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -6109,6 +6110,10 @@ function recalc(){
   svSync(c46,res,ac,it);
   // Annual summary
   calcAnual();
+  // DIAGNÓSTICO: escribir en consola y en el badge inferior (fuera de las pestañas)
+  console.log('[recalc] Q='+Q+' 303='+fmt(c46)+' 130='+fmt(res)+' ing='+fmt(ing));
+  const dbg=document.getElementById('debug-badge');
+  if(dbg) dbg.textContent='Q='+Q+' 130='+fmt(res);
 }
 function calcAnual(){
   const year=document.getElementById('year-m')?.value||new Date().getFullYear().toString();

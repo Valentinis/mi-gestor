@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.450</div>
+    <div class="login-version">v5.451</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.450</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.451</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -816,7 +816,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.450</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.451</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -5666,7 +5666,7 @@ const LS_UPLOAD_FAILS='migestor_upload_fails';
 function persistInProgress(){
   // Guardar fallos Y análisis en curso (ambos con archivo en base64 para reprocesar)
   try{
-    const guardar=uploadTracking.filter(t=>(t.estado==='fallo'||t.estado==='analizando')&&t.fileB64);
+    const guardar=uploadTracking.filter(t=>(t.estado==='fallo'||t.estado==='analizando'||t.estado==='revisar'||t.estado==='duplicado')&&t.fileB64);
     const slim=guardar.map(t=>({id:t.id,nombre:t.nombre,estado:t.estado,detalle:t.detalle||'',fileB64:t.fileB64,fileType:t.fileType}));
     localStorage.setItem(LS_UPLOAD_FAILS, JSON.stringify(slim));
   }catch(e){ /* localStorage lleno: ignorar */ }
@@ -5680,6 +5680,8 @@ function loadUploadFails(){
       if(uploadTracking.find(x=>x.id===s.id)) return;
       // Un "analizando" recuperado de sesión anterior quedó a medias -> marcarlo como fallo
       if(s.estado==='analizando'){ s.estado='fallo'; s.detalle='Quedó a medias en la sesión anterior'; }
+      // Un "revisar" de otra sesión perdió su análisis en memoria -> reabrir lo reprocesará
+      if(s.estado==='revisar'){ s.detalle='Pendiente de la sesión anterior'; }
       uploadTracking.push(s);
     });
     persistInProgress();
@@ -5709,14 +5711,11 @@ async function setUploadStatus(id, estado, extra){
   if(!t) return;
   t.estado=estado;
   if(extra) Object.assign(t, extra);
-  // Si es FALLO, asegurar archivo en base64 para persistir y poder reprocesar
-  if(estado==='fallo'){
+  // Para estados aún sin guardar (fallo/revisar/duplicado), asegurar el archivo en base64
+  if(estado==='fallo'||estado==='revisar'||estado==='duplicado'){
     if(t.file&&!t.fileB64){ try{ t.fileB64=await fileToB64(t.file); t.fileType=t.file.type; }catch(e){} }
-    persistInProgress();
-  } else {
-    // Análisis terminó bien (revisar/duplicado/pendiente): ya no es "in progress"
-    persistInProgress();
   }
+  persistInProgress();
   // Los "pendiente" se autoeliminan tras unos segundos (ya están en la lista real)
   if(estado==='pendiente'){
     setTimeout(()=>{ uploadTracking=uploadTracking.filter(x=>x.id!==id); renderList(); }, 4000);

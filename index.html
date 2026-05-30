@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.444</div>
+    <div class="login-version">v5.447</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.444</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.447</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -787,9 +787,7 @@ img,video,iframe,table{max-width:100%;}
         <button class="btn-sec" onclick="syncDrive()">Sincronizar</button>
       </div>
       <div style="font-size:11px;color:var(--text-3);margin-bottom:10px;" id="drive-last-sync">Sin sincronizar</div>
-      <button onclick="auditDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;">🧹 Auditar y limpiar Drive</button>
-      <button onclick="migrarPreviewsDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Recuperar previsualizaciones</button>
-      <div style="font-size:11px;color:var(--text-3);margin-top:6px;">Enlaza facturas antiguas que solo se ven en Drive con su PDF para verlas dentro de la app.</div>
+      <button onclick="auditDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🧹 Auditar y limpiar Drive</button>
     </div>
     <div class="section-label">Archivos subidos</div>
     <div class="card"><div id="drive-files-list"><div class="empty">Sin archivos</div></div></div>
@@ -818,7 +816,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.444</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.447</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -841,6 +839,11 @@ img,video,iframe,table{max-width:100%;}
       <div class="config-row"><div><div class="config-label">API Key</div><div class="config-sub">Sincronizada con Firestore</div></div><span class="status-pill pill-off" id="claude-key-status">No configurada</span></div>
       <input type="password" class="config-input" id="claude-key-input" placeholder="sk-ant-api03-..." style="width:100%;margin-top:10px;" oninput="updateClaudeKey(this.value)"/>
       <div class="feedback" id="claude-key-fb"></div>
+    </div>
+    <div class="section-label">Mantenimiento</div>
+    <div class="card">
+      <button onclick="migrarPreviewsDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Recuperar previsualizaciones</button>
+      <div style="font-size:11px;color:var(--text-3);margin-top:6px;">Enlaza facturas antiguas que solo se ven en Drive con su PDF para poder verlas dentro de la app.</div>
     </div>
     <div class="section-label">Datos del emisor</div>
     <div class="card">
@@ -1106,6 +1109,7 @@ const FS_URL=`https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databas
 function currentQuarter(){ const m=new Date().getMonth(); const q=m<3?'1T':m<6?'2T':m<9?'3T':'4T'; return q+' 2026'; }
 let pin='', Q=currentQuarter(), data={}, token=null, user=null, driveLoaded=false;
 let bienesInversion=[]; // Bienes de inversión / amortizaciones
+let uploadTracking=[]; // Seguimiento de facturas en proceso de análisis/subida
 let regQ=currentQuarter(), regView='gastos', regQScrollInit=false;
 let driveFiles=[], rootFId=null, dataFId=null, facturasFId=null, ticketsFId=null, gastosFId=null, ingresosFId=null, sheetId=null;
 let claudeKey='', userPin='1234';
@@ -2078,10 +2082,16 @@ async function handleClaudeFiles(files){
     const progressLabel=total>1?`Analizando ${idx}/${total}...`:'Analizando...';
     div.innerHTML=`<div class="analysis-hdr"><span class="analysis-filename">${file.name}</span><span class="analysis-badge badge-analyzing"><span class="spin" style="display:inline-block;vertical-align:middle;margin-right:4px;"></span>${progressLabel}</span></div>`;
     list.prepend(div);
+    // Placeholder en la lista principal de facturas
+    const trackId=addUploadTracking(file);
     try{
       window['_file_'+divId]=file;
       const result=await analyzeWithClaude(file);
       const items=Array.isArray(result)?result:[result];
+      // Marcar estado en el tracking de la lista principal
+      const hayDup=items.some(it=>isDuplicate(it));
+      if(hayDup) setUploadStatus(trackId,'duplicado',{detalle:'ya existe una factura igual'});
+      else setUploadStatus(trackId,'revisar');
       // Build review UI with checkboxes and justification
       const reviewHTML=items.map((f,i)=>{
         const isIng=f.tipo==='ingreso';
@@ -2172,6 +2182,8 @@ async function handleClaudeFiles(files){
       <div style="font-size:12px;color:var(--red);padding:8px 0 4px;">${e.message}</div>
       <button onclick="retryAnalysis('${divId}')" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">↻ Reintentar</button>`;
       window['_file_'+divId]=file;
+      // Marcar FALLO en la lista principal (pulsar para reprocesar)
+      setUploadStatus(trackId,'fallo',{detalle:e.message});
     } finally {
       window._analyzingCount=Math.max(0,(window._analyzingCount||1)-1);
       updateSaveBar();
@@ -2353,6 +2365,8 @@ function removeAnalysisItem(divId){
 }
 
 function saveAllSelected(){
+  // Limpiar placeholders en revisión: pasan a guardadas
+  uploadTracking.filter(t=>t.estado==='revisar').forEach(t=>{ t.estado='pendiente'; setTimeout(()=>{uploadTracking=uploadTracking.filter(x=>x.id!==t.id);try{renderList();}catch(e){}},3000); });
   const list=document.getElementById('analysis-list');
   if(!list) return;
   // Limpiar flag de lote anterior — las antiguas vuelven a color normal
@@ -5644,6 +5658,72 @@ async function migrarPreviewsDrive(){
   showToast(`✓ ${arregladas} arregladas${noEncontradas?', '+noEncontradas+' sin archivo en Drive':''}`,'success');
 }
 
+
+// ── SEGUIMIENTO DE SUBIDA DE FACTURAS (placeholder en lista) ──
+function addUploadTracking(file){
+  const id='up_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  uploadTracking.unshift({ id, nombre:file.name, estado:'analizando', file });
+  renderList();
+  return id;
+}
+function setUploadStatus(id, estado, extra){
+  const t=uploadTracking.find(x=>x.id===id);
+  if(!t) return;
+  t.estado=estado;
+  if(extra) Object.assign(t, extra);
+  // Los que quedan "pendiente" se autoeliminan tras unos segundos (ya están en la lista real)
+  if(estado==='pendiente'){
+    setTimeout(()=>{ uploadTracking=uploadTracking.filter(x=>x.id!==id); renderList(); }, 4000);
+  }
+  renderList();
+}
+function removeUploadTracking(id){
+  uploadTracking=uploadTracking.filter(x=>x.id!==id);
+  renderList();
+}
+function retryUpload(id){
+  const t=uploadTracking.find(x=>x.id===id);
+  if(!t||!t.file) return;
+  const file=t.file;
+  removeUploadTracking(id);
+  // Reabrir el modal de añadir y reprocesar
+  handleClaudeFiles([file]);
+}
+function renderUploadTrackingHTML(){
+  if(!uploadTracking.length) return '';
+  return uploadTracking.map(t=>{
+    let bg,border,icon,label,labelCol,action='';
+    if(t.estado==='analizando'){
+      bg='rgba(255,255,255,0.03)'; border='0.5px solid var(--line)';
+      icon='<span class="spin" style="display:inline-block;vertical-align:middle;"></span>';
+      label='Analizando…'; labelCol='var(--text-3)';
+    } else if(t.estado==='revisar'){
+      bg='rgba(74,144,240,0.06)'; border='0.5px solid var(--blue-bd)';
+      icon='👁'; label='Analizado · revisar y guardar'; labelCol='var(--blue)';
+      action=`<button onclick="openAddModal()" style="background:var(--blue-bg);color:var(--blue);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Revisar</button>`;
+    } else if(t.estado==='pendiente'){
+      bg='rgba(29,158,117,0.06)'; border='0.5px solid var(--green-bd)';
+      icon='✓'; label='Guardada'; labelCol='#1D9E75';
+    } else if(t.estado==='duplicado'){
+      bg='rgba(192,120,0,0.08)'; border='0.5px solid var(--amber-bd)';
+      icon='⚠'; label='Duplicado'; labelCol='#c07800';
+      action=`<button onclick="removeUploadTracking('${t.id}')" style="background:rgba(255,255,255,0.08);color:var(--text-3);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">Descartar</button>`;
+    } else { // fallo
+      bg='rgba(229,83,83,0.08)'; border='0.5px solid var(--red-bd)';
+      icon='✕'; label='FALLO'; labelCol='#E05252';
+      action=`<button onclick="retryUpload('${t.id}')" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">↻ Reprocesar</button>`;
+    }
+    return `<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;background:${bg};border:${border};border-radius:12px;margin-bottom:8px;">
+      <span style="font-size:15px;color:${labelCol};flex-shrink:0;width:18px;text-align:center;">${icon}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.nombre}</div>
+        <div style="font-size:11px;color:${labelCol};font-weight:600;margin-top:1px;">${label}${t.detalle?' · '+t.detalle:''}</div>
+      </div>
+      ${action}
+    </div>`;
+  }).join('');
+}
+
 function renderAll(){
   renderList(); recalc(); updateSI(); renderRegistros();
   try{ updateBienesCount(); }catch(e){}
@@ -5723,7 +5803,11 @@ function renderList(){
   const sg2=document.getElementById('fact-sum-gas'); if(sg2) sg2.textContent=totalGas>0?'↓'+fmt(totalGas):'';
   const si3=document.getElementById('fact-sum-ing-show'); if(si3) si3.textContent=totalIng>0?'↑'+fmt(totalIng):'';
   const sg3=document.getElementById('fact-sum-gas-show'); if(sg3) sg3.textContent=totalGas>0?'↓'+fmt(totalGas):'';
-  if(!fs.length){list.innerHTML='<div class="empty">Sin registros</div>';return;}
+  if(!fs.length){
+    const tk=renderUploadTrackingHTML();
+    list.innerHTML=(tk?'<div style="padding-top:8px;">'+tk+'</div>':'')+'<div class="empty">Sin registros</div>';
+    return;
+  }
   const sorted=[...fs].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
 
   function getWeekKey(dateStr){
@@ -5828,6 +5912,9 @@ function renderList(){
     }).join('');
     return header+rows;
   }).join('');
+  // Prepend placeholders de subidas en curso
+  const trackHTML=renderUploadTrackingHTML();
+  if(trackHTML) list.innerHTML='<div style="padding-top:8px;">'+trackHTML+'</div>'+list.innerHTML;
 }
 
 // ── MODAL ──

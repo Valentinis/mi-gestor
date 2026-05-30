@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.442</div>
+    <div class="login-version">v5.444</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.442</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.444</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -740,6 +740,12 @@ img,video,iframe,table{max-width:100%;}
         <span id="bienes-count" style="font-size:12px;color:var(--text-3);">—</span>
       </div>
     </div>
+    <div class="mod-card" style="margin-bottom:8px;">
+      <div class="mod-hdr" onclick="openCierreModal()" style="cursor:pointer;">
+        <div class="mod-left"><span class="mod-code" style="background:#1D9E75;">✓</span><span class="mod-name">Cierre de trimestre</span></div>
+        <span id="cierre-status" style="font-size:12px;color:var(--text-3);">Revisar</span>
+      </div>
+    </div>
     <div class="mod-card" style="margin-top:12px;">
       <div class="mod-hdr" onclick="tog('b-anual')">
         <div class="mod-left"><span class="mod-code" style="font-size:11px;background:var(--text-3);">AÑO</span><span class="mod-name">Resumen anual estimado</span></div>
@@ -781,7 +787,9 @@ img,video,iframe,table{max-width:100%;}
         <button class="btn-sec" onclick="syncDrive()">Sincronizar</button>
       </div>
       <div style="font-size:11px;color:var(--text-3);margin-bottom:10px;" id="drive-last-sync">Sin sincronizar</div>
-      <button onclick="auditDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🧹 Auditar y limpiar Drive</button>
+      <button onclick="auditDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;">🧹 Auditar y limpiar Drive</button>
+      <button onclick="migrarPreviewsDrive()" style="width:100%;background:var(--bg-raised);color:var(--text);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🔄 Recuperar previsualizaciones</button>
+      <div style="font-size:11px;color:var(--text-3);margin-top:6px;">Enlaza facturas antiguas que solo se ven en Drive con su PDF para verlas dentro de la app.</div>
     </div>
     <div class="section-label">Archivos subidos</div>
     <div class="card"><div id="drive-files-list"><div class="empty">Sin archivos</div></div></div>
@@ -810,7 +818,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.442</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.444</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -4154,6 +4162,64 @@ function openAddModal(){
     if(closeBtn) closeBtn.style.display='flex';
   }
 }
+async function previewFromDrive(fileId, nombre){
+  if(!token){ showToast('Conéctate a Drive primero','error'); return; }
+  if(!fileId){ showToast('Sin archivo en Drive','error'); return; }
+  showToast('Descargando de Drive...');
+  try{
+    const r=await driveReq(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const blob=await r.blob();
+    // Detectar tipo: si es PDF o imagen
+    let type=blob.type;
+    if(!type||type==='application/octet-stream'){
+      type=(nombre||'').toLowerCase().endsWith('.pdf')?'application/pdf':'image/jpeg';
+    }
+    const file=new File([blob], nombre||'factura', {type});
+    previewBlobFile(file);
+  }catch(e){
+    showToast('Error al descargar: '+e.message,'error');
+  }
+}
+
+function previewBlobFile(file){
+  document.getElementById('_preview_overlay')?.remove();
+  const url=URL.createObjectURL(file);
+  const isPDF=file.type==='application/pdf';
+  const overlay=document.createElement('div');
+  overlay.id='_preview_overlay';
+  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(0,0,0,0.97);display:flex;flex-direction:column;';
+  const bar=document.createElement('div');
+  bar.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#1C1814;flex-shrink:0;gap:8px;';
+  bar.innerHTML=`<span style="color:#F5EDE0;font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name}</span>
+    <div style="display:flex;gap:4px;align-items:center;">
+      <button onclick="previewZoom(-0.25)" style="background:rgba(255,255,255,0.15);border:none;border-radius:18px;width:32px;height:32px;color:#F5EDE0;cursor:pointer;font-size:18px;font-weight:700;">−</button>
+      <button onclick="previewZoom(0)" id="preview-zoom-label" style="background:rgba(255,255,255,0.1);border:none;border-radius:18px;padding:0 10px;height:32px;color:#F5EDE0;cursor:pointer;font-size:12px;font-weight:700;min-width:48px;">100%</button>
+      <button onclick="previewZoom(0.25)" style="background:rgba(255,255,255,0.15);border:none;border-radius:18px;width:32px;height:32px;color:#F5EDE0;cursor:pointer;font-size:18px;font-weight:700;">+</button>
+      <button onclick="document.getElementById('_preview_overlay').remove()" style="background:rgba(255,255,255,0.15);border:none;border-radius:20px;padding:6px 12px;color:#F5EDE0;cursor:pointer;font-size:13px;margin-left:4px;">✕</button>
+    </div>`;
+  const scrollWrap=document.createElement('div');
+  scrollWrap.id='_preview_scrollwrap';
+  scrollWrap.style.cssText='flex:1;overflow:auto;-webkit-overflow-scrolling:touch;background:#000;';
+  const content=document.createElement('div');
+  content.id='_preview_content';
+  content.style.cssText='display:flex;flex-direction:column;align-items:center;padding:12px;gap:12px;min-width:100%;width:fit-content;margin:0 auto;';
+  scrollWrap.appendChild(content);
+  overlay.appendChild(bar); overlay.appendChild(scrollWrap);
+  document.documentElement.appendChild(overlay);
+  window._previewZoom=1;
+  if(isPDF){
+    content.innerHTML='<div style="color:rgba(255,255,255,0.5);font-size:13px;padding:20px;">Cargando...</div>';
+    renderPDFPages(file, content, url);
+  } else {
+    const img=document.createElement('img');
+    img.src=url;
+    img.style.cssText='max-width:100%;border-radius:8px;display:block;';
+    content.appendChild(img);
+  }
+  attachPinchZoom(scrollWrap, content);
+}
+
 function previewFactura(divId){
   const file=window['_file_'+divId];
   if(!file){ showToast('Archivo no disponible','error'); return; }
@@ -5370,10 +5436,219 @@ function updateDeadlineAlert(){
   </div>`;
 }
 
+// ── CIERRE DE TRIMESTRE: CHECKLIST DE VALIDACIÓN ──
+function runCierreChecks(){
+  const fs=getF(Q);
+  const checks=[];
+
+  // 1. ¿Hay facturas en el trimestre?
+  checks.push({
+    ok: fs.length>0,
+    titulo: 'Hay registros en el trimestre',
+    detalle: fs.length+' facturas/tickets',
+    critico: true
+  });
+
+  // 2. Tickets pendientes sin aprobar
+  const pend=(ticketsPendientes||[]).filter(t=>!t._dup).length;
+  checks.push({
+    ok: pend===0,
+    titulo: 'Sin tickets pendientes de aprobar',
+    detalle: pend===0?'Todo aprobado':pend+' pendientes en la pestaña Tickets',
+    critico: false
+  });
+
+  // 3. Facturas sin fecha
+  const sinFecha=fs.filter(f=>!f.fecha).length;
+  checks.push({
+    ok: sinFecha===0,
+    titulo: 'Todas las facturas tienen fecha',
+    detalle: sinFecha===0?'Correcto':sinFecha+' sin fecha',
+    critico: true
+  });
+
+  // 4. Facturas sin base imponible
+  const sinBase=fs.filter(f=>!(f.base_iva||f.base_irpf)).length;
+  checks.push({
+    ok: sinBase===0,
+    titulo: 'Todas las facturas tienen importe',
+    detalle: sinBase===0?'Correcto':sinBase+' sin base imponible',
+    critico: true
+  });
+
+  // 5. Gastos sin proveedor identificado
+  const gastosSinProv=fs.filter(f=>f.tipo==='gasto'&&!f.proveedor_cliente).length;
+  checks.push({
+    ok: gastosSinProv===0,
+    titulo: 'Gastos con proveedor identificado',
+    detalle: gastosSinProv===0?'Correcto':gastosSinProv+' gastos sin proveedor',
+    critico: false
+  });
+
+  // 6. Facturas con fecha fuera del trimestre
+  const [per,yr]=Q.split(' ');
+  const qNum=parseInt(per);
+  const mesIni=(qNum-1)*3; // 0-indexed
+  const fueraQ=fs.filter(f=>{
+    if(!f.fecha) return false;
+    const d=new Date(f.fecha+'T00:00:00');
+    return d.getFullYear()!=parseInt(yr) || Math.floor(d.getMonth()/3)!=(qNum-1);
+  }).length;
+  checks.push({
+    ok: fueraQ===0,
+    titulo: 'Fechas dentro del trimestre',
+    detalle: fueraQ===0?'Correcto':fueraQ+' facturas con fecha de otro trimestre',
+    critico: false
+  });
+
+  // 7. Operaciones intracomunitarias con justificación
+  const intraSinJust=fs.filter(f=>(f.operacion==='INTRA_S'||f.operacion==='INTRA_B')&&!f.justificacion).length;
+  checks.push({
+    ok: intraSinJust===0,
+    titulo: 'Operaciones intracomunitarias justificadas',
+    detalle: intraSinJust===0?'Correcto':intraSinJust+' sin justificación',
+    critico: false
+  });
+
+  return checks;
+}
+
+function openCierreModal(){
+  let m=document.getElementById('cierre-modal');
+  if(!m){
+    m=document.createElement('div');
+    m.id='cierre-modal';
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:50001;display:flex;align-items:flex-end;justify-content:center;';
+    m.onclick=e=>{if(e.target===m)closeCierreModal();};
+    document.body.appendChild(m);
+  }
+  const checks=runCierreChecks();
+  const criticos=checks.filter(c=>c.critico&&!c.ok).length;
+  const avisos=checks.filter(c=>!c.critico&&!c.ok).length;
+  const allOk=checks.every(c=>c.ok);
+
+  const itemsHtml=checks.map(c=>{
+    const icon=c.ok?'✓':(c.critico?'✕':'⚠');
+    const col=c.ok?'#1D9E75':(c.critico?'#E05252':'#c07800');
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:0.5px solid var(--line);">
+      <span style="font-size:15px;font-weight:800;color:${col};flex-shrink:0;width:18px;text-align:center;">${icon}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">${c.titulo}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:1px;">${c.detalle}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  let resumen, resumenCol, resumenBg;
+  if(allOk){ resumen='✓ Todo listo para presentar'; resumenCol='#1D9E75'; resumenBg='rgba(29,158,117,0.12)'; }
+  else if(criticos>0){ resumen='✕ '+criticos+' problema'+(criticos>1?'s':'')+' que resolver'; resumenCol='#E05252'; resumenBg='rgba(229,83,83,0.12)'; }
+  else { resumen='⚠ '+avisos+' aviso'+(avisos>1?'s':'')+' a revisar'; resumenCol='#c07800'; resumenBg='rgba(192,120,0,0.12)'; }
+
+  m.innerHTML=`<div style="background:#0E0C0A;border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <h2 style="font-size:18px;font-weight:700;color:var(--text);margin:0;">Cierre de ${Q}</h2>
+      <button onclick="closeCierreModal()" style="background:none;border:none;color:var(--text-3);font-size:24px;cursor:pointer;">×</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">Verifica que todo esté en orden antes de presentar los modelos.</div>
+    <div style="background:${resumenBg};border-radius:12px;padding:12px;margin-bottom:16px;text-align:center;font-size:14px;font-weight:700;color:${resumenCol};">${resumen}</div>
+    <div style="background:var(--bg-card);border-radius:12px;padding:4px 14px;margin-bottom:16px;">${itemsHtml}</div>
+    <div style="background:var(--bg-card);border-radius:12px;padding:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin-bottom:8px;">Modelos a presentar</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7;">
+        303 IVA: <b>${document.getElementById('r303')?.textContent||'—'}</b><br>
+        130 IRPF: <b>${document.getElementById('r130')?.textContent||'—'}</b><br>
+        115 Alquiler: <b>${document.getElementById('r115')?.textContent||'—'}</b><br>
+        111 Retenciones: <b>${document.getElementById('r111')?.textContent||'—'}</b><br>
+        349 Intracom.: <b>${document.getElementById('r349')?.textContent||'—'}</b>
+      </div>
+    </div>
+  </div>`;
+  m.style.display='flex';
+}
+function closeCierreModal(){ const m=document.getElementById('cierre-modal'); if(m) m.style.display='none'; }
+
+function updateCierreStatus(){
+  const el=document.getElementById('cierre-status');
+  if(!el) return;
+  try{
+    const checks=runCierreChecks();
+    const criticos=checks.filter(c=>c.critico&&!c.ok).length;
+    const avisos=checks.filter(c=>!c.critico&&!c.ok).length;
+    if(checks.every(c=>c.ok)){ el.textContent='✓ Listo'; el.style.color='#1D9E75'; }
+    else if(criticos>0){ el.textContent=criticos+' ✕'; el.style.color='#E05252'; }
+    else { el.textContent=avisos+' ⚠'; el.style.color='#c07800'; }
+  }catch(e){ el.textContent='Revisar'; }
+}
+
+
+
+// ── MIGRACIÓN: enlazar facturas sin _driveFileId con su archivo en Drive ──
+async function migrarPreviewsDrive(){
+  if(!token){ showToast('Conéctate a Drive primero','error'); return; }
+  showToast('Buscando facturas sin previsualización...');
+  // Asegurar que tenemos la lista de archivos de Drive cargada
+  if(!driveFiles||!driveFiles.length){
+    showToast('Cargando archivos de Drive...');
+    try{ await loadDriveFiles(); }catch(e){}
+  }
+  const todas=[];
+  Object.keys(data).forEach(q=>{ (data[q]||[]).forEach(f=>todas.push({f,q})); });
+  // Facturas que NO tienen _driveFileId (las "rotas")
+  const sinPreview=todas.filter(({f})=>!f._driveFileId);
+  if(!sinPreview.length){ showToast('✓ Todas las facturas ya tienen previsualización','success'); return; }
+
+  let arregladas=0, noEncontradas=0;
+  const quartersAfectados=new Set();
+
+  for(const {f,q} of sinPreview){
+    let fileId=null;
+    // Prioridad 1: _driveLink guardado
+    if(f._driveLink){
+      const df=driveFiles.find(x=>x.link===f._driveLink);
+      if(df) fileId=df.id;
+    }
+    // Prioridad 2: por nombre fecha + proveedor
+    if(!fileId&&f.fecha){
+      const datePart=(f.fecha||'').slice(0,10);
+      const provPart=(f.proveedor_cliente||'').replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').slice(0,30).toLowerCase();
+      const matches=driveFiles.filter(df=>df.name&&df.name.toLowerCase().includes(datePart)&&(provPart?df.name.toLowerCase().includes(provPart.slice(0,10)):true));
+      if(matches.length===1){ fileId=matches[0].id; }
+      else if(matches.length>1){
+        const numf=(f.num_factura||'').replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
+        if(numf){ const m2=matches.find(df=>df.name.toLowerCase().includes(numf.slice(0,8))); if(m2) fileId=m2.id; }
+        if(!fileId) fileId=matches[0].id;
+      }
+    }
+    // Prioridad 3: solo por fecha
+    if(!fileId&&f.fecha){
+      const df=driveFiles.find(df=>df.name&&df.name.startsWith((f.fecha||'').slice(0,10)));
+      if(df) fileId=df.id;
+    }
+    if(fileId){
+      f._driveFileId=fileId;
+      const df=driveFiles.find(x=>x.id===fileId);
+      if(df&&df.link&&!f._driveLink) f._driveLink=df.link;
+      arregladas++;
+      quartersAfectados.add(q);
+    } else {
+      noEncontradas++;
+    }
+  }
+
+  // Guardar los trimestres afectados
+  saveLocal();
+  if(token){
+    for(const q of quartersAfectados){ try{ await saveDataToDrive(q); }catch(e){} }
+  }
+  renderAll();
+  showToast(`✓ ${arregladas} arregladas${noEncontradas?', '+noEncontradas+' sin archivo en Drive':''}`,'success');
+}
+
 function renderAll(){
   renderList(); recalc(); updateSI(); renderRegistros();
   try{ updateBienesCount(); }catch(e){}
   try{ updateDeadlineAlert(); }catch(e){}
+  try{ updateCierreStatus(); }catch(e){}
   updateFactSearchBar();
   if(document.getElementById('tab-insights')?.classList.contains('active')){
     if(currentInsightsTab==='calendario') renderCalendario();

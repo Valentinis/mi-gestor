@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.440</div>
+    <div class="login-version">v5.442</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.440</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.442</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -622,6 +622,8 @@ img,video,iframe,table{max-width:100%;}
     <button id="toggle-ingresos" onclick="setTipoToggle('ingreso')" title="Ingresos" style="height:22px;padding:0 7px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-size:10px;font-weight:700;transition:all .15s;">+€</button>
   </div>
 </div>
+
+<div id="deadline-alert" style="display:none;margin:0 12px 8px;"></div>
 
 <div id="subtab-swipe-container" style="overflow:hidden;position:relative;" ontouchstart="subTabTouchStart(event)" ontouchmove="subTabTouchMove(event)" ontouchend="subTabTouchEnd(event)">
 <div id="subtab-track" style="display:flex;width:300%;transition:transform .3s cubic-bezier(0.25,0.46,0.45,0.94);">
@@ -808,7 +810,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.440</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.442</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -5087,14 +5089,6 @@ function setQFromHeader(q){
   }
 }
 
-function forceModelRepaint(){
-  const mt=document.getElementById('tab-modelos');
-  if(!mt||!mt.classList.contains('active')) return;
-  // Forzar repaint SIN recalcular de nuevo (eso pisaba los valores)
-  mt.style.display='none';
-  void mt.offsetHeight;
-  mt.style.display='';
-}
 function setQY(t,btn,ns){
   const year=document.getElementById('year-'+ns)?.value||'2026';
   const q=t+'T '+year;
@@ -5321,9 +5315,65 @@ async function deleteBien(i){
 }
 
 
+
+// ── RECORDATORIOS DE VENCIMIENTOS FISCALES ──
+const VENCIMIENTOS_FISCALES=[
+  {mes:1, dia:20, modelos:['303','130','115','111','349'], desc:'4T del año anterior'},
+  {mes:1, dia:30, modelos:['390','190','180'], desc:'Resúmenes anuales'},
+  {mes:2, dia:28, modelos:['347'], desc:'Operaciones con terceros'},
+  {mes:4, dia:20, modelos:['303','130','115','111','349'], desc:'1T'},
+  {mes:7, dia:20, modelos:['303','130','115','111','349'], desc:'2T'},
+  {mes:10, dia:20, modelos:['303','130','115','111','349'], desc:'3T'}
+];
+
+function getProximoVencimiento(){
+  const hoy=new Date();
+  hoy.setHours(0,0,0,0);
+  const year=hoy.getFullYear();
+  // Generar fechas de este año y del próximo para cubrir el cambio de año
+  let candidatos=[];
+  [year, year+1].forEach(y=>{
+    VENCIMIENTOS_FISCALES.forEach(v=>{
+      const fecha=new Date(y, v.mes-1, v.dia);
+      fecha.setHours(0,0,0,0);
+      candidatos.push({fecha, modelos:v.modelos, desc:v.desc});
+    });
+  });
+  // Filtrar los que no han pasado y ordenar
+  candidatos=candidatos.filter(c=>c.fecha>=hoy).sort((a,b)=>a.fecha-b.fecha);
+  if(!candidatos.length) return null;
+  const prox=candidatos[0];
+  const dias=Math.round((prox.fecha-hoy)/(1000*60*60*24));
+  return {...prox, dias};
+}
+
+function updateDeadlineAlert(){
+  const alert=document.getElementById('deadline-alert');
+  if(!alert) return;
+  const v=getProximoVencimiento();
+  // Solo mostrar si faltan 15 días o menos
+  if(!v || v.dias>15){ alert.style.display='none'; return; }
+  let bg,color,icon,urgencia;
+  if(v.dias<=2){ bg='rgba(229,83,83,0.15)'; color='#E05252'; icon='🚨'; }
+  else if(v.dias<=7){ bg='rgba(229,83,83,0.10)'; color='#E05252'; icon='⚠️'; }
+  else { bg='rgba(240,132,74,0.10)'; color='var(--accent)'; icon='📅'; }
+  const cuando=v.dias===0?'HOY':v.dias===1?'MAÑANA':'en '+v.dias+' días';
+  const fechaStr=v.fecha.toLocaleDateString('es-ES',{day:'numeric',month:'long'});
+  alert.style.display='block';
+  alert.innerHTML=`<div onclick="switchNav('calendario',document.getElementById('nav-calendario'))" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${bg};border:0.5px solid ${color}40;border-radius:12px;cursor:pointer;">
+    <span style="font-size:18px;">${icon}</span>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:13px;font-weight:700;color:${color};">Presentación ${cuando} (${fechaStr})</div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:1px;">Modelos ${v.desc}: ${v.modelos.join(' · ')}</div>
+    </div>
+    <span style="font-size:18px;color:var(--text-3);">›</span>
+  </div>`;
+}
+
 function renderAll(){
   renderList(); recalc(); updateSI(); renderRegistros();
   try{ updateBienesCount(); }catch(e){}
+  try{ updateDeadlineAlert(); }catch(e){}
   updateFactSearchBar();
   if(document.getElementById('tab-insights')?.classList.contains('active')){
     if(currentInsightsTab==='calendario') renderCalendario();

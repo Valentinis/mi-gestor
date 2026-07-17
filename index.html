@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.472</div>
+    <div class="login-version">v5.473</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.472</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.473</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -820,7 +820,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.472</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.473</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -3038,6 +3038,7 @@ function librosCasillasTrimestre(q){
 function librosRowsModelos(year,hojas){
   const R=librosR2;
   const rows=[['MODELOS A PRESENTAR — valores listos para copiar en la sede AEAT','','','',''],[]];
+  let prev130={}; // casillas del trimestre anterior para el encadenado acumulativo del 130
   ['1T','2T','3T','4T'].forEach(t=>{
     const q=t+' '+year;
     const c=librosCasillasTrimestre(q);
@@ -3061,18 +3062,24 @@ function librosRowsModelos(year,hojas){
     const r45=rows.length+1;
     rows.push(['','45','Total a deducir','','=E'+r28+'+E'+r36]);
     rows.push(['','46','RESULTADO','','=E'+r27+'-E'+r45]);
-    rows.push(['MODELO 130 — IRPF','CASILLA','CONCEPTO','','IMPORTE']);
-    const r01=rows.length+1;
-    rows.push(['','01','Ingresos del trimestre','','='+eq+'!D'+p.emiTot]);
-    const r02=rows.length+1;
-    rows.push(['','02','Gastos deducibles (con amortización '+amort+')','','='+rq+'!D'+p.tot+'+'+rq+'!D'+p.cero+'+'+rq+'!D'+p.intra+'+'+String(amort).replace('.',',')]);
-    const r03=rows.length+1;
-    rows.push(['','03','Rendimiento neto','','=E'+r01+'-E'+r02]);
-    const r05=rows.length+1;
-    rows.push(['','05','20% rendimiento neto','','=MAX(0;E'+r03+'/5)']);
-    const r14=rows.length+1;
-    rows.push(['','14','Retenciones soportadas','','=-'+eq+'!F'+p.emiTot]);
-    rows.push(['','20','RESULTADO A INGRESAR','','=MAX(0;E'+r05+'-E'+r14+')']);
+    rows.push(['MODELO 130 — IRPF (ACUMULADO desde el 1 de enero)','CASILLA','CONCEPTO','','IMPORTE']);
+    const t01=rows.length+1;
+    rows.push(['','01','Ingresos del año hasta fin de trimestre','',(prev130.c01?('=E'+prev130.c01+'+'+eq+'!D'+p.emiTot):('='+eq+'!D'+p.emiTot))]);
+    const t02=rows.length+1;
+    rows.push(['','02','Gastos del año (con amortización)','',(prev130.c02?('=E'+prev130.c02+'+'):'=')+rq+'!D'+p.tot+'+'+rq+'!D'+p.cero+'+'+rq+'!D'+p.intra+'+'+String(amort).replace('.',',')]);
+    const t03=rows.length+1;
+    rows.push(['','03','Rendimiento neto acumulado','','=E'+t01+'-E'+t02]);
+    const t04=rows.length+1;
+    rows.push(['','04','20% del rendimiento (si positivo)','','=MAX(0;E'+t03+'/5)']);
+    const t05=rows.length+1;
+    rows.push(['','05','Pagos fraccionados anteriores del año','',(prev130.c05?('=E'+prev130.c05+'+MAX(0;E'+prev130.c07+')'):0)]);
+    const t06=rows.length+1;
+    rows.push(['','06','Retenciones del año acumuladas','',(prev130.c06?('=E'+prev130.c06+'-'):'=-')+eq+'!F'+p.emiTot]);
+    const t07=rows.length+1;
+    rows.push(['','07','Pago fraccionado previo (04−05−06)','','=E'+t04+'-E'+t05+'-E'+t06]);
+    rows.push(['','13','Minoración art. 110.3.c (según rendimiento año anterior — a mano si aplica)','','']);
+    rows.push(['','19','RESULTADO A INGRESAR (07 − 13 − 15 − 16 si aplican)','','=MAX(0;E'+t07+')']);
+    prev130={c01:t01,c02:t02,c05:t05,c06:t06,c07:t07};
     if(c.ac>0||c.ab>0){
       rows.push(['MODELO 115 — Retenciones alquiler','CASILLA','CONCEPTO','','IMPORTE']);
       rows.push(['','02','Base rentas satisfechas','',R(c.ab)]);

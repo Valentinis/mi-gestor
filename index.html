@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.473</div>
+    <div class="login-version">v5.474</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.473</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.474</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -820,7 +820,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.473</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.474</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2963,7 +2963,7 @@ function librosFormatosHoja(sid,tipo,rows){
       const a=String(r[0]||''), bLbl=String(r[2]||'');
       if(/^[1-4]T /.test(a)) reqs.push(librosFmtReq(sid,idx,idx+1,0,5,C.amarillo,true,false));
       if(a.indexOf('MODELO ')===0) reqs.push(librosFmtReq(sid,idx,idx+1,0,5,C.gris,true,false));
-      if(bLbl==='RESULTADO'||bLbl==='RESULTADO A INGRESAR'||bLbl==='RETENCIONES 19%'||bLbl==='RETENCIONES 15%'||bLbl==='TOTAL 349') reqs.push(librosFmtReq(sid,idx,idx+1,1,5,C.salmon,true,false));
+      if(bLbl.indexOf('RESULTADO')===0||bLbl==='TOTAL 349') reqs.push(librosFmtReq(sid,idx,idx+1,1,5,C.salmon,true,false));
     });
   }
   if(tipo==='amortizaciones'){
@@ -3015,8 +3015,8 @@ function librosFormatosHoja(sid,tipo,rows){
 // OJO: si algún día cambia recalc, este espejo debe cambiar igual.
 function librosCasillasTrimestre(q){
   const fs=data[q]||[];
-  let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0,profB=0,profR=0,profN=0;
-  const intra={};
+  let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0,profB=0,profR=0;
+  const intra={}, profSet={}, alqSet={};
   for(const f of fs){
     if(f.tipo==='ingreso'){
       ing+=f.base_irpf||0;
@@ -3025,15 +3025,16 @@ function librosCasillasTrimestre(q){
     } else {
       gas+=f.base_irpf||f.base_iva||0;
       if(f.operacion==='INTRA_S'){c10b+=f.base_iva||0;c10q+=(f.base_iva||0)*0.21;c36b+=f.base_iva||0;c36q+=(f.base_iva||0)*0.21;const p=f.proveedor_cliente||'UE';intra[p]=(intra[p]||0)+(f.base_iva||0);}
-      else if(f.operacion==='ALQUILER'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;ab+=f.base_irpf||f.base_iva||0;ac+=f.retencion_importe||0;}
+      else if(f.operacion==='ALQUILER'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;ab+=f.base_irpf||f.base_iva||0;ac+=f.retencion_importe||0;if(f.retencion_importe>0)alqSet[(f.proveedor_cliente||'').toLowerCase().trim()]=1;}
       else if(f.operacion==='INT'||f.operacion==='PROF'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;}
-      if(f.operacion==='PROF'&&f.retencion_importe>0){profN++;profB+=f.base_irpf||f.base_iva||0;profR+=f.retencion_importe||0;}
+      if(f.operacion==='PROF'&&f.retencion_importe>0){profSet[(f.proveedor_cliente||'').toLowerCase().trim()]=1;profB+=f.base_irpf||f.base_iva||0;profR+=f.retencion_importe||0;}
     }
   }
   const amort=(typeof amortizacionDelTrimestre==='function')?amortizacionDelTrimestre(q):0;
   const gasConAmort=gas+amort;
   const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gasConAmort,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret);
-  return {c07b,c07q,c10b,c10q,c27,c28b,c28q,c36b,c36q,c45,c46,ing,gas:gasConAmort,amort,net,v20,ret,res,ab,ac,profN,profB,profR,intra};
+  const profN=Object.keys(profSet).length, alqN=Object.keys(alqSet).length;
+  return {c07b,c07q,c10b,c10q,c27,c28b,c28q,c36b,c36q,c45,c46,ing,gas:gasConAmort,amort,net,v20,ret,res,ab,ac,alqN,profN,profB,profR,intra};
 }
 function librosRowsModelos(year,hojas){
   const R=librosR2;
@@ -3082,14 +3083,21 @@ function librosRowsModelos(year,hojas){
     prev130={c01:t01,c02:t02,c05:t05,c06:t06,c07:t07};
     if(c.ac>0||c.ab>0){
       rows.push(['MODELO 115 — Retenciones alquiler','CASILLA','CONCEPTO','','IMPORTE']);
-      rows.push(['','02','Base rentas satisfechas','',R(c.ab)]);
-      rows.push(['','03','RETENCIONES 19%','',R(c.ac)]);
+      rows.push(['','01','Nº de perceptores','',c.alqN||1]);
+      rows.push(['','02','Base de las retenciones','',R(c.ab)]);
+      const v03=rows.length+1;
+      rows.push(['','03','Retenciones e ingresos a cuenta (19%)','',R(c.ac)]);
+      rows.push(['','05','RESULTADO A INGRESAR (03 − 04 complementarias)','','=E'+v03]);
     }
     if(c.profN>0){
-      rows.push(['MODELO 111 — Retenciones profesionales','CASILLA','CONCEPTO','','IMPORTE']);
-      rows.push(['','03','Nº perceptores','',c.profN]);
-      rows.push(['','04','Base retenciones PROF','',R(c.profB)]);
-      rows.push(['','06','RETENCIONES 15%','',R(c.profR)]);
+      rows.push(['MODELO 111 — Retenciones profesionales (II. Actividades económicas)','CASILLA','CONCEPTO','','IMPORTE']);
+      rows.push(['','07','Nº de perceptores (personas, no facturas)','',c.profN]);
+      rows.push(['','08','Base de las retenciones','',R(c.profB)]);
+      const v09=rows.length+1;
+      rows.push(['','09','Retenciones e ingresos a cuenta','',R(c.profR)]);
+      rows.push(['','28','Total retenciones (suma de 03+06+09...)','','=E'+v09]);
+      const v28=rows.length;
+      rows.push(['','30','RESULTADO A INGRESAR (28 − 29 complementarias)','','=E'+v28]);
     }
     const ops=Object.entries(c.intra);
     if(ops.length){

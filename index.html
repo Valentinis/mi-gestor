@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.468</div>
+    <div class="login-version">v5.470</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.468</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.470</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -820,7 +820,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.468</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.470</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2840,10 +2840,11 @@ function librosRowsImpuestos(year,hojas){
     const amort=(typeof amortizacionDelTrimestre==='function')?R(amortizacionDelTrimestre(q)):0;
     rows.push([q,'','BASE','CUOTA','','','']);
     const rG=rows.length+1;
-    rows.push(['303','ganado (IVA devengado)','='+eq+'!D'+p.emiTot,'='+eq+'!E'+p.emiTot+'+'+rq+'!E'+p.intra,'ISP incluido en cuota','','']);
+    rows.push(['303','ganado (IVA repercutido)','='+eq+'!D'+p.emiTot,'='+eq+'!E'+p.emiTot,'','','']);
     const rGa=rows.length+1;
-    rows.push(['','gastado (IVA deducible)','='+rq+'!D'+p.tot+'+'+rq+'!D'+p.intra,'='+rq+'!G'+p.tot+'+'+rq+'!E'+p.intra,'ISP incluido en cuota','','']);
-    rows.push(['','diferencia','','=D'+rG+'-D'+rGa,'','','']);
+    rows.push(['','gastado (IVA soportado)','='+rq+'!D'+p.tot,'='+rq+'!G'+p.tot,'','','']);
+    rows.push(['','diferencia (resultado 46)','','=D'+rG+'-D'+rGa,'','','']);
+    rows.push(['','ISP intracomunitarias (va en 10-11 y 36-37, efecto 0 — no sumar aquí)','='+rq+'!D'+p.intra,'='+rq+'!E'+p.intra,'','','']);
     rows.push(['130','ingresos','='+eq+'!D'+p.emiTot,'','','','']);
     rows.push(['','gastos (con 0% y amortización)','='+rq+'!D'+p.tot+'+'+rq+'!D'+p.cero+'+'+rq+'!D'+p.intra+'+'+String(amort).replace('.',','),'',amort?('incluye amortización '+amort):'','','']);
     rows.push(['','retenciones soportadas','=-'+eq+'!F'+p.emiTot,'','','','']);
@@ -2897,6 +2898,11 @@ const LIBROS_COL={
   salmon:{red:0.902,green:0.722,blue:0.686},// E6B8AF gastos 130
   blanco:{red:1,green:1,blue:1}
 };
+function librosNumFmtReq(sheetId,r1,r2,c1,c2,type,pattern){
+  return {repeatCell:{range:{sheetId:sheetId,startRowIndex:r1,endRowIndex:r2,startColumnIndex:c1,endColumnIndex:c2},cell:{userEnteredFormat:{numberFormat:{type:type,pattern:pattern}}},fields:'userEnteredFormat.numberFormat'}};
+}
+const LIBROS_FMT_EUR=['CURRENCY','#,##0.00" €"'];
+const LIBROS_FMT_FECHA=['DATE','dd/mm/yyyy'];
 function librosFmtReq(sheetId,r1,r2,c1,c2,bg,bold,white){
   const cell={userEnteredFormat:{backgroundColor:bg}};
   if(bold||white){cell.userEnteredFormat.textFormat={};if(bold)cell.userEnteredFormat.textFormat.bold=true;if(white)cell.userEnteredFormat.textFormat.foregroundColor=LIBROS_COL.blanco;}
@@ -2947,6 +2953,7 @@ function librosFormatosHoja(sid,tipo,rows){
       if(a.indexOf('ANUAL')===0) reqs.push(librosFmtReq(sid,idx,idx+1,0,7,C.amarillo,true,false));
       if(/^[1-4]T /.test(a)) reqs.push(librosFmtReq(sid,idx,idx+1,0,7,C.amarillo,true,false));
       if(a==='303'&&b.indexOf('ganado')===0) reqs.push(librosFmtReq(sid,idx,idx+2,0,1,C.verde,true,false));
+      if(b.indexOf('ISP intracomunitarias')===0) reqs.push(librosFmtReq(sid,idx,idx+1,1,4,C.naranja,false,true));
       if(b.indexOf('gastos (con 0%')===0) reqs.push(librosFmtReq(sid,idx,idx+1,1,4,C.salmon,false,false));
     });
   }
@@ -2965,6 +2972,41 @@ function librosFormatosHoja(sid,tipo,rows){
       const a=String(r[0]||'');
       if(a.indexOf('CUADRO:')===0) reqs.push(librosFmtReq(sid,idx,idx+1,0,6,C.amarillo,true,false));
       if(a==='EJERCICIO') reqs.push(librosFmtReq(sid,idx,idx+1,0,6,C.gris,true,false));
+    });
+  }
+  // ── Formatos numéricos: euros y fechas ──
+  const EUR=LIBROS_FMT_EUR, FECHA=LIBROS_FMT_FECHA, n=rows.length;
+  if(tipo==='recibidas'){
+    reqs.push(librosNumFmtReq(sid,1,n,2,3,FECHA[0],FECHA[1]));   // col C fechas
+    reqs.push(librosNumFmtReq(sid,1,n,3,9,EUR[0],EUR[1]));       // D-I importes
+  }
+  if(tipo==='emitidas'){
+    reqs.push(librosNumFmtReq(sid,1,n,2,3,FECHA[0],FECHA[1]));
+    reqs.push(librosNumFmtReq(sid,1,n,3,6,EUR[0],EUR[1]));       // D-F importes
+  }
+  if(tipo==='impuestos'){
+    reqs.push(librosNumFmtReq(sid,1,n,1,7,EUR[0],EUR[1]));       // B-G importes
+  }
+  if(tipo==='modelos'){
+    reqs.push(librosNumFmtReq(sid,1,n,3,5,EUR[0],EUR[1]));       // D-E importes
+    rows.forEach((r,idx)=>{
+      if(String(r[2]||'')==='Nº perceptores') reqs.push(librosNumFmtReq(sid,idx,idx+1,4,5,'NUMBER','0'));
+    });
+  }
+  if(tipo==='amortizaciones'){
+    // Bloque resumen: desde fila 2 hasta la primera vacía
+    let finResumen=n;
+    for(let i=1;i<n;i++){ if(!rows[i]||!rows[i].length){ finResumen=i; break; } }
+    reqs.push(librosNumFmtReq(sid,1,finResumen,2,3,FECHA[0],FECHA[1]));  // C fecha inicio
+    reqs.push(librosNumFmtReq(sid,1,finResumen,3,4,EUR[0],EUR[1]));      // D valor amortizable
+    reqs.push(librosNumFmtReq(sid,1,finResumen,5,8,EUR[0],EUR[1]));      // F-H cuota/amortizado/VNC
+    // Cuadros por bien: tras cada fila EJERCICIO, importes en D-F hasta la siguiente vacía
+    rows.forEach((r,idx)=>{
+      if(String(r[0]||'')==='EJERCICIO'){
+        let fin=n;
+        for(let i=idx+1;i<n;i++){ if(!rows[i]||!rows[i].length){ fin=i; break; } }
+        reqs.push(librosNumFmtReq(sid,idx+1,fin,3,6,EUR[0],EUR[1]));
+      }
     });
   }
   return reqs;

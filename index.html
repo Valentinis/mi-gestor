@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.470</div>
+    <div class="login-version">v5.472</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.470</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.472</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -820,7 +820,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.470</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.472</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -7496,6 +7496,8 @@ async function loadTicketsFromFlama(){
         _fsId:'flama_'+flamaId,
         _flamaDocId:flamaId,
         _source:'flama',
+        _pagoId:get('pagoId')||'',
+        _createdAt:get('createdAt')||'',
         _dup:isDup,
         cliente:clienteStr,
         importe:importeNum,
@@ -7547,48 +7549,69 @@ async function loadTicketsPending(){
   try{
     const safeUid=getSafeUid();
     const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
-    const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
-    let loaded=[];
-    if(r.ok){
+    // Paginar TODOS los documentos (sin pageSize, Firestore devuelve solo la primera página)
+    let loaded=[]; let pageToken=''; let pages=0;
+    do{
+      const r=await fetch(url+'?pageSize=300'+(pageToken?'&pageToken='+encodeURIComponent(pageToken):''),{headers:{Authorization:'Bearer '+token}});
+      if(!r.ok) break;
       const j=await r.json();
-      if(j.documents&&j.documents.length){
-        loaded=j.documents.map(doc=>{
-          const f=doc.fields||{};
-          const t={};
-          Object.entries(f).forEach(([k,v])=>{
-            if(v.doubleValue!==undefined) t[k]=v.doubleValue;
-            else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
-            else t[k]=v.stringValue||'';
-          });
-          t._fsId=doc.name.split('/').pop();
-          return t;
+      (j.documents||[]).forEach(doc=>{
+        const f=doc.fields||{};
+        const t={};
+        Object.entries(f).forEach(([k,v])=>{
+          if(v.doubleValue!==undefined) t[k]=v.doubleValue;
+          else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
+          else t[k]=v.stringValue||'';
         });
-      }
-    }
+        t._fsId=doc.name.split('/').pop();
+        loaded.push(t);
+      });
+      pageToken=j.nextPageToken||''; pages++;
+    }while(pageToken&&pages<20);
     // Cargar también de Flama Workshop
     const flamaTickets=await loadTicketsFromFlama();
     // Combinar
     const all=loaded.concat(flamaTickets);
-    // Dedup por CONTENIDO (no por id de documento): mismo cliente+fecha+importe+método = mismo pago
-    // Agrupa los envíos duplicados desde Flama que llegan como documentos distintos,
-    // y guarda en el superviviente los _flamaDocId de TODOS sus duplicados para marcarlos juntos
-    const seenMap={};
+    // Dedup por IDENTIDAD de documento: mismo doc leído dos veces = mismo pago.
+    // El contenido igual entre docs DISTINTOS ya no se colapsa en silencio (podrían ser
+    // dos cobros iguales legítimos): se marca con el badge 'dup.' para que lo revises tú.
+    const seenIds={};
+    const byPagoId={};
+    const contentSeen={};
     const result=[];
     all.forEach(t=>{
-      const cli=(t.cliente||t.proveedor_cliente||'').trim().toLowerCase();
-      const met=(t.metodo||'').trim().toLowerCase();
-      const imp=(t.importe||t.ingresos_brutos||0);
-      const key=cli+'|'+(t.fecha||'')+'|'+imp+'|'+met;
-      if(seenMap[key]!==undefined){
-        // Duplicado: añadir su _flamaDocId a la lista del superviviente
-        const winner=result[seenMap[key]];
-        if(t._flamaDocId){
+      const id=t._fsId||('x_'+Math.random().toString(36).slice(2));
+      if(seenIds[id]!==undefined){
+        const winner=result[seenIds[id]];
+        if(t._flamaDocId&&winner._flamaDocId!==t._flamaDocId){
           if(!winner._flamaDupIds) winner._flamaDupIds=[];
           winner._flamaDupIds.push(t._flamaDocId);
         }
         return;
       }
-      seenMap[key]=result.length;
+      // Mismo pagoId = mismo pago con certeza: colapso automático, gana el más reciente
+      if(t._pagoId&&byPagoId[t._pagoId]!==undefined){
+        const wIdx=byPagoId[t._pagoId];
+        const w=result[wIdx];
+        // Registrar también el contenido del doc entrante para el badge de posibles duplicados
+        const kIn=(t.cliente||t.proveedor_cliente||'').trim().toLowerCase()+'|'+(t.fecha||'')+'|'+(t.importe||t.ingresos_brutos||0)+'|'+(t.metodo||'').trim().toLowerCase();
+        if(contentSeen[kIn]===undefined) contentSeen[kIn]=1;
+        const tEsMasNuevo=(t._createdAt||'')>(w._createdAt||'');
+        const winner=tEsMasNuevo?t:w;
+        const loser=tEsMasNuevo?w:t;
+        if(!winner._flamaDupIds) winner._flamaDupIds=[];
+        if(loser._flamaDupIds) winner._flamaDupIds=winner._flamaDupIds.concat(loser._flamaDupIds);
+        if(loser._flamaDocId) winner._flamaDupIds.push(loser._flamaDocId);
+        if(tEsMasNuevo){ result[wIdx]=t; seenIds[t._fsId]=wIdx; }
+        return;
+      }
+      if(t._pagoId) byPagoId[t._pagoId]=result.length;
+      seenIds[id]=result.length;
+      const cli=(t.cliente||t.proveedor_cliente||'').trim().toLowerCase();
+      const met=(t.metodo||'').trim().toLowerCase();
+      const key=cli+'|'+(t.fecha||'')+'|'+(t.importe||t.ingresos_brutos||0)+'|'+met;
+      if(contentSeen[key]!==undefined){ t._dup=true; }
+      else contentSeen[key]=1;
       result.push(t);
     });
     // Autocategorizar tickets sin categoría (ventas de cerámica, workshops, clases...)

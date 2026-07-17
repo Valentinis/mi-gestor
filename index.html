@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.474</div>
+    <div class="login-version">v5.475</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.474</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.475</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -820,7 +820,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.474</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.475</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -2963,6 +2963,7 @@ function librosFormatosHoja(sid,tipo,rows){
       const a=String(r[0]||''), bLbl=String(r[2]||'');
       if(/^[1-4]T /.test(a)) reqs.push(librosFmtReq(sid,idx,idx+1,0,5,C.amarillo,true,false));
       if(a.indexOf('MODELO ')===0) reqs.push(librosFmtReq(sid,idx,idx+1,0,5,C.gris,true,false));
+      if(a==='CLAVE'&&String(r[1]||'')==='COD. PAÍS') reqs.push(librosFmtReq(sid,idx,idx+1,0,5,C.naranja,true,true));
       if(bLbl.indexOf('RESULTADO')===0||bLbl==='TOTAL 349') reqs.push(librosFmtReq(sid,idx,idx+1,1,5,C.salmon,true,false));
     });
   }
@@ -3024,7 +3025,7 @@ function librosCasillasTrimestre(q){
       ret+=f.retencion_importe||0;
     } else {
       gas+=f.base_irpf||f.base_iva||0;
-      if(f.operacion==='INTRA_S'){c10b+=f.base_iva||0;c10q+=(f.base_iva||0)*0.21;c36b+=f.base_iva||0;c36q+=(f.base_iva||0)*0.21;const p=f.proveedor_cliente||'UE';intra[p]=(intra[p]||0)+(f.base_iva||0);}
+      if(f.operacion==='INTRA_S'){c10b+=f.base_iva||0;c10q+=(f.base_iva||0)*0.21;c36b+=f.base_iva||0;c36q+=(f.base_iva||0)*0.21;const p=f.proveedor_cliente||'UE';if(!intra[p])intra[p]={base:0,nif:f.nif||''};intra[p].base+=(f.base_iva||0);if(!intra[p].nif&&f.nif)intra[p].nif=f.nif;}
       else if(f.operacion==='ALQUILER'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;ab+=f.base_irpf||f.base_iva||0;ac+=f.retencion_importe||0;if(f.retencion_importe>0)alqSet[(f.proveedor_cliente||'').toLowerCase().trim()]=1;}
       else if(f.operacion==='INT'||f.operacion==='PROF'){c28b+=f.base_iva||0;c28q+=f.cuota_iva||0;}
       if(f.operacion==='PROF'&&f.retencion_importe>0){profSet[(f.proveedor_cliente||'').toLowerCase().trim()]=1;profB+=f.base_irpf||f.base_iva||0;profR+=f.retencion_importe||0;}
@@ -3035,6 +3036,13 @@ function librosCasillasTrimestre(q){
   const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gasConAmort,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret);
   const profN=Object.keys(profSet).length, alqN=Object.keys(alqSet).length;
   return {c07b,c07q,c10b,c10q,c27,c28b,c28q,c36b,c36q,c45,c46,ing,gas:gasConAmort,amort,net,v20,ret,res,ab,ac,alqN,profN,profB,profR,intra};
+}
+// Separa un NIF intracomunitario en {pais, numero}. Si no trae prefijo de letras, lo deja en blanco para revisión.
+function librosNifIntra(nif){
+  const raw=String(nif||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const m=raw.match(/^([A-Z]{2})(.+)$/);
+  if(m) return {pais:m[1], numero:m[2]};
+  return {pais:'', numero:raw};
 }
 function librosRowsModelos(year,hojas){
   const R=librosR2;
@@ -3101,10 +3109,14 @@ function librosRowsModelos(year,hojas){
     }
     const ops=Object.entries(c.intra);
     if(ops.length){
-      rows.push(['MODELO 349 — Op. intracomunitarias','CLAVE','OPERADOR','','BASE']);
+      rows.push(['MODELO 349 — Operaciones intracomunitarias','','','','']);
+      rows.push(['CLAVE','COD. PAÍS','NIF-IVA OPERADOR','NOMBRE','BASE (€)']);
       const a=rows.length+1;
-      ops.forEach(([pr,v])=>rows.push(['','I',pr,'',R(v)]));
-      rows.push(['','','TOTAL 349','','=SUM(E'+a+':E'+rows.length+')']);
+      ops.forEach(([pr,obj])=>{
+        const ni=librosNifIntra(obj.nif);
+        rows.push(['I',ni.pais||'(revisar)',ni.numero||'(falta NIF)',pr,R(obj.base)]);
+      });
+      rows.push(['','','','TOTAL 349','=SUM(E'+a+':E'+rows.length+')']);
     }
     rows.push([]);
   });

@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.477</div>
+    <div class="login-version">v5.478</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.477</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.478</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -732,11 +732,11 @@ img,video,iframe,table{max-width:100%;}
       <div class="sum-card"><div class="sum-label">349 Intracom.</div><div class="sum-val" id="s349">—</div></div>
       <div class="sum-card"><div class="sum-label">111 Ret.Prof.</div><div class="sum-val warn" id="s111">—</div></div>
     </div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b303')"><div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div><div class="mod-res pagar" id="r303">—</div></div><div class="mod-body" id="b303"><div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div><div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div><div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div><div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div><div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div><div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div><div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b130')"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div><div class="mod-body" id="b130"><div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos del trimestre</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div><div class="cas-row" id="m130-amort-row" style="opacity:0.85;"><span class="cas-num">└</span><span class="cas-desc">de los cuales, amortizaciones</span><span class="cas-base"></span><span class="cas-cuota" id="m130-amort">—</span></div><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div><div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">20% rendimiento neto</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div><div class="cas-row"><span class="cas-num">14</span><span class="cas-desc">Retenciones soportadas</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div><div class="cas-row cas-total"><span class="cas-num">20</span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b115')"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b111')"><div class="mod-left"><span class="mod-code">111</span><span class="mod-name">Retenciones profesionales</span></div><div class="mod-res pagar" id="r111">—</div></div><div class="mod-body" id="b111"><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Nº perceptores</span><span class="cas-base"></span><span class="cas-cuota" id="m111-n">—</span></div><div class="cas-row"><span class="cas-num">04</span><span class="cas-desc">Base retenciones PROF</span><span class="cas-base"></span><span class="cas-cuota" id="m111-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">06</span><span class="cas-desc">Retenciones 15%</span><span class="cas-base"></span><span class="cas-cuota" id="m111-c">—</span></div></div></div>
-    <div class="mod-card"><div class="mod-hdr" onclick="tog('b349')""><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b303',this)"><div class="mod-left"><span class="mod-code">303</span><span class="mod-name">IVA trimestral</span></div><div class="mod-res pagar" id="r303">—</div></div><div class="mod-body" id="b303"><div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Base devengado 21%</span><span class="cas-base" id="c07b">—</span><span class="cas-cuota" id="c07q">—</span></div><div class="cas-row"><span class="cas-num">10/11</span><span class="cas-desc">Adq. intracomunitarias</span><span class="cas-base" id="c10b">—</span><span class="cas-cuota" id="c10q">—</span></div><div class="cas-row"><span class="cas-num">27</span><span class="cas-desc">Total cuota devengada</span><span class="cas-base"></span><span class="cas-cuota" id="c27">—</span></div><div class="cas-row"><span class="cas-num">28/29</span><span class="cas-desc">IVA soportado interior</span><span class="cas-base" id="c28b">—</span><span class="cas-cuota" id="c28q">—</span></div><div class="cas-row"><span class="cas-num">36/37</span><span class="cas-desc">IVA soportado intracom.</span><span class="cas-base" id="c36b">—</span><span class="cas-cuota" id="c36q">—</span></div><div class="cas-row"><span class="cas-num">45</span><span class="cas-desc">Total a deducir</span><span class="cas-base"></span><span class="cas-cuota" id="c45">—</span></div><div class="cas-row cas-total"><span class="cas-num">46</span><span class="cas-desc">Resultado</span><span class="cas-base"></span><span class="cas-cuota" id="c46">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b130',this)"><div class="mod-left"><span class="mod-code">130</span><span class="mod-name">IRPF pago fraccionado</span></div><div class="mod-res pagar" id="r130">—</div></div><div class="mod-body" id="b130"><div class="cas-row"><span class="cas-num">01</span><span class="cas-desc">Ingresos desde el 1 de enero</span><span class="cas-base"></span><span class="cas-cuota" id="m130-i">—</span></div><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Gastos deducibles desde el 1 de enero</span><span class="cas-base"></span><span class="cas-cuota" id="m130-g">—</span></div><div class="cas-row" id="m130-amort-row" style="opacity:0.85;display:none;"><span class="cas-num">└</span><span class="cas-desc">de los cuales, amortizaciones</span><span class="cas-base"></span><span class="cas-cuota" id="m130-amort">—</span></div><div class="cas-row" id="m130-dj-row" style="opacity:0.85;"><span class="cas-num">└</span><span class="cas-desc">de los cuales, difícil justificación (5 %)</span><span class="cas-base"></span><span class="cas-cuota" id="m130-dj">—</span></div><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Rendimiento neto (01 − 02)</span><span class="cas-base"></span><span class="cas-cuota" id="m130-n">—</span></div><div class="cas-row"><span class="cas-num">04</span><span class="cas-desc">20 % del rendimiento</span><span class="cas-base"></span><span class="cas-cuota" id="m130-20">—</span></div><div class="cas-row"><span class="cas-num">05</span><span class="cas-desc">Pagado en los 130 anteriores del año</span><span class="cas-base"><input id="m130-05-in" type="text" inputmode="decimal" placeholder="auto" onchange="setC05Manual(Q,this.value)" style="width:86px;padding:4px 6px;border-radius:8px;border:0.5px solid var(--line-2);background:var(--bg-raised);color:var(--text);font-size:12px;text-align:right;"></span><span class="cas-cuota" id="m130-05">—</span></div><div class="cas-row"><span class="cas-num">06</span><span class="cas-desc">Retenciones desde el 1 de enero</span><span class="cas-base"></span><span class="cas-cuota" id="m130-r">—</span></div><div class="cas-row"><span class="cas-num">07</span><span class="cas-desc">Resultado (04 − 05 − 06)</span><span class="cas-base"></span><span class="cas-cuota" id="m130-07">—</span></div><div class="cas-row cas-total"><span class="cas-num"></span><span class="cas-desc">Resultado a ingresar</span><span class="cas-base"></span><span class="cas-cuota" id="m130-res">—</span></div><div class="cas-row" style="gap:8px;align-items:center;"><span class="cas-desc" style="flex:1;">Gastos de difícil justificación (5 %, máx. 2.000 €/año)</span><button id="m130-dj-btn" onclick="toggleDificilJustificacion()" style="padding:6px 12px;border-radius:10px;border:0.5px solid var(--line-2);background:var(--bg-raised);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">—</button></div><div id="m130-cmp" style="font-size:12px;color:var(--text-2);padding:6px 0 2px;line-height:1.45;">—</div><div style="font-size:11px;color:var(--text-3);padding:4px 0 2px;line-height:1.45;">Casilla 05: lo que te salió a ingresar en los 130 anteriores de este año. Si presentaste otras cifras, escríbelas en el recuadro.</div><div id="m130-aviso" style="display:none;font-size:11px;color:var(--amber);padding:4px 0 2px;line-height:1.45;"></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b115',this)"><div class="mod-left"><span class="mod-code">115</span><span class="mod-name">Retenciones alquiler</span></div><div class="mod-res pagar" id="r115">—</div></div><div class="mod-body" id="b115"><div class="cas-row"><span class="cas-num">02</span><span class="cas-desc">Base rentas satisfechas</span><span class="cas-base"></span><span class="cas-cuota" id="m115-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">03</span><span class="cas-desc">Retenciones 19%</span><span class="cas-base"></span><span class="cas-cuota" id="m115-c">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b111',this)"><div class="mod-left"><span class="mod-code">111</span><span class="mod-name">Retenciones profesionales</span></div><div class="mod-res pagar" id="r111">—</div></div><div class="mod-body" id="b111"><div class="cas-row"><span class="cas-num">03</span><span class="cas-desc">Nº perceptores</span><span class="cas-base"></span><span class="cas-cuota" id="m111-n">—</span></div><div class="cas-row"><span class="cas-num">04</span><span class="cas-desc">Base retenciones PROF</span><span class="cas-base"></span><span class="cas-cuota" id="m111-b">—</span></div><div class="cas-row cas-total"><span class="cas-num">06</span><span class="cas-desc">Retenciones 15%</span><span class="cas-base"></span><span class="cas-cuota" id="m111-c">—</span></div></div></div>
+    <div class="mod-card"><div class="mod-hdr" onclick="tog('b349',this)"><div class="mod-left"><span class="mod-code">349</span><span class="mod-name">Operaciones intracomunitarias</span></div><div class="mod-res" id="r349">—</div></div><div class="mod-body" id="b349"><div id="ops349"><div class="empty">Sin operaciones</div></div></div></div>
     <button onclick="recalc()" style="margin-bottom:8px;background:#F0844A !important;color:#fff !important;border:none;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Recalcular modelos</button>
     <div class="mod-card" style="margin-bottom:8px;">
       <div class="mod-hdr" onclick="openBienesModal()" style="cursor:pointer;">
@@ -820,7 +820,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.477</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.478</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -856,6 +856,7 @@ img,video,iframe,table{max-width:100%;}
       <div class="config-row"><span class="config-label">Dirección</span><span style="font-size:13px;color:var(--text-2);">Badajoz 95 LOC 1, 08005 Barcelona</span></div>
       <div class="config-row"><span class="config-label">Email</span><span style="font-size:13px;color:var(--text-2);">valentinnlopez@gmail.com</span></div>
       <div class="config-row"><span class="config-label">Teléfono</span><span style="font-size:13px;color:var(--text-2);">686 544 922</span></div>
+      <div class="config-row"><span class="config-label">Conexión con Flama</span><span id="flama-acceso" style="font-size:13px;color:var(--text-2);">—</span></div>
       <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text-2);">86.2 Ceramista</span></div>
     </div>
     <div class="section-label">Google Sheets</div>
@@ -3016,7 +3017,7 @@ async function syncDrive(){
   else setDS('err','Error sync');
   renderDriveTab();
 }
-function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${f.name}</div><div class="file-meta">${f.quarter} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
+function renderDriveTab(){ const fl=document.getElementById('drive-files-list'); fl.innerHTML=driveFiles.length?driveFiles.map(f=>`<div class="drive-file-item"><span style="font-size:18px;">📄</span><div class="file-info"><div class="file-name">${esc(f.name)}</div><div class="file-meta">${esc(f.quarter)} · ${new Date(f.ts).toLocaleDateString('es')}</div></div>${f.link?`<button class="file-open" onclick="window.open('${f.link}','_blank')">Abrir</button>`:''}</div>`).join(''):'<div class="empty">Sin archivos subidos</div>'; const jl=document.getElementById('drive-json-list'); const qs=Object.keys(data).filter(q=>data[q]&&data[q].length); jl.innerHTML=qs.length?qs.map(q=>`<div class="drive-file-item"><span style="font-size:18px;">📊</span><div class="file-info"><div class="file-name">${q}.json</div><div class="file-meta">${data[q].length} registros</div></div><span class="chip chip-drive">Drive</span></div>`).join(''):'<div class="empty">Sin datos en Drive</div>'; }
 
 // ── GOOGLE SHEETS ──
 async function exportToSheets(){
@@ -4016,11 +4017,11 @@ function renderTicketsSubtab(searchQ=''){
       return `<div style="background:var(--bg-card);${border}border-radius:10px;padding:10px 12px;margin-bottom:6px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
           <div style="flex:1;min-width:0;overflow:hidden;">
-            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${metodoIcon} ${t.concepto||'—'}${dupBadge}${t._source==='flama'?' <span style="display:inline-block;background:rgba(29,158,117,0.2);color:#1D9E75;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;">FLAMA</span>':''}</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${metodoIcon} ${esc(t.concepto||'—')}${dupBadge}${t._source==='flama'?' <span style="display:inline-block;background:rgba(29,158,117,0.2);color:#1D9E75;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;">FLAMA</span>':''}</div>
           </div>
           <div style="font-size:14px;font-weight:800;color:var(--green);flex-shrink:0;">+${bruto.toFixed(2).replace('.',',')} €</div>
         </div>
-        <div style="font-size:10px;color:var(--text-3);margin-bottom:6px;">${fmtFecha(t.fecha)}${t.hora?' · '+t.hora:''}${t.cliente?' · '+t.cliente:''} · Base ${base.toFixed(2).replace('.',',')}€ · IVA ${pctIva}% · ${metodoLabel}</div>
+        <div style="font-size:10px;color:var(--text-3);margin-bottom:6px;">${esc(fmtFecha(t.fecha))}${t.hora?' · '+esc(t.hora):''}${t.cliente?' · '+esc(t.cliente):''} · Base ${base.toFixed(2).replace('.',',')}€ · IVA ${esc(pctIva)}% · ${esc(metodoLabel)}</div>
         <div style="display:flex;gap:5px;">
           <button onclick="approveTicket(${realIdx});renderTicketsSubtab();" style="flex:1;background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:7px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;">✓ Aprobar</button>
           <button onclick="discardTicket(${realIdx});renderTicketsSubtab();" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">✕</button>
@@ -4660,8 +4661,8 @@ function renderReviewList(){
         <div style="display:flex;align-items:flex-start;gap:8px;">
           <div style="font-size:16px;flex-shrink:0;">${i.icon}</div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;">${i.description||''}</div>
-            ${i.extra?`<div style="font-size:11px;color:var(--text-3);margin-top:3px;word-break:break-word;">${i.extra}</div>`:''}
+            <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;">${esc(i.description||'')}</div>
+            ${i.extra?`<div style="font-size:11px;color:var(--text-3);margin-top:3px;word-break:break-word;">${esc(i.extra)}</div>`:''}
             ${i.qActual?`<div style="font-size:10px;color:var(--text-3);margin-top:3px;">📍 ${i.qActual}</div>`:''}
           </div>
         </div>
@@ -6066,8 +6067,8 @@ function calSelectDay(d){
     return `<div onclick="openModal('${f._id}');document.getElementById('cal-detail-sheet').style.display='none';" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
       <div style="width:3px;min-height:32px;border-radius:2px;background:${barColor};flex-shrink:0;"></div>
       <div style="flex:1;">
-        <div style="font-size:13px;font-weight:600;color:var(--text);">${f.proveedor_cliente||'—'}</div>
-        <div style="font-size:11px;color:var(--text-3);">${f.concepto||''}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);">${esc(f.proveedor_cliente||'—')}</div>
+        <div style="font-size:11px;color:var(--text-3);">${esc(f.concepto||'')}</div>
       </div>
       <div style="font-size:13px;font-weight:700;color:${isIng?'var(--green)':'var(--red)'};">${isIng?'+':'−'}${fmt(amount)} €</div>
     </div>`;
@@ -6865,7 +6866,7 @@ function renderList(){
       if(f._processing) return `<div class="fact-item" style="cursor:default;display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--line);opacity:0.6;">
         <div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:var(--accent);animation:pulse 1s ease-in-out infinite;"></div>
         <div class="fact-main">
-          <div class="fact-name">${f.proveedor_cliente||'—'}</div>
+          <div class="fact-name">${esc(f.proveedor_cliente||'—')}</div>
           <div class="fact-sub" style="color:var(--accent);">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite;vertical-align:middle;margin-right:3px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
             Procesando...
@@ -6873,7 +6874,7 @@ function renderList(){
         </div>
         <div class="fact-right">
           <div class="fact-amount" style="color:var(--green);font-weight:700;">+${fmt(f.ingresos_brutos||0)}</div>
-          <div class="fact-date">${fmtFecha(f.fecha)}</div>
+          <div class="fact-date">${esc(fmtFecha(f.fecha))}</div>
         </div>
       </div>`;
       const isBulkSel=bulkSelected.has(fid);
@@ -6888,14 +6889,14 @@ function renderList(){
         ${bulkMode?`<input id="bulk-cb-${fid}" type="checkbox" ${isBulkSel?'checked':''} onclick="event.stopPropagation();toggleBulkItem('${fid}')" style="flex-shrink:0;width:18px;height:18px;accent-color:var(--accent);">`:`<div style="width:3px;min-height:36px;border-radius:2px;flex-shrink:0;background:${getBarColor(f)};"></div>`}
         <div class="fact-main" style="min-width:0;flex:1;">
           <div style="display:flex;align-items:baseline;gap:5px;min-width:0;">
-            <div class="fact-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
-            ${f.num_factura?`<span style="font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0;">${f.num_factura}</span>`:''}
+            <div class="fact-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(f.proveedor_cliente||'—')}</div>
+            ${f.num_factura?`<span style="font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0;">${esc(f.num_factura)}</span>`:''}
           </div>
-          <div class="fact-sub">${f.concepto||''} ${f.operacion?'· '+f.operacion:''}${isIng&&f.categoria_ing?` <span style="display:inline-block;background:rgba(48,209,88,0.15);color:#30D158;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;margin-left:3px;">${f.categoria_ing}</span>`:''}</div>
+          <div class="fact-sub">${esc(f.concepto||'')} ${f.operacion?'· '+esc(f.operacion):''}${isIng&&f.categoria_ing?` <span style="display:inline-block;background:rgba(48,209,88,0.15);color:#30D158;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;margin-left:3px;">${esc(f.categoria_ing)}</span>`:''}</div>
         </div>
         <div class="fact-right">
           <div class="fact-amount" style="color:${isIng?'var(--green)':'var(--red)'};font-weight:700;">${isIng?'+':'−'}${fmt(amount)}</div>
-          <div class="fact-date">${fmtFecha(f.fecha)}</div>
+          <div class="fact-date">${esc(fmtFecha(f.fecha))}</div>
         </div>
         ${bulkMode?'':`<div style="flex-shrink:0;" onclick="event.stopPropagation()">${driveIcon(f)}</div>`}
       </div>`;
@@ -6938,8 +6939,8 @@ function openModal(id){
   document.getElementById('modal-body').innerHTML=`<div style="display:flex;flex-direction:column;gap:0;">${rows.filter(([k,v])=>v&&v!=='—'&&v!=='0,00 €').map(([k,v])=>{
     const hl=highlighted.includes(k);
     const valColor=k==='Cuota IVA'?'var(--amber)':k==='Retención'?'var(--red)':k==='Base IVA'||k==='Base IRPF'?'var(--blue)':k==='Ingresos brutos'?'var(--green)':'var(--text)';
-    return `<div style="display:flex;justify-content:space-between;padding:${hl?'10px':'8px'} 0;border-bottom:0.5px solid var(--line);font-size:${hl?'14px':'13px'};gap:12px;${hl?'background:transparent;':''}"><span style="color:var(--text-3);font-weight:${hl?'600':'500'};flex-shrink:0;">${k}</span><span style="color:${valColor};text-align:right;font-weight:${hl?'700':'400'};">${v}</span></div>`;
-  }).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${f.notas}</div>`:''}</div>`;
+    return `<div style="display:flex;justify-content:space-between;padding:${hl?'10px':'8px'} 0;border-bottom:0.5px solid var(--line);font-size:${hl?'14px':'13px'};gap:12px;${hl?'background:transparent;':''}"><span style="color:var(--text-3);font-weight:${hl?'600':'500'};flex-shrink:0;">${k}</span><span style="color:${valColor};text-align:right;font-weight:${hl?'700':'400'};">${esc(v)}</span></div>`;
+  }).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${esc(f.notas)}</div>`:''}</div>`;
   // Document preview — fetch from Drive
   const preview=document.getElementById('modal-doc-preview');
   preview.style.display='none';
@@ -7008,7 +7009,7 @@ function openModal(id){
         preview.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#1C1814;">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:600;color:#F5EDE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.num_factura||driveFileName||'Ticket'}</div>
+            <div style="font-size:13px;font-weight:600;color:#F5EDE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(f.num_factura||driveFileName||'Ticket')}</div>
             <div style="font-size:11px;color:rgba(255,255,255,0.4);">Factura simplificada · Toca para ver</div>
           </div>
           <button onclick="window.open('${url}')" style="background:#F0844A;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">Ver →</button>
@@ -7082,8 +7083,8 @@ function quickUpload(id){
   sheet.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;';
   sheet.innerHTML=`
     <div style="background:var(--bg-card);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;" onclick="event.stopPropagation()">
-      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">${f.proveedor_cliente||'—'}</div>
-      <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;">${fmtFecha(f.fecha)} · Sin copia en Drive</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">${esc(f.proveedor_cliente||'—')}</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;">${esc(fmtFecha(f.fecha))} · Sin copia en Drive</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
         <button onclick="this.closest('div[style*=z-index]').remove();_quickUploadFile(${id},'file')" style="background:var(--bg-raised);color:var(--text);border:none;border-radius:12px;padding:14px 8px;font-size:13px;font-weight:600;cursor:pointer;">Seleccionar archivo</button>
         <button onclick="this.closest('div[style*=z-index]').remove();_quickUploadFile(${id},'camera')" style="background:var(--bg-raised);color:var(--text);border:none;border-radius:12px;padding:14px 8px;font-size:13px;font-weight:600;cursor:pointer;">Tomar foto</button>
@@ -7474,6 +7475,49 @@ function amortizacionDelTrimestre(q){
   }catch(e){ console.warn('amortizacionDelTrimestre error:',e); return 0; }
 }
 
+// ── MODELO 130: pago fraccionado ACUMULADO desde el 1 de enero (instrucciones de la AEAT) ──
+// 01 y 02 son acumulados; 05 es la suma de lo que salió a ingresar en los 130 anteriores del año;
+// 06 son las retenciones acumuladas. Los gastos de difícil justificación (5 % del rendimiento
+// neto previo, máx. 2.000 €/año) van dentro de la casilla 02 y se pueden activar o no.
+const DJ_PCT=0.05, DJ_MAX_ANUAL=2000, PF130_PCT=0.20;
+function usarDificilJustificacion(){ try{ return localStorage.getItem('mg_130_dj')!=='0'; }catch(e){ return true; } }
+function toggleDificilJustificacion(){ try{ localStorage.setItem('mg_130_dj',usarDificilJustificacion()?'0':'1'); }catch(e){} recalc(); }
+function c05Manual(q){ try{ const v=localStorage.getItem('mg_130_05_'+q); if(v===null||v==='') return null; const n=parseFloat(v); return isNaN(n)?null:n; }catch(e){ return null; } }
+function setC05Manual(q,v){
+  const txt=String(v==null?'':v).trim().replace(/\s|€/g,'');
+  const norm=txt.includes(',')?txt.replace(/\./g,'').replace(',','.'):(/^\d{1,3}(\.\d{3})+$/.test(txt)?txt.replace(/\./g,''):txt);
+  const n=parseFloat(norm);
+  try{ if(txt===''||isNaN(n)||n<0) localStorage.removeItem('mg_130_05_'+q); else localStorage.setItem('mg_130_05_'+q,String(Math.round(n*100)/100)); }catch(e){}
+  recalc();
+}
+// Ingresos, gastos, amortización y retenciones de UN trimestre (mismos criterios que el resto de la app)
+function datos130Trimestre(q){
+  let ing=0,gas=0,ret=0;
+  for(const f of (data[q]||[])){
+    if(!f||f._processing) continue;
+    if(f.tipo==='ingreso'){ ing+=f.base_irpf||0; ret+=f.retencion_importe||0; }
+    else gas+=f.base_irpf||f.base_iva||0;
+  }
+  return {ing,gas,amort:amortizacionDelTrimestre(q),ret};
+}
+// Casillas del 130 de un trimestre, acumulando desde el 1T del mismo año
+function calc130(q,conDJ){
+  const n=parseInt(q[0],10), y=q.split(' ')[1];
+  let I=0,G=0,A=0,R=0,c05prev=0,res=null;
+  for(let i=1;i<=n;i++){
+    const d=datos130Trimestre(i+'T '+y);
+    I+=d.ing; G+=d.gas+d.amort; A+=d.amort; R+=d.ret;
+    const previo=I-G;
+    const dj=conDJ?Math.min(Math.max(0,previo)*DJ_PCT,DJ_MAX_ANUAL):0;
+    const c02=G+dj, c03=I-c02, c04=Math.max(0,c03*PF130_PCT);
+    const manual=(i===n)?c05Manual(q):null;
+    const c05=manual!==null?manual:c05prev;
+    const c07=c04-c05-R;
+    res={c01:I,c02,amort:A,dj,c03,c04,c05,c05Calculada:c05prev,c05Manual:manual!==null,c06:R,c07,aIngresar:Math.max(0,c07)};
+    if(i<n) c05prev+=Math.max(0,c07);
+  }
+  return res;
+}
 function recalc(){
   const fs=getF(Q);
   let c07b=0,c07q=0,c10b=0,c10q=0,c28b=0,c28q=0,c36b=0,c36q=0,ing=0,gas=0,ret=0,ab=0,ac=0,profB=0,profR=0,profN=0;
@@ -7493,15 +7537,31 @@ function recalc(){
   }
   const amort=amortizacionDelTrimestre(Q);
   const gasConAmort=gas+amort;
-  const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gasConAmort,v20=Math.max(0,net*.2),res=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0);
+  const c27=c07q+c10q,c45=c28q+c36q,c46=c27-c45,net=ing-gasConAmort,v20=Math.max(0,net*.2),resTrimestre=Math.max(0,v20-ret),it=Object.values(intra).reduce((a,b)=>a+b,0);
+  // 130 acumulado desde el 1 de enero, con o sin gastos de difícil justificación
+  const conDJ=usarDificilJustificacion();
+  const m130=calc130(Q,conDJ), m130otro=calc130(Q,!conDJ);
+  const res=m130.aIngresar;
   tx('c07b',fmt(c07b));tx('c07q',fmt(c07q));tx('c10b',fmt(c10b));tx('c10q',fmt(c10q));tx('c27',fmt(c27));tx('c28b',fmt(c28b));tx('c28q',fmt(c28q));tx('c36b',fmt(c36b));tx('c36q',fmt(c36q));tx('c45',fmt(c45));tx('c46',fmt(c46));tx('r303',fmt(c46));tx('s303',fmt(c46));
   document.getElementById('r303').className='mod-res '+(c46>=0?'pagar':'devolver');
   document.getElementById('s303').className='sum-val '+(c46>0?'warn':'good');
-  tx('m130-i',fmt(ing));tx('m130-g',fmt(gasConAmort));tx('m130-n',fmt(net));tx('m130-20',fmt(v20));tx('m130-r',fmt(ret));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));
-  // Mostrar línea de amortización en el 130 si existe
+  tx('m130-i',fmt(m130.c01));tx('m130-g',fmt(m130.c02));tx('m130-n',fmt(m130.c03));tx('m130-20',fmt(m130.c04));tx('m130-05',fmt(m130.c05));tx('m130-r',fmt(m130.c06));tx('m130-07',fmt(m130.c07));tx('m130-res',fmt(res));tx('r130',fmt(res));tx('s130',fmt(res));
   const amortRow=document.getElementById('m130-amort-row');
-  if(amort>0){
-    if(amortRow) tx('m130-amort',fmt(amort));
+  if(amortRow) amortRow.style.display=m130.amort>0?'':'none';
+  tx('m130-amort',fmt(m130.amort));
+  const djRow=document.getElementById('m130-dj-row');
+  if(djRow) djRow.style.display=conDJ?'':'none';
+  tx('m130-dj',fmt(m130.dj));
+  tx('m130-dj-btn',conDJ?'Incluidos':'No incluidos');
+  tx('m130-cmp',(conDJ?'Sin':'Con')+' el 5 %: '+fmt(m130otro.aIngresar)+' a ingresar. Cálculo anterior de la app (solo este trimestre): '+fmt(resTrimestre)+'.');
+  const in05=document.getElementById('m130-05-in');
+  if(in05){ in05.setAttribute('value',m130.c05Manual?String(m130.c05).replace('.',','):''); in05.value=m130.c05Manual?String(m130.c05).replace('.',','):''; in05.setAttribute('placeholder',fmt(m130.c05Calculada)); }
+  const aviso130=document.getElementById('m130-aviso');
+  if(aviso130){
+    const nq=parseInt(Q[0],10), yq=Q.split(' ')[1];
+    const faltan=[]; for(let i=1;i<nq;i++){ const qq=i+'T '+yq; if(qLoadFailed[qq]) faltan.push(qq); }
+    aviso130.textContent=faltan.length?('No se pudo cargar '+faltan.join(', ')+': el acumulado no es fiable hasta recargar.'):'';
+    aviso130.style.display=faltan.length?'block':'none';
   }
   document.getElementById('s130').className='sum-val '+(res>0?'warn':'good');
   tx('m115-b',fmt(ab));tx('m115-c',fmt(ac));tx('r115',fmt(ac));tx('s115',fmt(ac));
@@ -7557,7 +7617,7 @@ function calcAnual(){
     });
     tot390+=qIVA;
     const qAmort=amortizacionDelTrimestre(q);
-    const n=qIng-(qGas+qAmort); tot130+=Math.max(0,Math.max(0,n*.2)-qRet);
+    tot130+=calc130(q,usarDificilJustificacion()).aIngresar;
     totIng+=qIng; totGas+=(qGas+qAmort); totRet+=qRet;
   });
   tot111=tot190;
@@ -7578,7 +7638,15 @@ function svSync(r303,r130,r115,r349){ const tg={303:528.87,130:129.48,115:513,34
 function validar(){ recalc(); const fs=getF('1T 2026'); if(!fs.length){showV(false,'No hay registros del 1T 2026.');return;} const tg={303:528.87,130:129.48,115:513,349:57.03},get=id=>parseFloat((document.getElementById('v'+id).textContent||'0').replace(',','.'))||0,ac={303:get(303),130:get(130),115:get(115),349:get(349)},wrong=Object.keys(tg).filter(k=>ac[k]>0&&Math.abs(ac[k]-tg[k])>=0.02),miss=Object.keys(tg).filter(k=>!ac[k]); if(!wrong.length&&!miss.length) showV(true,'✓ Todos los modelos cuadran con el 1T 2026 presentado.'); else{let m='';if(miss.length) m+='Sin datos: '+miss.map(k=>'Mod.'+k).join(', ')+'. ';if(wrong.length) m+='Diferencias: '+wrong.map(k=>'Mod.'+k).join(', ')+'.';showV(false,m);} }
 function showV(ok,msg){ const e=document.getElementById('val-res'); e.style.display='block'; e.className='val-result '+(ok?'ok':'fail'); e.textContent=msg; }
 
-function tog(id){ document.getElementById(id).classList.toggle('open'); }
+// Despliega/recoge las casillas de un modelo. Funciona tanto en la vista original como en su copia visible.
+function tog(id,el){
+  const orig=document.getElementById(id);
+  if(orig) orig.classList.toggle('open');
+  const body=el&&el.nextElementSibling;
+  if(body&&body!==orig) body.classList.toggle('open',orig?orig.classList.contains('open'):!body.classList.contains('open'));
+}
+// Escapa texto antes de meterlo en HTML (datos de facturas, de Flama o de Drive)
+function esc(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function tx(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
 function fmt(n){ if(!n&&n!==0||isNaN(n)) return '—'; return n.toFixed(2).replace('.',',')+' €'; }
 function fmtFecha(f){ if(!f) return '—'; return f.match(/^\d{4}-\d{2}-\d{2}$/)?f.split('-').reverse().join('/'):f; }
@@ -7682,12 +7750,12 @@ function renderRegistros(searchQ=''){
       html+=`<div onclick="openModal('${f._id}')" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--line);cursor:pointer;">
         <div style="width:3px;min-height:36px;border-radius:2px;background:${rowColor};flex-shrink:0;align-self:stretch;"></div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.proveedor_cliente||'—'}</div>
-          <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${f.concepto||''}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(f.proveedor_cliente||'—')}</div>
+          <div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${esc(f.concepto||'')}${ret>0?' · Ret. '+fmtEur(ret):''}</div>
         </div>
         <div style="text-align:right;flex-shrink:0;">
           <div style="font-size:13px;font-weight:800;color:${rowColor};">${isGasto?'−':'+'} ${fmtEur(amount)}</div>
-          <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${fmtFecha(f.fecha)} ${hasDrive?'<span style="color:var(--green)">✓</span>':'<span style="color:var(--red)">!</span>'}</div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${esc(fmtFecha(f.fecha))} ${hasDrive?'<span style="color:var(--green)">✓</span>':'<span style="color:var(--red)">!</span>'}</div>
         </div>
       </div>`;
     });
@@ -7825,6 +7893,30 @@ async function saveTicketsPending(){
 // URL de Flama Workshop para leer pagos enviados
 const FLAMA_PAYMENTS_URL='https://firestore.googleapis.com/v1/projects/flama-workshop/databases/(default)/documents/payments_to_migestor';
 const FLAMA_API_KEY='AIzaSyDKGmdOZ4kaflBHKuRkqJxkXp2_t7sBfsk';
+// Acceso al buzón de Flama: con tu sesión de Google (permiso de base de datos y propietario del proyecto)
+// Firestore autoriza por IAM y no depende de las reglas. Si no hay permiso, se usa la clave como antes.
+let flamaAccesoSeguro=null; // true: con tu cuenta; false: solo con la clave (dejará de funcionar al cerrar las reglas)
+async function flamaFetch(url,opts={}){
+  const sinClave=url.replace(/([?&])key=[^&]*(&|$)/,(m,a,b)=>b?a:'').replace(/[?&]$/,'');
+  if(token){
+    const r=await fetch(sinClave,{...opts,headers:{...(opts.headers||{}),Authorization:'Bearer '+token}});
+    if(r.status===401){ setFlamaAcceso('caducada'); return r; } // sesión de Google caducada: hay que volver a entrar
+    if(r.status!==403){ setFlamaAcceso(true); return r; }
+    console.warn('Buzón de Flama: sin permiso con la cuenta de Google (403); se usa la clave');
+  }
+  setFlamaAcceso(false);
+  const conClave=/[?&]key=/.test(url)?url:(url+(url.includes('?')?'&':'?')+'key='+FLAMA_API_KEY);
+  return fetch(conClave,opts);
+}
+function setFlamaAcceso(v){
+  flamaAccesoSeguro=v===true;
+  const el=document.getElementById('flama-acceso');
+  if(el){
+    el.textContent=v===true?'Segura (tu cuenta de Google)':v==='caducada'?'Sesión de Google caducada: vuelve a entrar':'Sin permiso: usa la clave';
+    el.style.color=v===true?'var(--green)':'var(--amber)';
+  }
+  if(v==='caducada'){ try{ showToast('Tu sesión de Google ha caducado: vuelve a entrar para ver los pagos de Flama','error'); }catch(e){} }
+}
 // Cache local de IDs de Flama ya procesados (para evitar que reaparezcan antes del PATCH)
 const _flamaProcessedLocal=new Set(JSON.parse(localStorage.getItem('_flamaProcessedIds')||'[]'));
 function markFlamaLocalProcessed(docId){ _flamaProcessedLocal.add(docId); localStorage.setItem('_flamaProcessedIds',JSON.stringify([..._flamaProcessedLocal])); } // mismo FB_KEY de Flama
@@ -7840,7 +7932,7 @@ async function loadTicketsFromFlama(){
     for(let page=0; page<20; page++){
       let url=`${FLAMA_PAYMENTS_URL}?key=${FLAMA_API_KEY}&pageSize=300`;
       if(pageToken) url+=`&pageToken=${encodeURIComponent(pageToken)}`;
-      const r=await fetch(url);
+      const r=await flamaFetch(url);
       if(!r.ok) break;
       const j=await r.json();
       if(j.documents&&j.documents.length) allDocs=allDocs.concat(j.documents);
@@ -7857,9 +7949,12 @@ async function loadTicketsFromFlama(){
       if(get('processed')===true||f.processed?.booleanValue===true) return;
       if(_flamaProcessedLocal.has(doc.name.split('/').pop())) return;
       const flamaId=doc.name.split('/').pop();
-      const importeNum=parseFloat(get('importe'))||0;
-      const fechaStr=get('fecha')||'';
-      const clienteStr=get('cliente')||'';
+      const importeNum=Math.max(0,parseFloat(get('importe'))||0);
+      const fechaStr=/^\d{4}-\d{2}-\d{2}$/.test(String(get('fecha')))?String(get('fecha')):'';
+      const clienteStr=String(get('cliente')||'');
+      const horaStr=/^\d{1,2}:\d{2}$/.test(String(get('hora')))?String(get('hora')):'';
+      const metodoRaw=String(get('metodo')||'transferencia').toLowerCase();
+      const metodoStr=['sumup','transferencia','bizum','efectivo','tarjeta'].includes(metodoRaw)?metodoRaw:'otro';
       // Detectar si ya existe esta factura en data (duplicado)
       const existingFacturas=Object.values(data).flat();
       const isDup=existingFacturas.some(rec=>
@@ -7881,9 +7976,9 @@ async function loadTicketsFromFlama(){
           cliente:clienteStr,
           importe:importeNum,
           fecha:fechaStr,
-          metodo:(get('metodo')||'transferencia').toLowerCase(),
-          concepto:get('concepto')||'',
-          nota:get('nota')||'',
+          metodo:metodoStr,
+          concepto:String(get('concepto')||''),
+          nota:String(get('nota')||''),
           pct_iva:21
         });
       } else {
@@ -7897,9 +7992,9 @@ async function loadTicketsFromFlama(){
         cliente:clienteStr,
         importe:importeNum,
         fecha:fechaStr,
-        hora:get('hora')||'',
-        metodo:(get('metodo')||'transferencia').toLowerCase(),
-        concepto:get('concepto')||'Clases de cerámica',
+        hora:horaStr,
+        metodo:metodoStr,
+        concepto:String(get('concepto')||'Clases de cerámica'),
         pct_iva:21,
         cliente_nif:''
       });
@@ -7925,7 +8020,7 @@ async function markFlamaPaymentStatus(flamaDocId, status){
   markFlamaLocalProcessed(flamaDocId);
   try{
     const url=`${FLAMA_PAYMENTS_URL}/${flamaDocId}?updateMask.fieldPaths=processed&updateMask.fieldPaths=status&key=${FLAMA_API_KEY}`;
-    const r=await fetch(url,{
+    const r=await flamaFetch(url,{
       method:'PATCH',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({fields:{
@@ -8477,12 +8572,12 @@ function renderTicketsPendientes(){
         </div>
         <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;">Ticket original: ${origInfo}</div>
         <div style="font-size:11px;color:var(--text-2);line-height:1.8;">
-          ${t.cliente?'👤 '+t.cliente+'<br>':''}
+          ${t.cliente?esc(t.cliente)+'<br>':''}
           ${t.importe?'💰 '+fmt(t.importe)+'<br>':''}
-          ${t.metodo?'💳 '+t.metodo+'<br>':''}
-          ${t.fecha?'📅 '+fmtFecha(t.fecha)+'<br>':''}
-          ${t.concepto?'📝 '+t.concepto+'<br>':''}
-          ${t.nota?'🗒 '+t.nota:''}
+          ${t.metodo?esc(t.metodo)+'<br>':''}
+          ${t.fecha?esc(fmtFecha(t.fecha))+'<br>':''}
+          ${t.concepto?esc(t.concepto)+'<br>':''}
+          ${t.nota?esc(t.nota):''}
         </div>
         <div style="display:flex;gap:6px;margin-top:10px;">
           <button onclick="approveEditTicket(${realIdx})" style="flex:1;background:rgba(139,92,246,0.15);color:#8B5CF6;border:0.5px solid rgba(139,92,246,0.4);border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;">✓ Aplicar edición</button>
@@ -8496,15 +8591,15 @@ function renderTicketsPendientes(){
     const dupBadge=isDup?'<span style="font-size:10px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">posible dup.</span>':'';
     const flamaBadge=t._source==='flama'?' <span style="display:inline-block;background:rgba(29,158,117,0.2);color:#1D9E75;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;">FLAMA</span>':'';
     const metodoIcon={sumup:'💳',bizum:'📱',transferencia:'🏦'}[t.metodo]||'💰';
-    const catLabel=t.categoria_ing?`<span style="font-size:10px;background:rgba(29,158,117,0.12);color:#1D9E75;border-radius:4px;padding:1px 5px;font-weight:600;">${t.categoria_ing}</span>`:'';
+    const catLabel=t.categoria_ing?`<span style="font-size:10px;background:rgba(29,158,117,0.12);color:#1D9E75;border-radius:4px;padding:1px 5px;font-weight:600;">${esc(t.categoria_ing)}</span>`:'';
     return `<div style="${bg}${border}border-radius:12px;padding:12px;margin-bottom:8px;">
       <div style="display:flex;align-items:flex-start;gap:8px;">
         <input type="checkbox" ${isSel?'checked':''} onchange="toggleTicketBulk(${realIdx})" style="margin-top:3px;flex-shrink:0;width:18px;height:18px;accent-color:var(--accent);" />
         <div style="flex:1;min-width:0;">
           <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            ${metodoIcon} ${t.concepto||'—'}${dupBadge}${flamaBadge}
+            ${metodoIcon} ${esc(t.concepto||'—')}${dupBadge}${flamaBadge}
           </div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${fmtFecha(t.fecha)}${t.hora?' · '+t.hora:''} · ${t.cliente||'—'} · Base ${fmt(t.importe/(1+(t.pct_iva||21)/100))} · IVA ${t.pct_iva||21}% · ${(t.metodo||'—').charAt(0).toUpperCase()+(t.metodo||'').slice(1)}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${esc(fmtFecha(t.fecha))}${t.hora?' · '+esc(t.hora):''} · ${esc(t.cliente||'—')} · Base ${fmt(t.importe/(1+(t.pct_iva||21)/100))} · IVA ${esc(t.pct_iva||21)}% · ${esc((t.metodo||'—').charAt(0).toUpperCase()+(t.metodo||'').slice(1))}</div>
           <div style="margin-top:3px;">${catLabel}</div>
         </div>
         <div style="text-align:right;flex-shrink:0;">

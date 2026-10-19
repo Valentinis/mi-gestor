@@ -368,7 +368,7 @@ img,video,iframe,table{max-width:100%;}
     </svg>
     <div class="login-app-name">MiGestor</div>
     <div class="login-app-sub">Gestión fiscal profesional</div>
-    <div class="login-version">v5.478</div>
+    <div class="login-version">v5.479</div>
   </div>
   <div class="login-card">
     <p>Inicia sesión con Google para acceder a tus datos fiscales.</p>
@@ -456,7 +456,7 @@ img,video,iframe,table{max-width:100%;}
         <button id="refresh-btn" onclick="refreshFromDrive()" style="background:none;border:none;cursor:pointer;color:var(--text-2);padding:2px;display:none;">
           <svg id="refresh-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
         </button>
-        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.478</span>
+        <span style="font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.02em;">v5.479</span>
         <div onclick="switchNav('config',null)" style="width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;">
           <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           <span id="user-initials" style="color:#fff;font-size:11px;font-weight:700;">VL</span>
@@ -820,7 +820,7 @@ img,video,iframe,table{max-width:100%;}
         <div id="config-name" style="font-size:16px;font-weight:700;color:var(--text);">—</div>
         <div id="config-email" style="font-size:12px;color:var(--text-3);">—</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:10px;color:var(--text-3);">v5.478</span>
+          <span style="font-size:10px;color:var(--text-3);">v5.479</span>
           <button onclick="toggleDebug()" style="background:rgba(255,255,255,0.06);border:0.5px solid var(--line);border-radius:4px;cursor:pointer;color:var(--text-3);padding:1px 6px;font-size:10px;display:flex;align-items:center;gap:3px;">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             Debug
@@ -857,7 +857,7 @@ img,video,iframe,table{max-width:100%;}
       <div class="config-row"><span class="config-label">Email</span><span style="font-size:13px;color:var(--text-2);">valentinnlopez@gmail.com</span></div>
       <div class="config-row"><span class="config-label">Teléfono</span><span style="font-size:13px;color:var(--text-2);">686 544 922</span></div>
       <div class="config-row"><span class="config-label">Conexión con Flama</span><span id="flama-acceso" style="font-size:13px;color:var(--text-2);">—</span></div>
-      <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text-2);">86.2 Ceramista</span></div>
+      <div class="config-row" style="border:none;"><span class="config-label">Epígrafe IAE</span><span style="font-size:13px;color:var(--text-2);">861 Ceramista</span></div>
     </div>
     <div class="section-label">Google Sheets</div>
     <div class="card"><div class="config-row"><div><div class="config-label">Hoja activa</div><div class="config-sub" id="sheet-id-display">Sin crear</div></div><button class="btn-sec" onclick="resetSheet()" style="font-size:12px;padding:5px 10px;">Resetear</button></div></div>
@@ -865,7 +865,8 @@ img,video,iframe,table{max-width:100%;}
     <div class="card">
       <div class="config-row"><div><div class="config-label">Borrar trimestre</div><div class="config-sub">Elimina todos los registros de <span id="config-current-q" style="font-weight:700;"></span></div></div><button onclick="clearQFromConfig()" class="btn-sec" style="background:var(--red-bg);color:var(--red);border-color:var(--red-bd);font-size:12px;padding:5px 10px;">Borrar</button></div>
     </div>
-    <button onclick="nukeAndResetTicketsPending()" style="width:100%;margin-top:12px;background:var(--bg-raised);color:var(--text-3);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">🧹 Limpiar tickets pendientes en Firestore</button>
+    <button onclick="repararPdfsTickets(true)" style="width:100%;margin-top:12px;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">Revisar los PDF de los tickets</button>
+    <button onclick="nukeAndResetTicketsPending()" style="width:100%;margin-top:8px;background:var(--bg-raised);color:var(--text-3);border:0.5px solid var(--line);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;">Limpiar pendientes guardados en Firestore</button>
     <button onclick="signOut()" style="width:100%;margin-top:8px;background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;">Cerrar sesión</button>
   </div>
 
@@ -1305,18 +1306,39 @@ function changePin(){ const np=document.getElementById('new-pin-input').value.tr
 
 // ── DATA ──
 function loadLocal(){ data={}; } // Data comes from Drive only, never from localStorage
+// Identificador de registro único (entero creciente). Antes era Date.now()+Math.random(): en un mismo
+// milisegundo solo daba unos 4.000 valores distintos y en importaciones grandes se repetía.
+let _lastRecId=0;
+function newRecId(){
+  let id=Date.now()*1000+Math.floor(Math.random()*1000);
+  if(id<=_lastRecId) id=_lastRecId+1;
+  _lastRecId=id;
+  return id;
+}
+// Nuevo id para un registro que repetía el de otro: sale del id y del contenido, así es el mismo en todos los dispositivos
+function idDerivado(id,f){
+  const h=1+parseInt(recHash(f).split(':')[0],36)%997;
+  const n=Number(id);
+  if(!isFinite(n)||n<=0) return newRecId();
+  return n<1e14?Math.floor(n)*1000+h:Math.floor(n)+h;
+}
+const _qIdsArreglados=new Set(); // trimestres con ids repetidos arreglados al cargar (se guardan en Drive)
 function cleanData(){
   Object.keys(data).forEach(q=>{
     if(!Array.isArray(data[q])) { data[q]=[]; return; }
     const seen=new Map();
     data[q]=data[q].filter(f=>{
       if(!f||typeof f!=='object') return false;
-      if(!f._id) f._id=Date.now()+Math.random();
+      if(f._id==null||f._id==='') f._id=newRecId();
       const k=String(f._id);
       if(seen.has(k)){
         if(JSON.stringify(seen.get(k))===JSON.stringify(f)) return false; // copia exacta: sobra
-        let nid; do{ nid=Date.now()+Math.random(); }while(seen.has(String(nid)));
-        f._id=nid; seen.set(String(nid),f); return true; // mismo _id pero distinto registro: se conserva
+        // Mismo _id pero otro registro: se conserva con un id nuevo (igual en todos los dispositivos)
+        let nid=idDerivado(f._id,f);
+        while(seen.has(String(nid))) nid=nid+1;
+        f._id=nid; seen.set(String(nid),f);
+        if(isQuarterKey(q)) _qIdsArreglados.add(q);
+        return true;
       }
       seen.set(k,f);
       return true;
@@ -2473,7 +2495,7 @@ function saveAnalysis(divId, count, fromGlobal=false){
     f.justificacion=just;
     const catSel=document.getElementById(divId+'_cat'+i);
     if(catSel&&f.tipo==='ingreso') f.categoria_ing=catSel.value||'';
-    f._quarter=Q; f._id=Date.now()+Math.random();
+    f._quarter=Q; f._id=newRecId();
     f._recentlyAdded=true;
     if(!data[Q]) data[Q]=[];
     if(isDuplicate(f)){
@@ -2555,6 +2577,7 @@ async function initDrive(){
     const ok=await loadFromDrive();
     if(ok){ setDS('ok','Drive OK'); hideSyncBanner(); } else { setDS('err','Error Drive'); hideSyncBanner(true); }
     loadDriveFiles(); // en segundo plano: lista de PDF para Revisión y la pestaña Drive
+    if(ok){ let hecho=false; try{ hecho=localStorage.getItem('mg_tickets_pdf_v479')==='1'; }catch(e){} if(!hecho) setTimeout(()=>{ repararPdfsTickets(false).catch(()=>{}); },5000); }
   }catch(e){
     console.error('initDrive:',e);
     driveListOk=false;
@@ -2964,6 +2987,8 @@ async function loadFromDrive(){
   updateSI();
   if(driveListOk){
     await restorePendingJournals();
+    // Ids repetidos arreglados al cargar: se guarda el trimestre para que todos los dispositivos usen los mismos
+    for(const q of [..._qIdsArreglados]){ _qIdsArreglados.delete(q); if(!qLoadFailed[q]) await saveDataToDrive(q); }
     // Ficheros duplicados del mismo trimestre: se guarda lo combinado y los demás van a la papelera
     for(const q of Object.keys(qDupFiles)){ if(qDupFiles[q]&&qDupFiles[q].length&&!qLoadFailed[q]) await saveDataToDrive(q); }
     flushFlamaOutbox().catch(()=>{});
@@ -3615,7 +3640,7 @@ async function doSyncLibros(year){
 }
 
 // ── IMPORT MANUAL ──
-function importJ(){ const raw=document.getElementById('json-in').value.trim(),fb=document.getElementById('imp-fb'); if(!raw){fb.textContent='Pega un JSON primero.';fb.className='feedback err';return;} if(token&&!requireQuarterWritable(Q,'importar')) return; try{ const clean=raw.replace(/```json|```/g,'').trim(); let parsed=JSON.parse(clean); const items=Array.isArray(parsed)?parsed:[parsed]; if(!data[Q]) data[Q]=[]; items.forEach(f=>{f._quarter=Q;f._id=Date.now()+Math.random();data[Q].push(f);}); saveLocal();renderAll(); document.getElementById('json-in').value=''; fb.textContent='✓ '+items.length+' registro(s) guardado(s)';fb.className='feedback ok'; if(token) saveDataToDrive(Q).catch(()=>{}); setTimeout(()=>fb.textContent='',3000); }catch(e){fb.textContent='JSON inválido: '+e.message;fb.className='feedback err';} }
+function importJ(){ const raw=document.getElementById('json-in').value.trim(),fb=document.getElementById('imp-fb'); if(!raw){fb.textContent='Pega un JSON primero.';fb.className='feedback err';return;} if(token&&!requireQuarterWritable(Q,'importar')) return; try{ const clean=raw.replace(/```json|```/g,'').trim(); let parsed=JSON.parse(clean); const items=Array.isArray(parsed)?parsed:[parsed]; if(!data[Q]) data[Q]=[]; items.forEach(f=>{f._quarter=Q;f._id=newRecId();data[Q].push(f);}); saveLocal();renderAll(); document.getElementById('json-in').value=''; fb.textContent='✓ '+items.length+' registro(s) guardado(s)';fb.className='feedback ok'; if(token) saveDataToDrive(Q).catch(()=>{}); setTimeout(()=>fb.textContent='',3000); }catch(e){fb.textContent='JSON inválido: '+e.message;fb.className='feedback err';} }
 function clearJ(){ document.getElementById('json-in').value=''; document.getElementById('imp-fb').textContent=''; }
 function clearQFromConfig(){
   if(!confirm(`¿Borrar todos los registros de ${Q}? Esta acción no se puede deshacer.`)) return;
@@ -3855,7 +3880,7 @@ async function generateTicket(docId,nombre,importe,fecha,concepto,metodo){
     concepto:concepto,num_factura:'',operacion:'INT',
     base_iva:base,pct_iva:21,cuota_iva:iva,base_irpf:base,
     retencion_pct:0,retencion_importe:0,ingresos_brutos:importe,
-    notas:`Pago ${metodo}`,_id:Date.now()+Math.random()
+    notas:`Pago ${metodo}`,_id:newRecId()
   };
   classifyRecord(rec);
   if(!data[Q]) data[Q]=[];
@@ -3980,50 +4005,92 @@ function snapTrack(idx){
   const track=document.getElementById('subtab-track');
   if(track){ track.style.transition='transform .3s cubic-bezier(0.25,0.46,0.45,0.94)'; track.style.transform=`translateX(${-(idx/3)*100}%)`; }
 }
+// Iconos de método de pago (SVG, sin emojis)
+const ICO_METODO={
+  sumup:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+  bizum:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>',
+  transferencia:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M3 10 12 4l9 6"/><line x1="5" y1="10" x2="5" y2="18"/><line x1="10" y1="10" x2="10" y2="18"/><line x1="14" y1="10" x2="14" y2="18"/><line x1="19" y1="10" x2="19" y2="18"/><line x1="3" y1="20" x2="21" y2="20"/></svg>',
+  efectivo:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>'
+};
+function icoMetodo(m){ return ICO_METODO[m]||ICO_METODO.efectivo; }
+const ICO_LAPIZ='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const ICO_PAPELERA='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
+const ICO_DOBLE_CHECK='<svg width="17" height="15" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:block"><polyline points="2 13 7 18 17 6"/><polyline points="12 16 14 18 25 6"/></svg>';
+function metodoLabelDe(m){ return {sumup:'SumUp',bizum:'Bizum',transferencia:'Transferencia',efectivo:'Efectivo',tarjeta:'Tarjeta'}[m]||m||'—'; }
+
 function renderTicketsSubtab(searchQ=''){
   const sq=(searchQ||document.getElementById('fact-search-input')?.value||'').toLowerCase();
   const wrap=document.getElementById('tickets-subtab-wrap');
   if(!wrap) return;
   let pending=[...(ticketsPendientes||[])];
-  if(sq) pending=pending.filter(t=>(t.concepto||'').toLowerCase().includes(sq)||(t.fecha||'').includes(sq));
-  // Ordenar por fecha ascendente (más antigua primero)
-  pending.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
+  if(sq) pending=pending.filter(t=>(t.concepto||'').toLowerCase().includes(sq)||(t.fecha||'').includes(sq)||(t.cliente||'').toLowerCase().includes(sq));
+  // Correcciones primero; el resto por fecha ascendente (más antigua primero)
+  pending.sort((a,b)=>((a._type==='edit'?0:1)-(b._type==='edit'?0:1))||(a.fecha||'').localeCompare(b.fecha||''));
+  const hayNormales=pending.some(t=>t._type!=='edit');
   let html=`<div style="padding-top:12px;">`;
   html+=`<div style="display:flex;gap:8px;margin-bottom:12px;">
     <button onclick="openTicketModal()" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       Analizar extracto / pago
     </button>
-    ${pending.length>0?`<button id="approve-all-btn" onclick="approveAllChronological()" title="Aprobar todo" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;">✓✓</button>`:''}
-    ${pending.length>0?`<button onclick="clearAllTicketsPending()" title="Vaciar lista" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;">🗑</button>`:''}
+    ${hayNormales?`<button id="approve-all-btn" onclick="approveAllChronological()" title="Aprobar todo" style="background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;">${ICO_DOBLE_CHECK}</button>`:''}
+    ${pending.length>0?`<button onclick="clearAllTicketsPending()" title="Vaciar lista" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;">${ICO_PAPELERA}</button>`:''}
   </div>`;
   if(!pending.length){
     html+=`<div style="padding:40px 0;text-align:center;opacity:0.4;">
       <div style="font-size:13px;color:var(--text-3);">Sin facturas pendientes</div>
     </div>`;
   } else {
-    html+=pending.map((t,i)=>{
+    const badge=(txt,bg,col)=>`<span style="font-size:9px;background:${bg};color:${col};border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;white-space:nowrap;">${txt}</span>`;
+    html+=pending.map(t=>{
       const realIdx=ticketsPendientes.indexOf(t);
-      const isDup=t._dup;
-      const dupBadge=isDup?'<span style="font-size:9px;background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 5px;font-weight:700;margin-left:4px;">dup.</span>':'';
-      const metodoIcon={sumup:'💳',bizum:'📱',transferencia:'🏦'}[t.metodo]||'💰';
-      const metodoLabel={sumup:'SumUp',bizum:'Bizum',transferencia:'Transferencia'}[t.metodo]||t.metodo||'—';
+      const metodoLabel=metodoLabelDe(t.metodo);
+      if(t._type==='edit'){
+        // Corrección de un pago ya aprobado: se aplica al ticket existente
+        const found=buscarTicketDeCorreccion(t);
+        const orig=found&&!found.varios?found.r:null;
+        let linea;
+        if(orig){
+          linea='Ticket '+esc(orig.num_factura||'—')+': '+fmt(orig.ingresos_brutos||0)+' → <b>'+fmt(t.importe||0)+'</b>'
+            +(t.fecha&&t.fecha!==orig.fecha?' · fecha '+esc(fmtFecha(orig.fecha))+' → '+esc(fmtFecha(t.fecha)):'');
+        } else if(found&&found.varios){
+          linea='Varios tickets encajan ('+found.varios.length+'): se revisará al aplicar · <b>'+fmt(t.importe||0)+'</b>';
+        } else {
+          linea=(t.origImporte?fmt(t.origImporte)+' → ':'')+'<b>'+fmt(t.importe||0)+'</b> · el ticket se buscará al aplicar';
+        }
+        return `<div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.35);border-radius:10px;padding:10px 12px;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px;">${ICO_LAPIZ} Corrección de Flama · ${esc(t.cliente||'—')}</div>
+            ${badge('CORRECCIÓN','rgba(139,92,246,0.18)','#8B5CF6')}
+          </div>
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:4px;">${linea}</div>
+          <div style="font-size:10px;color:var(--text-3);margin-bottom:6px;">${esc(fmtFecha(t.fecha))} · ${esc(metodoLabel)}${t.concepto?' · '+esc(t.concepto):''}</div>
+          <div style="display:flex;gap:5px;">
+            <button onclick="approveEditTicket(${realIdx})" style="flex:1;background:rgba(139,92,246,0.15);color:#8B5CF6;border:0.5px solid rgba(139,92,246,0.4);border-radius:7px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;">Aplicar corrección</button>
+            <button onclick="discardTicket(${realIdx})" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">✕</button>
+          </div>
+        </div>`;
+      }
       const pctIva=t.pct_iva||21;
-      // Fix rounding: use parseFloat to avoid floating point errors
       const bruto=Math.round((t.importe||0)*100)/100;
       const base=Math.round(bruto/(1+pctIva/100)*100)/100;
-      const iva=Math.round((bruto-base)*100)/100;
-      const border=isDup?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);';
+      const avisos=(t._dup?badge('dup.','var(--amber-bg)','var(--amber)'):'')
+        +(t._reenvio?badge('ya aprobado: '+esc(t._reenvio),'var(--amber-bg)','var(--amber)'):'')
+        +(bruto>limiteSimplificada(t)?badge('más de '+limiteSimplificada(t)+' €','var(--red-bg)','var(--red)'):'')
+        +(t._source==='flama'?badge('FLAMA','rgba(29,158,117,0.2)','#1D9E75'):'');
+      const border=(t._dup||t._reenvio)?'border:1px solid var(--amber-bd);':'border:0.5px solid var(--line);';
       return `<div style="background:var(--bg-card);${border}border-radius:10px;padding:10px 12px;margin-bottom:6px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
           <div style="flex:1;min-width:0;overflow:hidden;">
-            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${metodoIcon} ${esc(t.concepto||'—')}${dupBadge}${t._source==='flama'?' <span style="display:inline-block;background:rgba(29,158,117,0.2);color:#1D9E75;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:3px;">FLAMA</span>':''}</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${icoMetodo(t.metodo)} ${esc(t.concepto||'—')}</div>
+            ${avisos?`<div style="margin:3px 0 0 -4px;display:flex;flex-wrap:wrap;gap:3px;">${avisos}</div>`:''}
           </div>
           <div style="font-size:14px;font-weight:800;color:var(--green);flex-shrink:0;">+${bruto.toFixed(2).replace('.',',')} €</div>
         </div>
-        <div style="font-size:10px;color:var(--text-3);margin-bottom:6px;">${esc(fmtFecha(t.fecha))}${t.hora?' · '+esc(t.hora):''}${t.cliente?' · '+esc(t.cliente):''} · Base ${base.toFixed(2).replace('.',',')}€ · IVA ${esc(pctIva)}% · ${esc(metodoLabel)}</div>
+        <div style="font-size:10px;color:var(--text-3);margin-bottom:6px;">${esc(fmtFecha(t.fecha))}${t.hora?' · '+esc(t.hora):''}${t.cliente?' · '+esc(t.cliente):''}${t.cliente_nif?' · NIF '+esc(t.cliente_nif):''} · Base ${base.toFixed(2).replace('.',',')}€ · IVA ${esc(pctIva)}% · ${esc(metodoLabel)}</div>
         <div style="display:flex;gap:5px;">
           <button onclick="approveTicket(${realIdx});renderTicketsSubtab();" style="flex:1;background:var(--green-bg);color:var(--green);border:0.5px solid var(--green-bd);border-radius:7px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;">✓ Aprobar</button>
+          <button onclick="pedirNifTicket(${realIdx})" title="NIF y domicilio del cliente" style="background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">NIF</button>
           <button onclick="discardTicket(${realIdx});renderTicketsSubtab();" style="background:var(--red-bg);color:var(--red);border:0.5px solid var(--red-bd);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;">✕</button>
         </div>
       </div>`;
@@ -4032,6 +4099,7 @@ function renderTicketsSubtab(searchQ=''){
   html+='</div>';
   wrap.innerHTML=html;
 }
+
 function updateHeader(id){
   const isGestor=(id==='facturas'||id==='registros'||id==='gestor');
   const isResultado=(id==='resultado');
@@ -4474,6 +4542,16 @@ function dateToQuarter(fecha){
   return (m<=3?'1T':m<=6?'2T':m<=9?'3T':'4T')+' '+y;
 }
 
+const REV_ICO={
+  noDrive:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--text-3)"><path d="M18 10h-1.3A7 7 0 1 0 9 20h9a5 5 0 0 0 0-10Z"/><line x1="4" y1="4" x2="20" y2="20"/></svg>',
+  aviso:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--amber)"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  papelera:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--red)"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>',
+  copia:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--amber)"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>',
+  numero:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--text-3)"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>',
+  etiqueta:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--text-3)"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+  calendario:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--blue)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  error:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;color:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+};
 function detectReviewIssues(){
   const issues=[];
   const allRecords=[];
@@ -4487,7 +4565,7 @@ function detectReviewIssues(){
     if(r.doc_type==='ticket') return; // tickets simplificados se generan en Drive
     const hasDrive=r._driveLink||r._driveFileId;
     if(!hasDrive){
-      issues.push({type:'noDrive', icon:'☁️', label:'Sin archivo en Drive', record:r._ref, qActual:r._q,
+      issues.push({type:'noDrive', icon:REV_ICO.noDrive, label:'Sin archivo en Drive', record:r._ref, qActual:r._q,
         description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`});
     }
   });
@@ -4496,7 +4574,7 @@ function detectReviewIssues(){
   allRecords.forEach(r=>{
     if(r._reviewIgnored?.lowConf) return;
     if(r._confidence==='baja'){
-      issues.push({type:'lowConf', icon:'⚠️', label:'Confianza baja del análisis', record:r._ref, qActual:r._q,
+      issues.push({type:'lowConf', icon:REV_ICO.aviso, label:'Confianza baja del análisis', record:r._ref, qActual:r._q,
         description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`,
         extra:(r._warnings||[]).join(' · ')});
     }
@@ -4511,27 +4589,41 @@ function detectReviewIssues(){
     if(df.mimeType==='application/vnd.google-apps.folder') return;
     const linkedRecord=idsVinculados.has(df.id)||enlacesVinculados.has(df.link);
     if(!linkedRecord){
-      issues.push({type:'orphan', icon:'🗑', label:'Archivo huérfano en Drive', driveFile:df,
+      issues.push({type:'orphan', icon:REV_ICO.papelera, label:'Archivo huérfano en Drive', driveFile:df,
         description:`${df.name||'(sin nombre)'}${df.quarter?' · '+df.quarter:''}`});
     }
   });
 
-  // 4. Posibles duplicados (mismo proveedor + fecha + importe)
-  const seenKeys={};
+  // 4. Posibles duplicados: mismo tipo, proveedor, fecha e importe, y mismo número de factura (o alguno sin número).
+  //    Dos tickets con números distintos (p. ej. dos "Venta directa" de 10 € el mismo día) no son duplicados.
+  const grupos={};
   allRecords.forEach(r=>{
-    if(r._reviewIgnored?.duplicate) return;
-    const key=`${(r.proveedor_cliente||'').toLowerCase()}|${r.fecha||''}|${(r.base_iva||0).toFixed(2)}`;
-    if(!seenKeys[key]) seenKeys[key]=[];
-    seenKeys[key].push(r);
+    if(r._reviewIgnored?.duplicate||r._processing) return;
+    const key=`${r.tipo||''}|${(r.proveedor_cliente||'').toLowerCase()}|${r.fecha||''}|${(+r.base_iva||0).toFixed(2)}`;
+    (grupos[key]=grupos[key]||[]).push(r);
   });
-  Object.values(seenKeys).forEach(group=>{
-    if(group.length>1){
-      group.slice(1).forEach(r=>{ // a partir del segundo
-        issues.push({type:'duplicate', icon:'👥', label:'Posible duplicado', record:r._ref, qActual:r._q,
-          description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`,
-          extra:`Hay ${group.length} registros idénticos`});
-      });
-    }
+  const numNorm=r=>String(r.num_factura||'').replace(/[^a-z0-9]/gi,'').toLowerCase();
+  Object.values(grupos).forEach(group=>{
+    if(group.length<2) return;
+    group.forEach((r,i)=>{
+      if(i===0) return;
+      const iguales=group.slice(0,i).filter(o=>!numNorm(o)||!numNorm(r)||numNorm(o)===numNorm(r));
+      if(!iguales.length) return;
+      issues.push({type:'duplicate', icon:REV_ICO.copia, label:'Posible duplicado', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`,
+        extra:`Coincide con ${iguales.map(o=>o.num_factura||'otro registro sin número').join(', ')}`});
+    });
+  });
+  //    Dos tickets del mismo pago de Flama (mismo pagoId) son el mismo cobro aunque tengan números distintos
+  const porPagoFlama={};
+  allRecords.forEach(r=>{ if(r.doc_type==='ticket'&&r._pagoId&&!r._processing&&!r._reviewIgnored?.duplicate) (porPagoFlama[r._pagoId]=porPagoFlama[r._pagoId]||[]).push(r); });
+  Object.values(porPagoFlama).forEach(group=>{
+    group.forEach((r,i)=>{
+      if(i===0||issues.some(x=>x.type==='duplicate'&&x.record===r._ref)) return;
+      issues.push({type:'duplicate', icon:REV_ICO.copia, label:'Posible duplicado', record:r._ref, qActual:r._q,
+        description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`,
+        extra:`Mismo pago de Flama que ${group.slice(0,i).map(o=>o.num_factura||'otro ticket').join(', ')}`});
+    });
   });
 
   // 5. Facturas sin número de factura
@@ -4539,7 +4631,7 @@ function detectReviewIssues(){
     if(r._reviewIgnored?.noNumFactura) return;
     if(r.doc_type==='ticket') return; // tickets propios tienen numeración generada
     if(!r.num_factura||r.num_factura.trim()===''||r.num_factura==='—'){
-      issues.push({type:'noNumFactura', icon:'🔢', label:'Sin número de factura', record:r._ref, qActual:r._q,
+      issues.push({type:'noNumFactura', icon:REV_ICO.numero, label:'Sin número de factura', record:r._ref, qActual:r._q,
         description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)} · ${fmt(r.base_iva||0)}`});
     }
   });
@@ -4548,11 +4640,11 @@ function detectReviewIssues(){
   allRecords.forEach(r=>{
     if(r._reviewIgnored?.noJust) return;
     if(r.tipo==='gasto' && (!r.justificacion||r.justificacion.trim()==='')){
-      issues.push({type:'noJust', icon:'🏷', label:'Gasto sin justificación', record:r._ref, qActual:r._q,
+      issues.push({type:'noJust', icon:REV_ICO.etiqueta, label:'Gasto sin justificación', record:r._ref, qActual:r._q,
         description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`});
     }
     if(r.tipo==='ingreso' && !r.categoria_ing){
-      issues.push({type:'noJust', icon:'🏷', label:'Ingreso sin categoría', record:r._ref, qActual:r._q,
+      issues.push({type:'noJust', icon:REV_ICO.etiqueta, label:'Ingreso sin categoría', record:r._ref, qActual:r._q,
         description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`});
     }
   });
@@ -4562,7 +4654,7 @@ function detectReviewIssues(){
     if(r._reviewIgnored?.wrongQ) return;
     const expectedQ=dateToQuarter(r.fecha);
     if(expectedQ && r._q && expectedQ!==r._q){
-      issues.push({type:'wrongQ', icon:'📅', label:'Trimestre desajustado', record:r._ref, qActual:r._q,
+      issues.push({type:'wrongQ', icon:REV_ICO.calendario, label:'Trimestre desajustado', record:r._ref, qActual:r._q,
         description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`,
         extra:`Está en ${r._q}, pero la fecha indica ${expectedQ}`,
         suggestedQ:expectedQ});
@@ -4573,7 +4665,7 @@ function detectReviewIssues(){
   allRecords.forEach(r=>{
     if(r._reviewIgnored?.uploadError) return;
     if(r._driveError){
-      issues.push({type:'uploadError', icon:'❌', label:'Error subiendo a Drive', record:r._ref, qActual:r._q,
+      issues.push({type:'uploadError', icon:REV_ICO.error, label:'Error subiendo a Drive', record:r._ref, qActual:r._q,
         description:`${r.proveedor_cliente||'—'} · ${fmtFecha(r.fecha)}`});
     }
   });
@@ -4601,7 +4693,7 @@ function openReviewModal(){
       <div style="background:var(--bg-card);border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
         <div style="padding:14px 16px;border-bottom:0.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;">
           <div>
-            <div style="font-size:16px;font-weight:700;color:var(--text);">🔍 Review</div>
+            <div style="font-size:16px;font-weight:700;color:var(--text);">Revisión</div>
             <div id="review-count" style="font-size:11px;color:var(--text-3);margin-top:2px;"></div>
           </div>
           <button onclick="closeReviewModal()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;">×</button>
@@ -4629,7 +4721,7 @@ function renderReviewList(){
   if(!list) return;
   if(!issues.length){
     list.innerHTML=`<div style="text-align:center;padding:40px 20px;color:var(--text-3);">
-      <div style="font-size:48px;margin-bottom:12px;">✨</div>
+      <div style="margin:0 auto 12px;width:44px;color:var(--green);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg></div>
       <div style="font-size:14px;font-weight:600;color:var(--text);">Todo en orden</div>
       <div style="font-size:12px;margin-top:6px;">No hay nada que revisar.</div>
     </div>`;
@@ -4663,7 +4755,7 @@ function renderReviewList(){
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:600;color:var(--text);word-break:break-word;">${esc(i.description||'')}</div>
             ${i.extra?`<div style="font-size:11px;color:var(--text-3);margin-top:3px;word-break:break-word;">${esc(i.extra)}</div>`:''}
-            ${i.qActual?`<div style="font-size:10px;color:var(--text-3);margin-top:3px;">📍 ${i.qActual}</div>`:''}
+            ${i.qActual?`<div style="font-size:10px;color:var(--text-3);margin-top:3px;">${esc(i.qActual)}</div>`:''}
           </div>
         </div>
         <div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;">
@@ -4776,49 +4868,61 @@ async function bulkChangeQuarter(){
   const quarters=['1T 2025','2T 2025','3T 2025','4T 2025','1T 2026','2T 2026','3T 2026','4T 2026','1T 2027'];
   const q=prompt('Nuevo trimestre:\n'+quarters.join(' | ')+'\n\nEscribe el trimestre:');
   if(!q||!quarters.includes(q)){if(q) alert('Trimestre no válido. Formato: 1T 2026'); return;}
-  if(token){
-    const origenes=new Set();
-    bulkSelected.forEach(id=>{ const k=Object.keys(data).find(kk=>data[kk]&&data[kk].find(x=>String(x._id)===String(id))); if(k) origenes.add(k); });
-    if(!canWriteQuarter(q)||[...origenes].some(k=>!canWriteQuarter(k))){ alert('No se puede mover ahora: Drive no tiene cargados todos los trimestres implicados. Recarga y vuelve a intentarlo.'); return; }
-  }
-  if(!confirm(`Mover ${bulkSelected.size} factura(s) a ${q}?`)) return;
-  const all=Object.values(data).flat();
-  const affectedOldQs=new Set();
-  const filesToMove=[]; // {fileId, tipo, recordRef}
+  const movidos=[];
   bulkSelected.forEach(id=>{
-    const f=all.find(x=>String(x._id)===String(id));
-    if(!f) return;
     const oldQ=Object.keys(data).find(k=>data[k]&&data[k].find(x=>String(x._id)===String(id)));
-    if(oldQ&&oldQ!==q){
-      data[oldQ]=data[oldQ].filter(x=>String(x._id)!==String(id));
-      if(!data[q]) data[q]=[];
-      f._quarter=q;
-      data[q].push(f);
-      affectedOldQs.add(oldQ);
-      const driveFileId=f._driveFileId||(driveFiles.find(x=>x.link===f._driveLink)||{}).id;
-      if(driveFileId) filesToMove.push({fileId:driveFileId, tipo:f.tipo||'gasto', record:f});
-    }
+    if(!oldQ||oldQ===q) return;
+    const f=data[oldQ].find(x=>String(x._id)===String(id));
+    if(f) movidos.push({f,oldQ});
   });
+  if(!movidos.length){ showToast('Ya estaban en '+q,'info'); exitBulkMode(); return; }
+  const origenes=[...new Set(movidos.map(m=>m.oldQ))];
+  if(token&&(!canWriteQuarter(q)||origenes.some(k=>!canWriteQuarter(k)))){ alert('No se puede mover ahora: Drive no tiene cargados todos los trimestres implicados. Recarga y vuelve a intentarlo.'); return; }
+  if(!confirm(`Mover ${movidos.length} factura(s) a ${q}?`)) return;
+  const esMovido=x=>movidos.some(m=>m.f===x);
+  // 1) Al destino, y se guarda
+  if(!data[q]) data[q]=[];
+  movidos.forEach(m=>{ m.f._quarter=q; data[q].push(m.f); });
   saveLocal(); renderAll();
   if(token){
-    affectedOldQs.forEach(oq=>saveDataToDrive(oq).catch(()=>{}));
-    saveDataToDrive(q).catch(()=>{});
-    if(filesToMove.length){
-      showToast(`Moviendo ${filesToMove.length} archivo(s) en Drive...`,'info');
+    const okDestino=await saveDataToDrive(q);
+    if(!okDestino){
+      // No se pudo guardar el destino: todo vuelve a su sitio
+      data[q]=data[q].filter(x=>!esMovido(x));
+      movidos.forEach(m=>{ m.f._quarter=m.oldQ; });
+      saveLocal(); renderAll();
+      saveDataToDrive(q);
+      showToast('No se pudo guardar '+q+' en Drive: no se ha movido nada','error');
+      return;
+    }
+  }
+  // 2) Solo entonces se quitan del origen
+  origenes.forEach(oq=>{ data[oq]=(data[oq]||[]).filter(x=>!esMovido(x)); });
+  saveLocal(); renderAll();
+  let sinGuardar=[];
+  if(token){
+    const res=await Promise.all(origenes.map(oq=>saveDataToDrive(oq)));
+    sinGuardar=origenes.filter((oq,k)=>!res[k]);
+    // 3) Sus PDF a la carpeta del nuevo trimestre
+    const conPdf=movidos.filter(m=>m.f._driveFileId||m.f._driveLink);
+    if(conPdf.length){
+      showToast(`Moviendo ${conPdf.length} archivo(s) en Drive...`,'info');
       let moved=0, errors=0;
-      for(const item of filesToMove){
+      for(const m of conPdf){
+        const fid=m.f._driveFileId||(driveFiles.find(x=>x.link===m.f._driveLink)||{}).id||driveIdFromLink(m.f._driveLink);
+        if(!fid){ errors++; continue; }
         try{
-          const r=await moveFileToQuarter(item.fileId, q, item.tipo);
-          if(r){ if(r.webViewLink) item.record._driveLink=r.webViewLink; moved++; }
-          else errors++;
+          if(m.f.doc_type==='ticket'){ await moverPdfTicket(fid,q); moved++; }
+          else { const r=await moveFileToQuarter(fid, q, m.f.tipo||'gasto'); if(r){ if(r.webViewLink) m.f._driveLink=r.webViewLink; moved++; } else errors++; }
         }catch(e){ errors++; }
       }
       saveLocal();
-      saveDataToDrive(q).catch(()=>{});
-      showToast(`✓ ${moved} archivo(s) movidos${errors?', '+errors+' con error':''}`,'success');
+      await saveDataToDrive(q);
+      if(errors) showToast(`${moved} archivo(s) movidos, ${errors} con error`,'error');
     }
   }
-  showToast(`✓ ${bulkSelected.size} factura(s) movidas a ${q}`,'success');
+  if(sinGuardar.length) showToast('Movidas a '+q+', pero '+sinGuardar.join(', ')+' aún no está guardado en Drive. Se reintentará.','error');
+  else showToast(`${movidos.length} factura(s) movidas a ${q}`,'success');
   exitBulkMode();
 }
 async function bulkDelete(){
@@ -5697,7 +5801,7 @@ function appendAsesorMsg(role, text){
 function buildFinancialContext(){
   // Pasar TODAS las facturas de TODOS los trimestres con detalle completo
   const lines=[];
-  lines.push('Autónomo: Valentín López Pérez, NIF 48220739C, ceramista Barcelona, IAE 86.2, estimación directa simplificada.');
+  lines.push('Autónomo: Valentín López Pérez, NIF 48220739C, ceramista Barcelona, IAE 861, estimación directa simplificada.');
   lines.push('Trimestre activo en la app: '+Q);
   lines.push('');
 
@@ -5748,7 +5852,7 @@ async function sendAsesorMessage(){
 
   try{
     const ctx=buildFinancialContext();
-    const systemPrompt=`Eres el asesor fiscal personal de Valentín López Pérez, autónomo ceramista en Barcelona (NIF 48220739C, IAE 86.2, estimación directa simplificada). Tienes acceso completo a TODAS sus facturas e ingresos/gastos de todos los trimestres. Responde siempre en español, de forma concisa y práctica. Cuando calcules importes sé preciso. Puedes consultar cualquier factura, hacer cálculos fiscales, comparar trimestres, o ayudar a preparar declaraciones.
+    const systemPrompt=`Eres el asesor fiscal personal de Valentín López Pérez, autónomo ceramista en Barcelona (NIF 48220739C, IAE 861, estimación directa simplificada). Tienes acceso completo a TODAS sus facturas e ingresos/gastos de todos los trimestres. Responde siempre en español, de forma concisa y práctica. Cuando calcules importes sé preciso. Puedes consultar cualquier factura, hacer cálculos fiscales, comparar trimestres, o ayudar a preparar declaraciones.
 
 DATOS FINANCIEROS COMPLETOS:
 ${ctx}`;
@@ -5859,7 +5963,7 @@ async function runAdvisor(){
   const qEndMonth={'1T':3,'2T':6,'3T':9,'4T':12}[qNum];
   const daysToDeadline=Math.round((new Date(parseInt(qYear),qEndMonth-1,20)-today)/(1000*60*60*24));
 
-  const prompt=`Eres el asesor fiscal de Valentín López Pérez, ceramista autónomo en Barcelona (IAE 862, estimación directa simplificada, IVA 21%, retención 7% en 2024 y años anteriores).
+  const prompt=`Eres el asesor fiscal de Valentín López Pérez, ceramista autónomo en Barcelona (IAE 861, estimación directa simplificada, IVA 21%, retención 7% en 2024 y años anteriores).
 
 DATOS TRIMESTRE ${Q}:
 - Ingresos totales: ${totalIng.toFixed(2)}€ (${ingresos.length} facturas)
@@ -6079,6 +6183,7 @@ function calSelectDay(d){
 function prevQuarter(){ const i=ALL_QUARTERS.indexOf(Q); if(i>0){ setQFromHeader(ALL_QUARTERS[i-1]); } else if(i<0){ showToast('Q no reconocido: '+Q,'error'); } }
 function nextQuarter(){ const i=ALL_QUARTERS.indexOf(Q); if(i>=0&&i<ALL_QUARTERS.length-1){ setQFromHeader(ALL_QUARTERS[i+1]); } else if(i<0){ showToast('Q no reconocido: '+Q,'error'); } }
 function setQFromHeader(q){
+  if(bulkMode&&q!==Q) exitBulkMode(); // si no, "Borrar" actuaría sobre facturas de un trimestre que ya no se ve
   Q=q; regQ=q;
   const ym=document.getElementById('year-m'); if(ym) ym.value=q.split(' ')[1];
   document.querySelectorAll('#qs-m .q-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===q.split(' ')[0]+'T'));
@@ -6109,7 +6214,7 @@ function updateYearQ(ns){
     setQ(q,active,ns==='f'?'qs-f':'qs-m');
   }
 }
-function setQ(q,btn,qsId){ Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); const qb=document.getElementById('qbadge'); if(qb) qb.textContent=q; const hs=document.getElementById('header-q-select'); if(hs) hs.value=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); updateSaveBar(); }
+function setQ(q,btn,qsId){ if(bulkMode&&q!==Q) exitBulkMode(); Q=q; document.querySelectorAll('#'+qsId+' .q-pill').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); const qb=document.getElementById('qbadge'); if(qb) qb.textContent=q; const hs=document.getElementById('header-q-select'); if(hs) hs.value=q; const pqf=document.getElementById('pq-f'); if(pqf) pqf.textContent=q; renderAll(); updateSaveBar(); }
 // ── UI MÓDULO BIENES DE INVERSIÓN ──
 let bienesEditId=null;
 
@@ -6261,7 +6366,7 @@ async function saveBien(){
     porcentaje_afectacion:parseFloat(document.getElementById('bf-afect').value)||100,
     cuota_trimestral_manual:parseFloat(document.getElementById('bf-cuotatrim').value)||0,
     metodo:'lineal_trimestral',
-    _id:bienesEditId!==null?bienesInversion[bienesEditId]._id:Date.now()+Math.random()
+    _id:bienesEditId!==null?bienesInversion[bienesEditId]._id:newRecId()
   };
   const bienesAntes=bienesInversion.slice();
   if(bienesEditId!==null){ bienesInversion[bienesEditId]=bien; }
@@ -6370,14 +6475,14 @@ function updateDeadlineAlert(){
   // Solo mostrar si faltan 15 días o menos
   if(!v || v.dias>15){ alert.style.display='none'; return; }
   let bg,color,icon,urgencia;
-  if(v.dias<=2){ bg='rgba(229,83,83,0.15)'; color='#E05252'; icon='🚨'; }
-  else if(v.dias<=7){ bg='rgba(229,83,83,0.10)'; color='#E05252'; icon='⚠️'; }
-  else { bg='rgba(240,132,74,0.10)'; color='var(--accent)'; icon='📅'; }
+  if(v.dias<=2){ bg='rgba(229,83,83,0.15)'; color='#E05252'; icon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'; }
+  else if(v.dias<=7){ bg='rgba(229,83,83,0.10)'; color='#E05252'; icon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'; }
+  else { bg='rgba(240,132,74,0.10)'; color='var(--accent)'; icon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'; }
   const cuando=v.dias===0?'HOY':v.dias===1?'MAÑANA':'en '+v.dias+' días';
   const fechaStr=v.fecha.toLocaleDateString('es-ES',{day:'numeric',month:'long'});
   alert.style.display='block';
   alert.innerHTML=`<div onclick="switchNav('calendario',document.getElementById('nav-calendario'))" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${bg};border:0.5px solid ${color}40;border-radius:12px;cursor:pointer;">
-    <span style="font-size:18px;">${icon}</span>
+    <span style="color:${color};flex-shrink:0;">${icon}</span>
     <div style="flex:1;min-width:0;">
       <div style="font-size:13px;font-weight:700;color:${color};">Presentación ${cuando} (${fechaStr})</div>
       <div style="font-size:11px;color:var(--text-3);margin-top:1px;">Modelos ${v.desc}: ${v.modelos.join(' · ')}</div>
@@ -6917,12 +7022,13 @@ function openModal(id){
   modalFacturaId=id;
   document.getElementById('modal-title').textContent=(f.proveedor_cliente||'—')+' · '+(f.fecha||'—');
   const rows=[
-    ['Tipo', f.tipo==='ingreso'?'💚 Ingreso':'🔴 Gasto'],
+    ['Tipo', f.tipo==='ingreso'?'Ingreso':'Gasto'],
     ['Fecha', f.fecha||'—'],
     ['Trimestre', f._quarter||f.trimestre||'—'],
     ['Concepto', f.concepto||'—'],
     ['Nº Factura', f.num_factura||'—'],
     ['NIF', f.nif||'—'],
+    ['Domicilio', f.domicilio_cliente||'—'],
     ['Operación', f.operacion||'—'],
     ['Base IVA', fmt(f.base_iva)],
     ['% IVA', (f.pct_iva||0)+'%'],
@@ -6940,7 +7046,7 @@ function openModal(id){
     const hl=highlighted.includes(k);
     const valColor=k==='Cuota IVA'?'var(--amber)':k==='Retención'?'var(--red)':k==='Base IVA'||k==='Base IRPF'?'var(--blue)':k==='Ingresos brutos'?'var(--green)':'var(--text)';
     return `<div style="display:flex;justify-content:space-between;padding:${hl?'10px':'8px'} 0;border-bottom:0.5px solid var(--line);font-size:${hl?'14px':'13px'};gap:12px;${hl?'background:transparent;':''}"><span style="color:var(--text-3);font-weight:${hl?'600':'500'};flex-shrink:0;">${k}</span><span style="color:${valColor};text-align:right;font-weight:${hl?'700':'400'};">${esc(v)}</span></div>`;
-  }).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${esc(f.notas)}</div>`:''}</div>`;
+  }).join('')}${f.notas&&f.notas.includes('⚠️')?`<div style="background:var(--amber-bg);color:var(--amber);font-size:12px;padding:8px 10px;border-radius:var(--r-xs);margin-top:10px;">${esc(f.notas)}</div>`:''}${f.doc_type==='ticket'?`<button onclick="editarClienteTicketModal()" style="width:100%;margin-top:10px;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line);border-radius:10px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;">${f.nif?'Cambiar NIF y domicilio del cliente':'Añadir NIF y domicilio del cliente'}</button><button onclick="regenerarPdfTicketModal()" style="width:100%;margin-top:6px;background:var(--bg-raised);color:var(--text-2);border:0.5px solid var(--line);border-radius:10px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;">Volver a generar el PDF del ticket</button>`:''}</div>`;
   // Document preview — fetch from Drive
   const preview=document.getElementById('modal-doc-preview');
   preview.style.display='none';
@@ -6998,7 +7104,7 @@ function openModal(id){
       preview.style.cssText='display:block;background:#000;border-radius:20px 20px 0 0;overflow:hidden;max-height:260px;';
       if(isPDF){
         preview.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#1C1814;">
-          <span style="font-size:28px;">📄</span>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;color:#F5EDE0;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg>
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:600;color:#F5EDE0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${driveFileName||f.proveedor_cliente||'—'}</div>
             <div style="font-size:11px;color:rgba(255,255,255,0.4);">PDF · Toca para ver</div>
@@ -7172,7 +7278,7 @@ function toggleJustEdit(){
   const sec=document.getElementById('modal-just-section');
   const showing=sec.style.display!=='none';
   sec.style.display=showing?'none':'block';
-  document.getElementById('modal-just-btn').textContent=showing?'✏️ Justificación':'✏️ Cerrar';
+  document.getElementById('modal-just-btn').textContent=showing?'Justificación':'Cerrar';
 }
 function toggleModalJustOther(sel){
   const other=document.getElementById('modal-just-other');
@@ -7191,7 +7297,7 @@ function saveJustification(){
     const q=Object.keys(data).find(q=>data[q]&&data[q].find(x=>x._id==modalFacturaId));
     if(token&&q) saveDataToDrive(q).catch(()=>{});
     // Update modal title area to reflect change
-    document.getElementById('modal-just-btn').textContent='✏️ Justificación';
+    document.getElementById('modal-just-btn').textContent='Justificación';
     document.getElementById('modal-just-section').style.display='none';
     // Re-open modal to refresh body
     openModal(modalFacturaId);
@@ -7202,7 +7308,7 @@ function toggleModalEdit(){
   const btn=document.getElementById('modal-edit-btn');
   const showing=sec.style.display!=='none';
   sec.style.display=showing?'none':'block';
-  btn.textContent=showing?'✏️ Editar':'✕ Cancelar';
+  btn.innerHTML=showing?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar':'✕ Cancelar';
   // Populate quarter selector
   if(!showing){
     const qSel=document.getElementById('edit-quarter');
@@ -7358,7 +7464,7 @@ async function handleReprocessFile(files){
     const result=await analyzeWithClaude(file);
     const items=Array.isArray(result)?result:[result];
     data[q]=data[q].filter(f=>String(f._id)!==String(oldId));
-    items.forEach(f=>{ f._quarter=q; f._id=Date.now()+Math.random(); data[q].push(f); });
+    items.forEach(f=>{ f._quarter=q; f._id=newRecId(); data[q].push(f); });
     saveLocal(); renderAll();
     if(token) saveDataToDrive(q).catch(()=>{});
     // Upload file to Drive
@@ -7809,85 +7915,110 @@ function addSwipeToClose(sheetEl, closeFn){
 }
 const LS_TICK='migestor_tickets_pending';
 let ticketsPendientes=[];
+let ticketsLoadOk=false; // Pendientes se leyó bien: solo entonces se borra en la nube lo que ya no está
 
 function fsTicketUrl(safeUid){ return `${FS_URL}/users/${safeUid}/tickets_pending`; }
 function getSafeUid(){ return user&&user.email?user.email.replace(/[^a-zA-Z0-9]/g,'_'):null; }
 
+// Todos los documentos de tickets_pending (paginando). Lanza error si no se pueden leer.
+async function listFsTickets(safeUid){
+  const out=[]; let pageToken='';
+  for(let i=0;i<100;i++){
+    const r=await fetch(fsTicketUrl(safeUid)+'?pageSize=300'+(pageToken?'&pageToken='+encodeURIComponent(pageToken):''),{headers:{Authorization:'Bearer '+token}});
+    if(!r.ok) throw new Error('Pendientes '+r.status);
+    const j=await r.json();
+    (j.documents||[]).forEach(d=>out.push(d));
+    pageToken=j.nextPageToken||'';
+    if(!pageToken) break;
+  }
+  return out;
+}
+// Borra todos los documentos de tickets_pending. Si alguno no se deja borrar, sigue con los demás y lo cuenta
+// (antes volvía a pedir la misma página y podía quedarse en bucle para siempre).
 async function deleteAllFsTickets(safeUid){
+  let deleted=0, failed=0;
   try{
-    let deleted=0;
-    while(true){
-      const url=`${FS_URL}/users/${safeUid}/tickets_pending?pageSize=20`;
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
-      if(!r.ok) break;
-      const j=await r.json();
-      if(!j.documents||!j.documents.length) break;
-      for(const doc of j.documents){
-        const docId=doc.name.split('/').pop();
-        await fetch(`${FS_URL}/users/${safeUid}/tickets_pending/${docId}`,{
-          method:'DELETE',headers:{Authorization:'Bearer '+token}
-        }).catch(()=>{});
-        await new Promise(r=>setTimeout(r,150));
-        deleted++;
-      }
+    const docs=await listFsTickets(safeUid);
+    for(const doc of docs){
+      const docId=doc.name.split('/').pop();
+      try{
+        const r=await fetch(`${fsTicketUrl(safeUid)}/${encodeURIComponent(docId)}`,{method:'DELETE',headers:{Authorization:'Bearer '+token}});
+        if(r.ok||r.status===404){ deleted++; _tpGuardado.delete(docId); } else failed++;
+      }catch(e){ failed++; }
     }
-    console.log('deleteAllFsTickets: borrados',deleted,'documentos');
-  }catch(e){ console.warn('deleteAllFsTickets error:',e); }
+  }catch(e){ console.warn('deleteAllFsTickets error:',e); failed++; }
+  return {deleted,failed};
 }
 
 async function nukeAndResetTicketsPending(){
-  if(!confirm('¿Limpiar todos los tickets pendientes de Firestore y reescribir solo los actuales?\n\nEsto puede tardar unos segundos.')) return;
+  if(!confirm('¿Limpiar los pendientes guardados en Firestore y volver a guardar solo los actuales?')) return;
   const safeUid=getSafeUid();
   if(!safeUid||!token){alert('Necesitas estar conectado.');return;}
   showToast('Limpiando Firestore...','info');
-  await deleteAllFsTickets(safeUid);
-  // Reset _fsId so they get new IDs
-  ticketsPendientes.forEach(t=>{ delete t._fsId; });
+  const res=await deleteAllFsTickets(safeUid);
+  ticketsPendientes.forEach(t=>{ if(t._source!=='flama') delete t._fsId; });
+  ticketsLoadOk=true;
   await saveTicketsPending();
   renderTicketsSubtab();
-  showToast('✓ Firestore limpio y tickets reescritos','success');
+  if(res.failed) showToast('Limpieza incompleta: '+res.failed+' documento(s) no se pudieron borrar','error');
+  else showToast('Firestore limpio y pendientes reescritos','success');
 }
 
-async function saveTicketsPending(){
-  if(!token||!getSafeUid()) return;
-  const safeUid=getSafeUid();
-  try{
-    // Get existing docs from Firestore
-    const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
-    const existing=new Set();
-    try{
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
-      if(r.ok){
-        const j=await r.json();
-        (j.documents||[]).forEach(d=>existing.add(d.name.split('/').pop()));
-      }
-    }catch(e){}
-
-    // Write/update current tickets
-    const currentIds=new Set();
-    for(const t of ticketsPendientes){
-      const docId='t_'+(t._fsId||Date.now()+'_'+Math.random().toString(36).slice(2));
-      t._fsId=docId;
-      currentIds.add(docId);
-      const docUrl=`${FS_URL}/users/${safeUid}/tickets_pending/${docId}`;
-      const fields={};
-      Object.entries(t).forEach(([k,v])=>{
-        if(typeof v==='number') fields[k]={doubleValue:v};
-        else if(typeof v==='boolean') fields[k]={booleanValue:v};
-        else fields[k]={stringValue:String(v??'')};
-      });
-      await fetch(docUrl,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({fields})}).catch(()=>{});
-    }
-
-    // Delete only docs that are no longer in the list
-    for(const docId of existing){
-      if(!currentIds.has(docId)){
-        await fetch(`${FS_URL}/users/${safeUid}/tickets_pending/${docId}`,{
-          method:'DELETE',headers:{Authorization:'Bearer '+token}
-        }).catch(()=>{});
-      }
-    }
-  }catch(e){ console.warn('saveTicketsPending error:',e); }
+// Pendientes manuales (importados de texto, foto o PDF) guardados en tu Firestore.
+// Los de Flama NO se copian: viven en el buzón de Flama, que manda (la copia vieja tapaba los cambios
+// hechos en Flama y hacía reaparecer pagos ya aprobados).
+// Cada ticket va en un documento de id estable ('t_…') con todo su contenido en el campo json.
+const _tpGuardado=new Map(); // id → json que hay en la nube
+let _tpGuardando=null, _tpOtraVez=false;
+function saveTicketsPending(){
+  if(!token||!getSafeUid()) return Promise.resolve();
+  if(_tpGuardando){ _tpOtraVez=true; return _tpGuardando; }
+  _tpGuardando=(async()=>{
+    try{ do{ _tpOtraVez=false; await _saveTicketsPendingNow(); }while(_tpOtraVez); }
+    catch(e){ console.warn('saveTicketsPending error:',e); }
+    finally{ _tpGuardando=null; }
+  })();
+  return _tpGuardando;
+}
+async function _saveTicketsPendingNow(){
+  const safeUid=getSafeUid(); if(!safeUid) return;
+  const want=new Map();
+  ticketsPendientes.forEach(t=>{
+    if(!t||t._source==='flama') return;
+    if(!t._fsId||!/^t_/.test(String(t._fsId))) t._fsId='t_'+newRecId();
+    const copia={...t}; delete copia._fsId;
+    want.set(String(t._fsId),JSON.stringify(copia));
+  });
+  for(const [id,json] of want){
+    if(_tpGuardado.get(id)===json) continue;
+    const r=await fetch(`${fsTicketUrl(safeUid)}/${encodeURIComponent(id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({fields:{json:{stringValue:json}}})});
+    if(!r.ok) throw new Error('Pendientes '+r.status);
+    _tpGuardado.set(id,json);
+  }
+  // Se borra solo lo que este dispositivo conocía y ya no está (aprobado o descartado aquí). Lo que otro
+  // dispositivo haya añadido después de cargar no se toca (antes se borraba todo lo que no estaba en esta lista).
+  for(const id of [..._tpGuardado.keys()]){
+    if(want.has(id)) continue;
+    const r=await fetch(`${fsTicketUrl(safeUid)}/${encodeURIComponent(id)}`,{method:'DELETE',headers:{Authorization:'Bearer '+token}});
+    if(r.ok||r.status===404) _tpGuardado.delete(id);
+  }
+}
+// Un documento de tickets_pending: formato nuevo (campo json) o el antiguo campo a campo
+function fsTicketFromDoc(doc){
+  const f=doc.fields||{};
+  let t=null;
+  if(f.json&&f.json.stringValue){ try{ t=JSON.parse(f.json.stringValue); }catch(e){ t=null; } }
+  if(!t||typeof t!=='object'||Array.isArray(t)){
+    t={};
+    Object.entries(f).forEach(([k,v])=>{
+      if(v.doubleValue!==undefined) t[k]=+v.doubleValue;
+      else if(v.integerValue!==undefined) t[k]=+v.integerValue;
+      else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
+      else t[k]=v.stringValue||'';
+    });
+  }
+  t._fsId=doc.name.split('/').pop();
+  return t;
 }
 
 // URL de Flama Workshop para leer pagos enviados
@@ -7917,122 +8048,240 @@ function setFlamaAcceso(v){
   }
   if(v==='caducada'){ try{ showToast('Tu sesión de Google ha caducado: vuelve a entrar para ver los pagos de Flama','error'); }catch(e){} }
 }
-// Cache local de IDs de Flama ya procesados (para evitar que reaparezcan antes del PATCH)
-const _flamaProcessedLocal=new Set(JSON.parse(localStorage.getItem('_flamaProcessedIds')||'[]'));
-function markFlamaLocalProcessed(docId){ _flamaProcessedLocal.add(docId); localStorage.setItem('_flamaProcessedIds',JSON.stringify([..._flamaProcessedLocal])); } // mismo FB_KEY de Flama
+// Envíos de Flama ya procesados en este dispositivo (para que no reaparezcan mientras Flama lo confirma)
+const _flamaProcessedLocal=new Set((()=>{ try{ const a=JSON.parse(localStorage.getItem('_flamaProcessedIds')||'[]'); return Array.isArray(a)?a.slice(-3000):[]; }catch(e){ return []; } })());
+function markFlamaLocalProcessed(docId){
+  if(!docId) return;
+  _flamaProcessedLocal.add(docId);
+  try{ localStorage.setItem('_flamaProcessedIds',JSON.stringify([..._flamaProcessedLocal].slice(-3000))); }catch(e){}
+}
 
-async function loadTicketsFromFlama(){
-  // Lee de Flama Workshop los pagos NO procesados (paginando TODOS los documentos)
-  if(!getSafeUid()) return [];
+// ── Lectura del buzón de Flama ──
+// Solo se piden los envíos sin procesar de tu cuenta (antes se leía la colección entera y, a partir
+// de 6.000 documentos, los pagos nuevos dejaban de verse sin ningún aviso).
+const FLAMA_RUNQUERY_URL='https://firestore.googleapis.com/v1/projects/flama-workshop/databases/(default)/documents:runQuery';
+function fsEq(field,value){ return {fieldFilter:{field:{fieldPath:field},op:'EQUAL',value}}; }
+function fsAnd(...filters){ return {compositeFilter:{op:'AND',filters}}; }
+async function flamaQuery(where){
+  const r=await flamaFetch(`${FLAMA_RUNQUERY_URL}?key=${FLAMA_API_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:'payments_to_migestor'}],where}})});
+  if(!r.ok) throw new Error('Flama '+r.status);
+  const arr=await r.json();
+  return (Array.isArray(arr)?arr:[]).filter(x=>x&&x.document).map(x=>x.document);
+}
+async function flamaListAll(){
+  const out=[]; let pageToken='';
+  for(let page=0;page<500;page++){
+    let url=`${FLAMA_PAYMENTS_URL}?key=${FLAMA_API_KEY}&pageSize=300`;
+    if(pageToken) url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+    const r=await flamaFetch(url);
+    if(!r.ok) throw new Error('Flama '+r.status);
+    const j=await r.json();
+    (j.documents||[]).forEach(d=>out.push(d));
+    pageToken=j.nextPageToken||'';
+    if(!pageToken) break;
+  }
+  return out;
+}
+function flamaVal(f,k){
+  const v=f&&f[k]; if(!v) return undefined;
+  if(v.stringValue!==undefined) return v.stringValue;
+  if(v.doubleValue!==undefined) return +v.doubleValue;
+  if(v.integerValue!==undefined) return +v.integerValue;
+  if(v.booleanValue!==undefined) return v.booleanValue;
+  if(v.timestampValue!==undefined) return v.timestampValue;
+  return undefined;
+}
+// Una sola vez: los envíos antiguos sin el campo "processed" se marcan como no procesados para que la consulta los vea
+async function flamaMigrarProcesados(safeUid){
+  if(localStorage.getItem('mg_flama_scan_v479')==='1') return;
+  const docs=await flamaListAll();
+  for(const d of docs){
+    const f=d.fields||{};
+    if(flamaVal(f,'uid')!==safeUid||f.processed) continue;
+    const id=d.name.split('/').pop();
+    const r=await flamaFetch(`${FLAMA_PAYMENTS_URL}/${encodeURIComponent(id)}?updateMask.fieldPaths=processed&currentDocument.exists=true&key=${FLAMA_API_KEY}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{processed:{booleanValue:false}}})});
+    if(!r.ok&&r.status!==404) throw new Error('Flama '+r.status);
+  }
+  localStorage.setItem('mg_flama_scan_v479','1');
+}
+// Datos de un envío de Flama, normalizados igual que al cargar Pendientes
+function flamaDatosDeDoc(f){
+  const get=k=>{ const v=flamaVal(f,k); return v===undefined?'':v; };
+  const metodoRaw=String(get('metodo')||'transferencia').toLowerCase();
+  return {importe:Math.max(0,parseFloat(get('importe'))||0),
+    fecha:/^\d{4}-\d{2}-\d{2}$/.test(String(get('fecha')))?String(get('fecha')):'',
+    cliente:String(get('cliente')||'').slice(0,200),
+    metodo:['sumup','transferencia','bizum','efectivo','tarjeta'].includes(metodoRaw)?metodoRaw:'otro',
+    concepto:String(get('concepto')||'').slice(0,300)};
+}
+// Antes de crear un ticket de Flama se vuelve a leer su envío: Flama lo actualiza mientras está pendiente
+// y lo retira si el pago se borra (Pendientes solo se lee al abrir o al refrescar).
+async function releerEnvioFlama(t){
+  if(!t||t._source!=='flama'||!t._flamaDocId) return {estado:'ok'};
   try{
-    const safeUid=getSafeUid();
-    // Recoger todos los documentos paginando (la colección puede tener >100)
-    let allDocs=[];
-    let pageToken='';
-    for(let page=0; page<20; page++){
-      let url=`${FLAMA_PAYMENTS_URL}?key=${FLAMA_API_KEY}&pageSize=300`;
-      if(pageToken) url+=`&pageToken=${encodeURIComponent(pageToken)}`;
-      const r=await flamaFetch(url);
-      if(!r.ok) break;
-      const j=await r.json();
-      if(j.documents&&j.documents.length) allDocs=allDocs.concat(j.documents);
-      if(j.nextPageToken) pageToken=j.nextPageToken; else break;
+    const r=await flamaFetch(`${FLAMA_PAYMENTS_URL}/${encodeURIComponent(t._flamaDocId)}?key=${FLAMA_API_KEY}`);
+    if(r.status===404) return {estado:'procesado',motivo:'borrado'};
+    if(!r.ok) return {estado:'sinconexion'};
+    const d=await r.json();
+    if(!d||!d.fields) return {estado:'sinconexion'}; // respuesta rara: no se puede comprobar
+    const f=d.fields;
+    if(flamaVal(f,'processed')===true) return {estado:'procesado',motivo:String(flamaVal(f,'status')||''),ticketId:String(flamaVal(f,'ticketId')||'')};
+    const nuevo=flamaDatosDeDoc(f);
+    const o=t._flamaOrig||{importe:t.importe,fecha:t.fecha,metodo:t.metodo,concepto:t.concepto,cliente:t.cliente};
+    const cambios=[];
+    if(Math.abs((nuevo.importe||0)-(o.importe||0))>=0.005) cambios.push('Importe: '+fmt(o.importe||0)+' → '+fmt(nuevo.importe));
+    if(nuevo.fecha!==o.fecha) cambios.push('Fecha: '+fmtFecha(o.fecha)+' → '+fmtFecha(nuevo.fecha));
+    if(nuevo.metodo!==o.metodo) cambios.push('Método: '+metodoLabelDe(o.metodo)+' → '+metodoLabelDe(nuevo.metodo));
+    if(nuevo.concepto!==o.concepto) cambios.push('Concepto: '+(o.concepto||'—')+' → '+(nuevo.concepto||'—'));
+    if(nuevo.cliente!==o.cliente) cambios.push('Cliente: '+(o.cliente||'—')+' → '+(nuevo.cliente||'—'));
+    return {estado:cambios.length?'cambiado':'ok',nuevo,cambios,ut:d.updateTime||''};
+  }catch(e){ return {estado:'sinconexion'}; }
+}
+// Lleva a la tarjeta de Pendientes lo que ha cambiado en Flama
+function aplicarCambiosFlama(t,rel){
+  const n=rel.nuevo;
+  t.importe=n.importe; t.fecha=n.fecha; t.metodo=n.metodo; t.cliente=n.cliente;
+  t.concepto=n.concepto||'Clases de cerámica';
+  t._flamaOrig=n; t._flamaUt=rel.ut;
+  t._dup=!!buscarTicketIgual(t);
+}
+// Comprueba en Flama un pago antes de aprobarlo. Devuelve false si no hay que seguir.
+async function comprobarEnvioFlama(t){
+  if(!t||t._source!=='flama') return true;
+  const rel=await releerEnvioFlama(t);
+  if(rel.estado==='procesado'){
+    quitarDePendientes(t); markFlamaLocalProcessed(t._flamaDocId); renderTicketsSubtab();
+    alert(rel.motivo==='withdrawn'||rel.motivo==='borrado'?'Este pago se ha borrado en Flama: ya no está pendiente.':'Este pago ya se procesó'+(rel.ticketId?' ('+rel.ticketId+')':'')+' en otro dispositivo: ya no está pendiente.');
+    return false;
+  }
+  if(rel.estado==='cambiado'){
+    aplicarCambiosFlama(t,rel); renderTicketsSubtab();
+    if(!confirm('Este pago ha cambiado en Flama:\n\n'+rel.cambios.join('\n')+'\n\n¿Aprobarlo con los datos nuevos?')) return false;
+    return requireQuarterWritable(getQuarterFromDate(t.fecha)||Q,'aprobar tickets');
+  }
+  if(rel.estado==='sinconexion') return confirm('No se ha podido comprobar en Flama si este pago ha cambiado.\n\n¿Aprobarlo igualmente con estos datos?');
+  return true;
+}
+// Datos con los que se hizo (o se enlazó) el ticket: se apuntan en Flama para que los compare con su pago
+function aprobDe(rec,t){
+  const m=((String(rec&&rec.notas||'')).match(/^Pago (\w+)/)||[])[1]||(t&&t.metodo)||'';
+  return {importe:Math.round(((rec&&rec.ingresos_brutos)||0)*100)/100,fecha:(rec&&rec.fecha)||'',metodo:String(m).toLowerCase(),concepto:(rec&&rec.concepto)||''};
+}
+// Pagos de Flama sin procesar. Si no se pueden leer, lanza error (para no vaciar Pendientes en silencio).
+async function loadTicketsFromFlama(){
+  const safeUid=getSafeUid();
+  if(!safeUid) return [];
+  try{ await flamaMigrarProcesados(safeUid); }catch(e){ console.warn('Buzón de Flama: revisión inicial pendiente',e); }
+  let docs;
+  try{
+    docs=await flamaQuery(fsAnd(fsEq('uid',{stringValue:safeUid}),fsEq('processed',{booleanValue:false})));
+  }catch(e){
+    console.warn('Consulta al buzón de Flama fallida; se lee entero',e);
+    docs=(await flamaListAll()).filter(d=>{ const f=d.fields||{}; return flamaVal(f,'uid')===safeUid&&flamaVal(f,'processed')!==true; });
+  }
+  const todas=Object.values(data).flat();
+  const flamaPayments=[];
+  docs.forEach(doc=>{
+    const f=doc.fields||{};
+    const flamaId=doc.name.split('/').pop();
+    if(_flamaProcessedLocal.has(flamaId)) return;
+    const get=k=>{ const v=flamaVal(f,k); return v===undefined?'':v; };
+    const importeNum=Math.max(0,parseFloat(get('importe'))||0);
+    const fechaStr=/^\d{4}-\d{2}-\d{2}$/.test(String(get('fecha')))?String(get('fecha')):'';
+    const clienteStr=String(get('cliente')||'').slice(0,200);
+    const horaStr=/^\d{1,2}:\d{2}$/.test(String(get('hora')))?String(get('hora')):'';
+    const metodoRaw=String(get('metodo')||'transferencia').toLowerCase();
+    const metodoStr=['sumup','transferencia','bizum','efectivo','tarjeta'].includes(metodoRaw)?metodoRaw:'otro';
+    const comun={_flamaDocId:flamaId,_source:'flama',_pagoId:String(get('pagoId')||'').slice(0,120),_createdAt:String(get('createdAt')||''),_flamaUt:doc.updateTime||'',_flamaOrig:flamaDatosDeDoc(f),
+      cliente:clienteStr,importe:importeNum,fecha:fechaStr,hora:horaStr,metodo:metodoStr,concepto:String(get('concepto')||'').slice(0,300),pct_iva:21};
+    if(get('type')==='edit'){
+      // Corrección de un pago que ya estaba aprobado: se aplica al ticket existente (no crea otro ingreso)
+      const oi=parseFloat(get('origImporte'));
+      flamaPayments.push({...comun,_fsId:'flama_edit_'+flamaId,_type:'edit',
+        originalTicketId:String(get('originalTicketId')||'').slice(0,40),originalFlamaDocId:String(get('originalFlamaDocId')||'').slice(0,200),
+        origImporte:isFinite(oi)&&oi>0?oi:0,origFecha:/^\d{4}-\d{2}-\d{2}$/.test(String(get('origFecha')))?String(get('origFecha')):'',
+        origMetodo:String(get('origMetodo')||'').toLowerCase().slice(0,20),nota:String(get('nota')||'').slice(0,300)});
+      return;
     }
-    if(!allDocs.length) return [];
-    const j={documents:allDocs};
-    const flamaPayments=[];
-    j.documents.forEach(doc=>{
-      const f=doc.fields||{};
-      const get=(k)=>{ const v=f[k]; if(!v) return ''; return v.stringValue||v.doubleValue||v.integerValue||v.booleanValue||''; };
-      // Solo los del usuario actual y NO procesados
-      if(get('uid')!==safeUid) return;
-      if(get('processed')===true||f.processed?.booleanValue===true) return;
-      if(_flamaProcessedLocal.has(doc.name.split('/').pop())) return;
-      const flamaId=doc.name.split('/').pop();
-      const importeNum=Math.max(0,parseFloat(get('importe'))||0);
-      const fechaStr=/^\d{4}-\d{2}-\d{2}$/.test(String(get('fecha')))?String(get('fecha')):'';
-      const clienteStr=String(get('cliente')||'');
-      const horaStr=/^\d{1,2}:\d{2}$/.test(String(get('hora')))?String(get('hora')):'';
-      const metodoRaw=String(get('metodo')||'transferencia').toLowerCase();
-      const metodoStr=['sumup','transferencia','bizum','efectivo','tarjeta'].includes(metodoRaw)?metodoRaw:'otro';
-      // Detectar si ya existe esta factura en data (duplicado)
-      const existingFacturas=Object.values(data).flat();
-      const isDup=existingFacturas.some(rec=>
-        rec.doc_type==='ticket' &&
-        rec.fecha===fechaStr &&
-        Math.abs((rec.ingresos_brutos||0)-importeNum)<0.01 &&
-        (clienteStr===''||rec.proveedor_cliente===clienteStr)
-      );
-      var docType=get('type')||'payment';
-      if(docType==='edit'){
-        // Solicitud de edición de ticket ya aprobado
-        flamaPayments.push({
-          _fsId:'flama_edit_'+flamaId,
-          _flamaDocId:flamaId,
-          _source:'flama',
-          _type:'edit',
-          originalTicketId:f.originalTicketId?f.originalTicketId.stringValue:'',
-          originalFlamaDocId:f.originalFlamaDocId?f.originalFlamaDocId.stringValue:'',
-          cliente:clienteStr,
-          importe:importeNum,
-          fecha:fechaStr,
-          metodo:metodoStr,
-          concepto:String(get('concepto')||''),
-          nota:String(get('nota')||''),
-          pct_iva:21
+    const isDup=todas.some(rec=>rec&&rec.doc_type==='ticket'&&rec.fecha===fechaStr&&Math.abs((rec.ingresos_brutos||0)-importeNum)<0.01&&(clienteStr===''||rec.proveedor_cliente===clienteStr)&&(!rec._pagoId||!comun._pagoId||rec._pagoId===comun._pagoId));
+    flamaPayments.push({...comun,_fsId:'flama_'+flamaId,_dup:isDup,concepto:comun.concepto||'Clases de cerámica',cliente_nif:''});
+  });
+  // Reenvíos: si ese mismo pago (pagoId) ya se aprobó antes, se avisa al aprobar
+  const ids=[...new Set(flamaPayments.filter(t=>t._type!=='edit'&&t._pagoId).map(t=>t._pagoId))];
+  if(ids.length){
+    const aprobados={};
+    todas.forEach(r=>{ if(r&&r._pagoId&&r.doc_type==='ticket') aprobados[r._pagoId]=r.num_factura||'(sin número)'; });
+    for(let i=0;i<ids.length;i+=30){
+      const lote=ids.slice(i,i+30);
+      try{
+        const ds=await flamaQuery(fsAnd(fsEq('uid',{stringValue:safeUid}),{fieldFilter:{field:{fieldPath:'pagoId'},op:'IN',value:{arrayValue:{values:lote.map(x=>({stringValue:x}))}}}}));
+        ds.forEach(d=>{
+          const f=d.fields||{}; const st=flamaVal(f,'status');
+          if(flamaVal(f,'processed')===true&&(st==='approved'||st==='duplicate')&&flamaVal(f,'type')!=='edit'){
+            const pid=flamaVal(f,'pagoId'); if(pid&&!aprobados[pid]) aprobados[pid]=String(flamaVal(f,'ticketId')||'aprobado');
+          }
         });
-      } else {
-      flamaPayments.push({
-        _fsId:'flama_'+flamaId,
-        _flamaDocId:flamaId,
-        _source:'flama',
-        _pagoId:get('pagoId')||'',
-        _createdAt:get('createdAt')||'',
-        _dup:isDup,
-        cliente:clienteStr,
-        importe:importeNum,
-        fecha:fechaStr,
-        hora:horaStr,
-        metodo:metodoStr,
-        concepto:String(get('concepto')||'Clases de cerámica'),
-        pct_iva:21,
-        cliente_nif:''
-      });
-      }
-    });
-    return flamaPayments;
-  }catch(e){ console.warn('Error cargando pagos Flama:',e); return []; }
+      }catch(e){ console.warn('No se pudo comprobar si hay reenvíos',e); }
+    }
+    flamaPayments.forEach(t=>{ if(t._type!=='edit'&&t._pagoId&&aprobados[t._pagoId]) t._reenvio=aprobados[t._pagoId]; });
+  }
+  return flamaPayments;
 }
 
 async function markFlamaPaymentProcessed(flamaDocId){
   return markFlamaPaymentStatus(flamaDocId, 'approved');
 }
-
 // Marca un ticket de Flama y TODOS sus duplicados con el mismo estado
-async function markFlamaTicketAndDups(t, status){
-  if(t._flamaDocId) await markFlamaPaymentStatus(t._flamaDocId, status);
+async function markFlamaTicketAndDups(t, status, extra){
+  let ok=true;
+  if(t._flamaDocId) ok=(await markFlamaPaymentStatus(t._flamaDocId,status,extra))&&ok;
   for(const dupId of flamaDupIdsOf(t)){
-    try{ await markFlamaPaymentStatus(dupId, status); }catch(e){}
+    try{ ok=(await markFlamaPaymentStatus(dupId,status,extra))&&ok; }catch(e){ ok=false; }
   }
+  return ok;
 }
-
-async function markFlamaPaymentStatus(flamaDocId, status){
+// Marca un envío de Flama como procesado (con el número de ticket y los datos con que se hizo, si se aprobó).
+// Se lee antes y se escribe con la condición de que no haya cambiado: si Flama lo retiró (pago borrado allí),
+// no se pisa y se avisa. No crea documentos: si el envío ya no existe, no hay nada que marcar.
+function avisoRetiradoEnFlama(extra){
+  try{ alert('Ojo: un pago que acabas de aprobar'+(extra&&extra.ticketId?' ('+extra.ticketId+')':'')+' se había borrado en Flama.\n\nEl ticket está creado aquí. Si ese cobro no existe, bórralo.'); }catch(e){}
+}
+async function markFlamaPaymentStatus(flamaDocId, status, extra){
   markFlamaLocalProcessed(flamaDocId);
   try{
-    const url=`${FLAMA_PAYMENTS_URL}/${flamaDocId}?updateMask.fieldPaths=processed&updateMask.fieldPaths=status&key=${FLAMA_API_KEY}`;
-    const r=await flamaFetch(url,{
-      method:'PATCH',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({fields:{
-        processed:{booleanValue:true},
-        status:{stringValue:status||'approved'}
-      }})
-    });
-    return r.ok;
+    for(let intento=0;intento<3;intento++){
+      const r0=await flamaFetch(`${FLAMA_PAYMENTS_URL}/${encodeURIComponent(flamaDocId)}?key=${FLAMA_API_KEY}`);
+      if(r0.status===404) return true;
+      if(!r0.ok) return false;
+      const d0=await r0.json(); const f0=d0.fields||{};
+      if(flamaVal(f0,'processed')===true&&flamaVal(f0,'status')==='withdrawn'){
+        if(status==='approved') avisoRetiradoEnFlama(extra);
+        return true;
+      }
+      const fields={processed:{booleanValue:true},status:{stringValue:status||'approved'},processedAt:{timestampValue:new Date().toISOString()}};
+      if(extra&&extra.ticketId) fields.ticketId={stringValue:String(extra.ticketId)};
+      if(extra&&extra.recId!=null&&extra.recId!=='') fields.recId={stringValue:String(extra.recId)};
+      const a=extra&&extra.aprob;
+      if(a&&(status==='approved'||status==='duplicate')){
+        fields.ticketImporte={doubleValue:Math.round((+a.importe||0)*100)/100};
+        fields.ticketFecha={stringValue:String(a.fecha||'')};
+        fields.ticketMetodo={stringValue:String(a.metodo||'').toLowerCase()};
+        fields.ticketConcepto={stringValue:String(a.concepto||'')};
+      }
+      const mask=Object.keys(fields).map(k=>'updateMask.fieldPaths='+k).join('&');
+      const cond=d0.updateTime?'currentDocument.updateTime='+encodeURIComponent(d0.updateTime):'currentDocument.exists=true';
+      const r=await flamaFetch(`${FLAMA_PAYMENTS_URL}/${encodeURIComponent(flamaDocId)}?${mask}&${cond}&key=${FLAMA_API_KEY}`,{
+        method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})
+      });
+      if(r.ok||r.status===404) return true;
+      if(r.status===400||r.status===409||r.status===412) continue; // cambió entretanto: se vuelve a leer
+      return false;
+    }
+    return false;
   }catch(e){ console.warn('Error marcando Flama status:',e); return false; }
 }
 // Cola de marcas para Flama: un pago aprobado se marca en Flama solo cuando su ingreso ya está guardado en Drive.
-// Mientras tanto queda oculto en Pendientes de este dispositivo.
+// Mientras tanto queda oculto en Pendientes de este dispositivo. Si una marca falla, se reintenta.
 function flamaDupIdsOf(t){
   const d=t&&t._flamaDupIds;
   if(Array.isArray(d)) return d.filter(Boolean);
@@ -8041,13 +8290,18 @@ function flamaDupIdsOf(t){
 }
 function flamaOutboxGet(){ try{ const a=JSON.parse(localStorage.getItem('mg_flama_outbox')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
 function flamaOutboxSet(a){ try{ localStorage.setItem('mg_flama_outbox',JSON.stringify(a)); }catch(e){} }
-function queueFlamaMark(t,status,q){
+function queueFlamaMark(t,status,q,extra){
   const ids=[];
   if(t&&t._flamaDocId) ids.push(t._flamaDocId);
   flamaDupIdsOf(t).forEach(id=>ids.push(id));
   if(!ids.length) return;
   const box=flamaOutboxGet();
-  ids.forEach(id=>{ markFlamaLocalProcessed(id); if(!box.some(x=>x.id===id)) box.push({id,status:status||'approved',q:q||null}); });
+  ids.forEach(id=>{
+    markFlamaLocalProcessed(id);
+    const it={id,status:status||'approved',q:q||null,ticketId:(extra&&extra.ticketId)||'',recId:(extra&&extra.recId!=null)?String(extra.recId):'',aprob:(extra&&extra.aprob)||null};
+    const k=box.findIndex(x=>x.id===id);
+    if(k>=0) box[k]=it; else box.push(it);
+  });
   flamaOutboxSet(box);
 }
 let _flushingOutbox=false, _flushAgain=false;
@@ -8061,7 +8315,7 @@ async function flushFlamaOutbox(q){
     for(const it of box){
       if(q&&it.q&&it.q!==q){ rest.push(it); continue; }
       if(it.q&&(saveFailed[it.q]||journalHas(it.q)||saveQueued[it.q])){ rest.push(it); continue; } // su ingreso aún no está en Drive
-      const ok=await markFlamaPaymentStatus(it.id,it.status);
+      const ok=await markFlamaPaymentStatus(it.id,it.status,{ticketId:it.ticketId,recId:it.recId,aprob:it.aprob});
       if(!ok) rest.push(it);
     }
     const now=flamaOutboxGet(); // por si se añadieron mientras tanto
@@ -8074,85 +8328,65 @@ async function flushFlamaOutbox(q){
 }
 
 async function loadTicketsPending(){
-  if(window._clearingTickets) return; // bloqueado mientras se vacía
-  if(!token||!getSafeUid()){ ticketsPendientes=[]; renderTicketsPendientes(); try{renderTicketsSubtab();}catch(e){} return; }
+  if(window._clearingTickets||window._approvingTicket) return; // no recargar mientras se vacía o se aprueba
+  if(!token||!getSafeUid()){ ticketsPendientes=[]; ticketsLoadOk=false; renderTicketsPendientes(); try{renderTicketsSubtab();}catch(e){} return; }
   try{
     const safeUid=getSafeUid();
-    const url=`${FS_URL}/users/${safeUid}/tickets_pending`;
-    // Paginar TODOS los documentos (sin pageSize, Firestore devuelve solo la primera página)
-    let loaded=[]; let pageToken=''; let pages=0;
-    do{
-      const r=await fetch(url+'?pageSize=300'+(pageToken?'&pageToken='+encodeURIComponent(pageToken):''),{headers:{Authorization:'Bearer '+token}});
-      if(!r.ok) break;
-      const j=await r.json();
-      (j.documents||[]).forEach(doc=>{
-        const f=doc.fields||{};
-        const t={};
-        Object.entries(f).forEach(([k,v])=>{
-          if(v.doubleValue!==undefined) t[k]=v.doubleValue;
-          else if(v.booleanValue!==undefined) t[k]=v.booleanValue;
-          else t[k]=v.stringValue||'';
-        });
-        t._fsId=doc.name.split('/').pop();
-        loaded.push(t);
-      });
-      pageToken=j.nextPageToken||''; pages++;
-    }while(pageToken&&pages<20);
-    // Cargar también de Flama Workshop
+    const docs=await listFsTickets(safeUid);
+    const loaded=[];
+    let hayCopiasViejas=false;
+    docs.forEach(doc=>{
+      const t=fsTicketFromDoc(doc);
+      const f=doc.fields||{};
+      // Lo que hay en la nube y conoce este dispositivo (el formato antiguo se reescribe al guardar)
+      _tpGuardado.set(t._fsId,f.json&&f.json.stringValue?f.json.stringValue:'');
+      if(t._source==='flama'){ hayCopiasViejas=true; return; } // copia antigua de un pago de Flama: manda el buzón (esta se borra al guardar)
+      loaded.push(t);
+    });
     const flamaTickets=await loadTicketsFromFlama();
-    // Combinar
     const all=loaded.concat(flamaTickets);
-    // Dedup por IDENTIDAD de documento: mismo doc leído dos veces = mismo pago.
-    // El contenido igual entre docs DISTINTOS ya no se colapsa en silencio (podrían ser
-    // dos cobros iguales legítimos): se marca con el badge 'dup.' para que lo revises tú.
-    const seenIds={};
-    const byPagoId={};
-    const contentSeen={};
-    const result=[];
+    // Mismo pagoId = mismo pago: se queda el envío más reciente y los demás se marcan con él.
+    // Lo mismo con varias correcciones del mismo pago. Contenido igual en pagos distintos: solo aviso "dup."
+    const seenIds={}, byPagoId={}, editByPago={}, contentSeen={}, result=[];
+    const addDup=(w,id)=>{ if(!id) return; const a=flamaDupIdsOf(w); if(!a.includes(id)) a.push(id); w._flamaDupIds=a; };
+    const fusionar=(idx,t)=>{
+      const w=result[idx];
+      const tNuevo=(t._createdAt||'')>(w._createdAt||'');
+      const win=tNuevo?t:w, lose=tNuevo?w:t;
+      flamaDupIdsOf(lose).forEach(x=>addDup(win,x)); addDup(win,lose._flamaDocId);
+      if(tNuevo){ result[idx]=t; seenIds[t._fsId]=idx; }
+    };
     all.forEach(t=>{
       const id=t._fsId||('x_'+Math.random().toString(36).slice(2));
-      if(seenIds[id]!==undefined){
-        const winner=result[seenIds[id]];
-        if(t._flamaDocId&&winner._flamaDocId!==t._flamaDocId){
-          if(!winner._flamaDupIds) winner._flamaDupIds=[];
-          winner._flamaDupIds.push(t._flamaDocId);
-        }
-        return;
-      }
-      // Mismo pagoId = mismo pago con certeza: colapso automático, gana el más reciente
-      if(t._pagoId&&byPagoId[t._pagoId]!==undefined){
-        const wIdx=byPagoId[t._pagoId];
-        const w=result[wIdx];
-        // Registrar también el contenido del doc entrante para el badge de posibles duplicados
-        const kIn=(t.cliente||t.proveedor_cliente||'').trim().toLowerCase()+'|'+(t.fecha||'')+'|'+(t.importe||t.ingresos_brutos||0)+'|'+(t.metodo||'').trim().toLowerCase();
-        if(contentSeen[kIn]===undefined) contentSeen[kIn]=1;
-        const tEsMasNuevo=(t._createdAt||'')>(w._createdAt||'');
-        const winner=tEsMasNuevo?t:w;
-        const loser=tEsMasNuevo?w:t;
-        if(!winner._flamaDupIds) winner._flamaDupIds=[];
-        if(loser._flamaDupIds) winner._flamaDupIds=winner._flamaDupIds.concat(loser._flamaDupIds);
-        if(loser._flamaDocId) winner._flamaDupIds.push(loser._flamaDocId);
-        if(tEsMasNuevo){ result[wIdx]=t; seenIds[t._fsId]=wIdx; }
-        return;
-      }
-      if(t._pagoId) byPagoId[t._pagoId]=result.length;
+      if(seenIds[id]!==undefined) return;
+      const esEdit=t._type==='edit';
+      const mapa=esEdit?editByPago:byPagoId;
+      if(t._pagoId&&mapa[t._pagoId]!==undefined){ fusionar(mapa[t._pagoId],t); return; }
+      if(t._pagoId) mapa[t._pagoId]=result.length;
       seenIds[id]=result.length;
-      const cli=(t.cliente||t.proveedor_cliente||'').trim().toLowerCase();
-      const met=(t.metodo||'').trim().toLowerCase();
-      const key=cli+'|'+(t.fecha||'')+'|'+(t.importe||t.ingresos_brutos||0)+'|'+met;
-      if(contentSeen[key]!==undefined){ t._dup=true; }
-      else contentSeen[key]=1;
+      if(!esEdit){
+        const cli=(t.cliente||t.proveedor_cliente||'').trim().toLowerCase();
+        const met=(t.metodo||'').trim().toLowerCase();
+        const key=cli+'|'+(t.fecha||'')+'|'+(t.importe||t.ingresos_brutos||0)+'|'+met;
+        if(contentSeen[key]!==undefined) t._dup=true; else contentSeen[key]=1;
+      }
       result.push(t);
     });
     // Autocategorizar tickets sin categoría (ventas de cerámica, workshops, clases...)
     result.forEach(t=>{
-      if(!t.categoria_ing){
+      if(t._type!=='edit'&&!t.categoria_ing){
         const auto=autoCategoria({tipo:'ingreso',concepto:t.concepto||'',proveedor_cliente:t.cliente||''});
         if(auto) t.categoria_ing=auto;
       }
     });
     ticketsPendientes=result;
-  }catch(e){ ticketsPendientes=[]; console.warn(e); }
+    ticketsLoadOk=true;
+    if(hayCopiasViejas) saveTicketsPending();
+  }catch(e){
+    console.warn('loadTicketsPending:',e);
+    // No se vacía la lista: se queda lo que había y se avisa
+    try{ showToast('No se pudieron leer los pagos pendientes. Tira hacia abajo para reintentar.','error'); }catch(e2){}
+  }
   renderTicketsPendientes();
   try{ renderTicketsSubtab(); }catch(e){}
 }
@@ -8184,35 +8418,110 @@ function closeTicketModal(e){
 function triggerTicketUpload(){ document.getElementById('file-ticket').value=''; document.getElementById('file-ticket').click(); }
 function triggerTicketCamera(){ document.getElementById('file-ticket-camera').value=''; document.getElementById('file-ticket-camera').click(); }
 
+// Pegar una imagen: un solo receptor (antes se analizaba dos veces y el receptor de la página
+// se quedaba esperando y se comía el siguiente pegado de texto).
+let _pegarLimpiar=null;
 function pasteTicketFromClipboard(){
   if(!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
   const st=document.getElementById('ticket-analysis-status');
+  if(_pegarLimpiar) _pegarLimpiar();
   let trap=document.getElementById('_paste_trap_ticket');
+  const atender=(e)=>{
+    const items=[...(e.clipboardData?.items||[])];
+    const img=items.find(i=>i.type&&i.type.startsWith('image/'));
+    if(!img) return false;
+    const f=img.getAsFile();
+    if(!f) return false;
+    st.textContent='';
+    handleTicketFile(f);
+    return true;
+  };
   if(!trap){
     trap=document.createElement('div');
     trap.id='_paste_trap_ticket';
     trap.contentEditable='true';
     trap.style.cssText='position:fixed;opacity:0;top:50%;left:50%;width:1px;height:1px;overflow:hidden;z-index:9999;';
     document.body.appendChild(trap);
-    trap.addEventListener('paste',function(e){
-      e.preventDefault();
-      const items=[...(e.clipboardData?.items||[])];
-      const img=items.find(i=>i.type.startsWith('image/'));
-      if(img){const f=img.getAsFile();if(f){st.textContent='';handleTicketFile(f);trap.blur();return;}}
-      st.textContent='No se detectó imagen.';trap.blur();
-    });
   }
-  st.textContent='📋 Mantén pulsado → Pegar...';
-  trap.focus();
-  const onPaste=function(e){
-    e.preventDefault();
-    document.removeEventListener('paste',onPaste);
-    const items=[...(e.clipboardData?.items||[])];
-    const img=items.find(i=>i.type.startsWith('image/'));
-    if(img){const f=img.getAsFile();if(f){st.textContent='';handleTicketFile(f);return;}}
-    st.textContent='No se detectó imagen.';
+  trap.onpaste=function(e){
+    e.preventDefault(); e.stopPropagation();
+    trap.blur();
+    const ok=atender(e);
+    if(_pegarLimpiar) _pegarLimpiar();
+    if(!ok) st.textContent='No se detectó ninguna imagen.';
   };
-  document.addEventListener('paste',onPaste,{once:true});
+  // Por si el pegado llega a la página y no al campo invisible: solo imágenes y solo fuera de campos de texto
+  const enPagina=function(e){
+    if(e.target===trap||(trap&&trap.contains(e.target))) return;
+    const el=e.target;
+    if(el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable)) return;
+    const items=[...(e.clipboardData?.items||[])];
+    if(!items.some(i=>i.type&&i.type.startsWith('image/'))) return;
+    e.preventDefault();
+    if(_pegarLimpiar) _pegarLimpiar();
+    atender(e);
+  };
+  document.addEventListener('paste',enPagina);
+  const tmo=setTimeout(()=>{ if(_pegarLimpiar) _pegarLimpiar(); },60000);
+  _pegarLimpiar=()=>{ document.removeEventListener('paste',enPagina); clearTimeout(tmo); _pegarLimpiar=null; };
+  st.textContent='Mantén pulsado y elige Pegar...';
+  trap.focus();
+}
+
+// Importe escrito en español: "1.234,56 €", "61,98", "1234.56", "100"
+function parseImporteES(s){
+  let x=String(s==null?'':s).replace(/[€\s ]/g,'');
+  if(!x) return NaN;
+  const neg=/^-/.test(x); x=x.replace(/^[-+]/,'');
+  if(x.includes(',')&&x.includes('.')){
+    if(x.lastIndexOf(',')>x.lastIndexOf('.')) x=x.replace(/\./g,'').replace(',','.');
+    else x=x.replace(/,/g,'');
+  } else if(x.includes(',')) x=x.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(x)) x=x.replace(/\./g,'');
+  const n=parseFloat(x);
+  return isFinite(n)?(neg?-n:n):NaN;
+}
+// ¿Esta columna es un método de pago? Devuelve el método o null
+function metodoDeColumna(s){
+  const v=String(s||'').trim().toLowerCase();
+  if(!v) return null;
+  if(v==='bz'||v.includes('bizum')) return 'bizum';
+  if(v==='su'||v==='tpv'||v.includes('sumup')||v.includes('tarjeta')||v==='visa'||v==='mastercard') return 'sumup';
+  if(v==='tf'||v==='trf'||v==='transf'||v.includes('transfer')) return 'transferencia';
+  if(v==='efectivo'||v==='cash'||v==='metálico'||v==='metalico') return 'efectivo';
+  return null;
+}
+// Año de un mes que viene sin año: el actual, salvo que ese mes aún no haya llegado (entonces, el anterior)
+function anioParaMes(mesNum){ const d=new Date(); return mesNum>d.getMonth()+1?d.getFullYear()-1:d.getFullYear(); }
+function redondeoTicket(importe){
+  const raw=Math.round(importe*100)/100;
+  const ent=Math.round(raw);
+  return Math.abs(ent-raw)<0.02?ent:raw; // base + IVA redondeados por separado: 99,99 → 100
+}
+// Datos de un pago extraído por Claude: se descarta si no tiene fecha AAAA-MM-DD o importe válido
+function normalizarTicketExtraido(t){
+  if(!t||typeof t!=='object') return null;
+  const imp=typeof t.importe==='number'?t.importe:parseImporteES(t.importe);
+  if(!(imp>0)) return null;
+  const fecha=String(t.fecha||'').trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(fecha)||!getQuarterFromDate(fecha)) return null;
+  const m=String(t.metodo||'').toLowerCase();
+  const pct=parseFloat(t.pct_iva);
+  return {fecha,hora:/^\d{1,2}:\d{2}$/.test(String(t.hora||''))?String(t.hora):'',importe:redondeoTicket(imp),
+    pct_iva:isFinite(pct)&&pct>=0&&pct<=21?pct:21,concepto:String(t.concepto||'').slice(0,300)||'Venta / servicio de cerámica',
+    metodo:['sumup','bizum','transferencia','efectivo'].includes(m)?m:(metodoDeColumna(m)||'transferencia'),cliente:String(t.cliente||'').slice(0,200)};
+}
+// Marca los que ya existen como ticket y los repetidos dentro de lo importado (no se descarta ninguno)
+function marcarDuplicadosImportados(lista){
+  const todas=Object.values(data).flat();
+  const vistos=new Set();
+  lista.forEach(t=>{
+    const cli=(t.cliente||'').trim().toLowerCase();
+    const k=(t.fecha||'')+'|'+(t.hora||'')+'|'+(t.importe||0)+'|'+cli+'|'+(t.metodo||'');
+    const yaExiste=todas.some(f=>f&&f.doc_type==='ticket'&&f.fecha===t.fecha&&Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01&&(!cli||(f.proveedor_cliente||'').trim().toLowerCase()===cli));
+    t._dup=yaExiste||vistos.has(k);
+    vistos.add(k);
+  });
 }
 
 async function handleTicketText(){
@@ -8221,118 +8530,85 @@ async function handleTicketText(){
   if(!claudeKey||!claudeKey.startsWith('sk-ant-')){alert('Configura la API key en Config primero.');return;}
   const status=document.getElementById('ticket-analysis-status');
 
-  // ── Pre-parser JS para formato columnar (sin Claude) ──────────────────
-  const MESES={enero:31,ene:31,febre:28,feb:28,marzo:31,mar:31,abril:30,abr:30,
-    mayo:31,junio:30,jun:30,julio:31,jul:31,agosto:31,ago:31,
-    septiembre:30,sep:30,octubre:31,oct:31,noviembre:30,nov:30,diciembre:31,dic:31};
-  const year=new Date().getFullYear();
+  // ── Pre-parser para formato en columnas (sin Claude) ──
+  const MES={enero:1,ene:1,febrero:2,febre:2,feb:2,marzo:3,mar:3,abril:4,abr:4,mayo:5,may:5,junio:6,jun:6,
+    julio:7,jul:7,agosto:8,ago:8,septiembre:9,setiembre:9,sept:9,sep:9,octubre:10,oct:10,noviembre:11,nov:11,diciembre:12,dic:12};
+  const parseDate=s=>{
+    const m=String(s||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(!m) return null;
+    const f=`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+    return getQuarterFromDate(f)?f:null;
+  };
   const preResults=[];
   for(const line of text.split('\n')){
     const parts=line.trim().split(/\s{2,}|\t/).map(p=>p.trim()).filter(Boolean);
     if(parts.length<4) continue;
-    // Detect sumup monthly: first col = "sumup", second col = month name
     const col0=parts[0].toLowerCase();
     const col1=parts[1].toLowerCase();
-    if((col0==='sumup'||col0==='su') && MESES[col1]!==undefined){
-      const lastDay=MESES[col1];
-      const mesNum=Object.keys(MESES).indexOf(col1);
-      // Map month name to month number
-      const mesMap={enero:1,ene:1,febre:2,feb:2,marzo:3,mar:3,abril:4,abr:4,
-        mayo:5,junio:6,jun:6,julio:7,jul:7,agosto:8,ago:8,
-        septiembre:9,sep:9,octubre:10,oct:10,noviembre:11,nov:11,diciembre:12,dic:12};
-      const mesN=mesMap[col1];
-      if(!mesN) continue;
-      const fecha=`${year}-${String(mesN).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`;
-      // Parse base and IVA
-      const parseNum=s=>parseFloat(s.replace(/[€\s]/g,'').replace(',','.'));
-      const base=parseNum(parts[2]||'0');
-      const iva=parseNum(parts[3]||'0');
-      const importeRaw=Math.round((base+iva)*100)/100;
-      // Redondear al entero más cercano si la diferencia es < 0.02
-      const rounded=Math.round(importeRaw);
-      const importe=Math.abs(rounded-importeRaw)<0.02?rounded:importeRaw;
-      const concepto=parts[5]||parts[4]||'Ingresos por SumUp';
-      preResults.push({fecha,hora:'',importe,pct_iva:21,concepto,metodo:'sumup',cliente:''});
+    if((col0==='sumup'||col0==='su') && MES[col1]!==undefined){
+      // Resumen mensual de SumUp: sumup · mes · base · IVA · [Tarjeta] · [concepto] (· año opcional)
+      const mesN=MES[col1];
+      const anioCol=parts.find(p=>/^20\d{2}$/.test(p));
+      const y=anioCol?+anioCol:anioParaMes(mesN);
+      const ultimo=new Date(y,mesN,0).getDate();
+      const fecha=`${y}-${String(mesN).padStart(2,'0')}-${String(ultimo).padStart(2,'0')}`;
+      const base=parseImporteES(parts[2]);
+      const iva=parseImporteES(parts[3]);
+      if(!(base>0)||isNaN(iva)) continue;
+      const resto=parts.slice(4).filter(p=>!/^20\d{2}$/.test(p)&&!metodoDeColumna(p));
+      preResults.push({fecha,hora:'',importe:redondeoTicket(base+iva),pct_iva:21,concepto:resto[0]||('Ingresos por SumUp '+parts[1]),metodo:'sumup',cliente:''});
     } else {
-      // ── Parser columnar: Nombre  Fecha  Base  IVA  [Método]  [Concepto] ──
-      // Detectar si col1 o col2 parece una fecha DD/MM/YYYY o D/M/YYYY
-      const parseNum=s=>parseFloat((s||'').replace(/[€\s]/g,'').replace(',','.'));
-      const parseDate=s=>{
-        const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        if(!m) return null;
-        return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-      };
-      // col0=nombre, col1=fecha, col2=base, col3=IVA, col4=método, col5=concepto
+      // Columnas: Nombre · Fecha · Base · IVA · [Método] · [Concepto]
       const fecha=parseDate(parts[1]);
-      if(fecha){
-        const base=parseNum(parts[2]);
-        const iva=parseNum(parts[3]);
-        if(!isNaN(base)&&base>0&&!isNaN(iva)){
-          const importeRaw=Math.round((base+iva)*100)/100;
-          const rounded=Math.round(importeRaw);
-          const importe=Math.abs(rounded-importeRaw)<0.02?rounded:importeRaw;
-          const metodoRaw=(parts[4]||'').toLowerCase();
-          const metodo=metodoRaw.includes('bizum')?'bizum':metodoRaw.includes('sumup')||metodoRaw.includes('tarjeta')?'sumup':'transferencia';
-          const concepto=parts[5]||parts[4]||'Clases de cerámica';
-          const cliente=parts[0]||'';
-          preResults.push({fecha,hora:'',importe,pct_iva:21,concepto,metodo,cliente});
-        }
-      }
+      if(!fecha) continue;
+      const base=parseImporteES(parts[2]);
+      const iva=parseImporteES(parts[3]);
+      if(!(base>0)||isNaN(iva)) continue;
+      const c4=parts[4]||'', c5=parts[5]||'';
+      let metodo, concepto;
+      if(metodoDeColumna(c4)){ metodo=metodoDeColumna(c4); concepto=c5; }
+      else { concepto=c4; metodo=metodoDeColumna(c5)||'transferencia'; }
+      preResults.push({fecha,hora:'',importe:redondeoTicket(base+iva),pct_iva:21,concepto:concepto||'Clases de cerámica',metodo,cliente:parts[0]||''});
     }
   }
   if(preResults.length>0){
     preResults.sort((a,b)=>a.fecha.localeCompare(b.fecha));
-    const existing=Object.values(data).flat();
-    preResults.forEach(t=>{
-      t._dup=existing.some(f=>f.doc_type==='ticket'&&f.fecha===t.fecha&&Math.abs((f.ingresos_brutos||0)-t.importe)<0.01);
-    });
+    marcarDuplicadosImportados(preResults);
     ticketsPendientes=[...ticketsPendientes,...preResults];
     await saveTicketsPending();
     closeTicketModal();
     renderTicketsSubtab();
     const n=preResults.length;
-    showToast(`✓ ${n===1?'1 pago añadido':n+' pagos añadidos'} a Pendientes`,'success');
+    showToast(`${n===1?'1 pago añadido':n+' pagos añadidos'} a Pendientes`,'success');
     haptic('success');
     return;
   }
-  // ── Fallback: Claude para otros formatos ─────────────────────────────
+  // ── Otros formatos: Claude ──
   status.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 0;">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" style="animation:spin 1s linear infinite;flex-shrink:0;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
     <span style="color:var(--text-2);font-size:13px;font-weight:600;">Analizando con Claude...</span>
   </div>`;
   try{
     const extracted=await analyzeTicketText(text);
-    if(!extracted||!extracted.length){
-      status.innerHTML=`<div style="color:#FF5A48;font-size:13px;text-align:center;padding:8px 0;">⚠️ No se encontraron transacciones.</div>`;
+    const lista=(Array.isArray(extracted)?extracted:[]).map(normalizarTicketExtraido);
+    const validos=lista.filter(Boolean);
+    const descartados=lista.length-validos.length;
+    if(!validos.length){
+      status.innerHTML=`<div style="color:#FF5A48;font-size:13px;text-align:center;padding:8px 0;">No se encontraron pagos${descartados?' con fecha e importe válidos':''}.</div>`;
       return;
     }
-    const seen=new Set();
-    const deduped=[];
-    for(const t of extracted){
-      // Fix rounding: if importe is very close to an integer, round it
-      if(t.importe){
-        const rounded=Math.round(t.importe);
-        if(Math.abs(rounded-t.importe)<0.02) t.importe=rounded;
-        else t.importe=Math.round(t.importe*100)/100;
-      }
-      const key=(t.fecha||'')+'|'+(t.hora||'')+'|'+(t.importe||0);
-      if(seen.has(key)) continue;
-      seen.add(key);
-      deduped.push(t);
-    }
-    deduped.sort((a,b)=>((b.fecha||'')+' '+(b.hora||'')).localeCompare((a.fecha||'')+' '+(a.hora||'')));
-    const existing=getF(Q);
-    deduped.forEach(t=>{ t._dup=existing.some(f=>f.doc_type==='ticket'&&f.fecha===t.fecha&&Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01); });
-    ticketsPendientes=[...ticketsPendientes,...deduped];
+    validos.sort((a,b)=>((b.fecha||'')+' '+(b.hora||'')).localeCompare((a.fecha||'')+' '+(a.hora||'')));
+    marcarDuplicadosImportados(validos);
+    ticketsPendientes=[...ticketsPendientes,...validos];
     await saveTicketsPending();
     status.textContent='';
     closeTicketModal();
     renderTicketsSubtab();
-    const n=deduped.length;
-    showToast(`✓ ${n===1?'1 pago añadido':n+' pagos añadidos'} a Pendientes`,'success');
+    const n=validos.length;
+    showToast(`${n===1?'1 pago añadido':n+' pagos añadidos'} a Pendientes`+(descartados?` (${descartados} sin fecha o importe válidos, descartados)`:''),'success');
     haptic('success');
   }catch(e){
-    status.textContent='❌ Error: '+e.message;
+    status.textContent='Error: '+e.message;
   }
 }
 
@@ -8365,20 +8641,20 @@ FORMATO RESUMEN MENSUAL SUMUP (columnas sin nombre de cliente):
   Sexta columna = concepto
   Ejemplo: "sumup  enero  768,60 €  161,40 €  Tarjeta  Ingresos por SumUp Enero"
   → metodo="sumup", cliente="", fecha=último día del mes, importe=base+IVA
-  → El año es SIEMPRE ${currentYear}
-  → Convierte el nombre del mes (incluyendo abreviaturas) al último día del mes:
-     enero/ene → ${currentYear}-01-31
-     febrero/feb/febre → ${currentYear}-02-28
-     marzo/mar → ${currentYear}-03-31
-     abril/abr → ${currentYear}-04-30
-     mayo → ${currentYear}-05-31
-     junio/jun → ${currentYear}-06-30
-     julio/jul → ${currentYear}-07-31
-     agosto/ago → ${currentYear}-08-31
-     septiembre/sep → ${currentYear}-09-30
-     octubre/oct → ${currentYear}-10-31
-     noviembre/nov → ${currentYear}-11-30
-     diciembre/dic → ${currentYear}-12-31
+  → Si la línea no dice el año, usa ${currentYear}, salvo que ese mes sea posterior al mes actual (${new Date().getMonth()+1}): entonces es ${currentYear-1}
+  → Convierte el nombre del mes (incluyendo abreviaturas) al último día del mes (AAAA = el año según la regla anterior):
+     enero/ene → AAAA-01-31
+     febrero/feb/febre → AAAA-02-28 (29 si el año es bisiesto)
+     marzo/mar → AAAA-03-31
+     abril/abr → AAAA-04-30
+     mayo → AAAA-05-31
+     junio/jun → AAAA-06-30
+     julio/jul → AAAA-07-31
+     agosto/ago → AAAA-08-31
+     septiembre/sep → AAAA-09-30
+     octubre/oct → AAAA-10-31
+     noviembre/nov → AAAA-11-30
+     diciembre/dic → AAAA-12-31
 
 Para cada transacción devuelve:
 {
@@ -8418,54 +8694,31 @@ async function handleTicketFile(file){
     return;
   }
   const status=document.getElementById('ticket-analysis-status');
-  // Animated analyzing state
   status.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 0;">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" style="animation:spin 1s linear infinite;flex-shrink:0;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
     <span style="color:var(--text-2);font-size:13px;font-weight:600;">Analizando con Claude...</span>
   </div>`;
   try{
     const extracted=await analyzeTicketWithClaude(file);
-    if(!extracted||!extracted.length){
-      status.innerHTML=`<div style="color:#FF5A48;font-size:13px;text-align:center;padding:8px 0;">⚠️ No se encontraron transacciones.</div>`;
+    const lista=(Array.isArray(extracted)?extracted:[]).map(normalizarTicketExtraido);
+    const validos=lista.filter(Boolean);
+    const descartados=lista.length-validos.length;
+    if(!validos.length){
+      status.innerHTML=`<div style="color:#FF5A48;font-size:13px;text-align:center;padding:8px 0;">No se encontraron pagos${descartados?' con fecha e importe válidos':''}.</div>`;
       return;
     }
-    const seen=new Set();
-    const deduped=[];
-    for(const t of extracted){
-      if(t.importe){
-        const rounded=Math.round(t.importe);
-        if(Math.abs(rounded-t.importe)<0.02) t.importe=rounded;
-        else t.importe=Math.round(t.importe*100)/100;
-      }
-      const key=(t.fecha||'')+'|'+(t.hora||'')+'|'+(t.importe||0);
-      if(seen.has(key)) continue;
-      seen.add(key);
-      deduped.push(t);
-    }
-    deduped.sort((a,b)=>{
-      const da=(a.fecha||'')+' '+(a.hora||'');
-      const db=(b.fecha||'')+' '+(b.hora||'');
-      return db.localeCompare(da);
-    });
-    const existing=getF(Q);
-    deduped.forEach(t=>{
-      t._dup=existing.some(f=>
-        f.doc_type==='ticket'&&
-        f.fecha===t.fecha&&
-        Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01
-      );
-    });
-    ticketsPendientes=[...ticketsPendientes,...deduped];
+    validos.sort((a,b)=>((b.fecha||'')+' '+(b.hora||'')).localeCompare((a.fecha||'')+' '+(a.hora||'')));
+    marcarDuplicadosImportados(validos);
+    ticketsPendientes=[...ticketsPendientes,...validos];
     saveTicketsPending();
     status.textContent='';
     closeTicketModal();
     renderTicketsSubtab();
-    // Toast de éxito
-    const n=deduped.length;
-    showToast(`✓ ${n===1?'1 pago añadido':n+' pagos añadidos'} a Pendientes`,'success');
+    const n=validos.length;
+    showToast(`${n===1?'1 pago añadido':n+' pagos añadidos'} a Pendientes`+(descartados?` (${descartados} sin fecha o importe válidos, descartados)`:''),'success');
     haptic('success');
   }catch(e){
-    status.innerHTML=`<div style="color:#FF5A48;font-size:13px;text-align:center;padding:8px 0;">❌ ${e.message}</div>`;
+    status.innerHTML=`<div style="color:#FF5A48;font-size:13px;text-align:center;padding:8px 0;">Error: ${esc(e.message)}</div>`;
   }
 }
 
@@ -8653,7 +8906,7 @@ async function getNextTicketNum(ticketFecha){
 
 async function _getNextTicketNumCore(ticketFecha){
   const safeUid=getSafeUid();
-  const year=ticketFecha?new Date(ticketFecha).getFullYear():new Date().getFullYear();
+  const year=/^\d{4}/.test(String(ticketFecha||''))?+String(ticketFecha).slice(0,4):new Date().getFullYear();
   if(driveLoading||!driveListOk||!yearQuartersOk(year)) throw new Error('Drive no está cargado del todo; no se puede numerar el ticket sin riesgo de repetir número. Recarga y vuelve a intentarlo.');
   // Calcular el máximo número ya usado en data[Q] para este año
   let maxUsed=0;
@@ -8698,6 +8951,8 @@ async function _getNextTicketNumCore(ticketFecha){
   return 'T'+String(year).slice(2)+String(num).padStart(4,'0');
 }
 
+// Factura simplificada (art. 7 RD 1619/2012). Lleva la fecha de expedición y, si es otra, la de la operación;
+// el NIF y el domicilio del cliente si los tiene (los pide una empresa para deducir), y el concepto entero.
 function generateTicketPDF(rec){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'mm',format:'a4'});
@@ -8706,14 +8961,12 @@ function generateTicketPDF(rec){
   const ivaAmt=parseFloat((rec.cuota_iva||0).toFixed(2));
   const total=parseFloat((rec.ingresos_brutos||0).toFixed(2));
   const pctIva=rec.pct_iva||21;
-  const cliente=rec.proveedor_cliente&&rec.proveedor_cliente!=='Venta directa'?rec.proveedor_cliente:'';
-  const fechaRaw=rec.fecha||'—';
-  // Format date as DD/MM/YYYY
-  const fecha=fechaRaw.match(/^\d{4}-\d{2}-\d{2}$/)
-    ? fechaRaw.split('-').reverse().join('/')
-    : fechaRaw;
+  const cliente=rec.proveedor_cliente&&rec.proveedor_cliente!=='Venta directa'?String(rec.proveedor_cliente):'';
+  const fmtD=f=>/^\d{4}-\d{2}-\d{2}$/.test(String(f||''))?String(f).split('-').reverse().join('/'):(f||'—');
+  const fechaOp=fmtD(rec.fecha);
+  const fechaExp=rec.fecha_expedicion&&rec.fecha_expedicion!==rec.fecha?fmtD(rec.fecha_expedicion):'';
   const numFact=rec.num_factura||'';
-  const concepto=rec.concepto||'Venta / servicio de cerámica';
+  const concepto=String(rec.concepto||'Venta / servicio de cerámica');
 
   // ── Emisor (izquierda) ──────────────────────────────────
   doc.setFont('helvetica','bold');
@@ -8737,20 +8990,28 @@ function generateTicketPDF(rec){
   doc.setFont('helvetica','normal');
   doc.setFontSize(10);
   doc.setTextColor(80,80,80);
-  doc.text('Fecha: '+fecha,W-mg,29,{align:'right'});
-  doc.text('1/1',W-mg,35,{align:'right'});
+  if(fechaExp){
+    doc.text('Fecha de expedición: '+fechaExp,W-mg,29,{align:'right'});
+    doc.text('Fecha de la operación: '+fechaOp,W-mg,34,{align:'right'});
+    doc.text('1/1',W-mg,40,{align:'right'});
+  } else {
+    doc.text('Fecha: '+fechaOp,W-mg,29,{align:'right'});
+    doc.text('1/1',W-mg,35,{align:'right'});
+  }
 
   // ── Cliente ─────────────────────────────────────────────
   let y=58;
-  if(cliente){
+  if(cliente||rec.nif){
     doc.setFont('helvetica','bold');
     doc.setFontSize(10);
     doc.setTextColor(30,30,30);
-    doc.text(cliente,mg,y);
+    doc.text(cliente||'Cliente',mg,y);
     doc.setFont('helvetica','normal');
     doc.setFontSize(9);
     doc.setTextColor(80,80,80);
     y+=5;
+    if(rec.nif){ doc.text('NIF: '+String(rec.nif),mg,y); y+=5; }
+    if(rec.domicilio_cliente){ const dl=doc.splitTextToSize(String(rec.domicilio_cliente),110); doc.text(dl,mg,y); y+=4.5*dl.length; }
     doc.text('Total '+total.toFixed(2)+'€',mg,y);
     y+=10;
   } else {
@@ -8785,23 +9046,23 @@ function generateTicketPDF(rec){
   doc.text('TOTAL',cols.total,y+5,{align:'right'});
   y+=7;
 
-  // ── Fila producto ───────────────────────────────────────
-  doc.setFillColor(252,252,252);
-  doc.rect(mg,y,W-mg*2,9,'F');
-  doc.setDrawColor(220,220,220);
-  doc.rect(mg,y,W-mg*2,9,'S');
+  // ── Fila producto (el concepto ocupa las líneas que haga falta) ──
   doc.setFont('helvetica','normal');
   doc.setFontSize(8.5);
+  const lineas=doc.splitTextToSize(concepto,80).slice(0,8);
+  const altoFila=Math.max(9,5+lineas.length*3.6);
+  doc.setFillColor(252,252,252);
+  doc.rect(mg,y,W-mg*2,altoFila,'F');
+  doc.setDrawColor(220,220,220);
+  doc.rect(mg,y,W-mg*2,altoFila,'S');
   doc.setTextColor(30,30,30);
-  // Concepto (truncado si es muy largo)
-  const concTrunc=concepto.length>38?concepto.slice(0,36)+'…':concepto;
-  doc.text(concTrunc,cols.concepto+2,y+6);
+  doc.text(lineas,cols.concepto+2,y+6);
   doc.text(base.toFixed(2)+'€',cols.precio,y+6,{align:'left'});
   doc.text('1',cols.uds+4,y+6,{align:'left'});
   doc.text(base.toFixed(2)+'€',cols.subtotal,y+6,{align:'left'});
   doc.text(pctIva+'%',cols.iva,y+6,{align:'left'});
   doc.text(total.toFixed(2)+'€',cols.total,y+6,{align:'right'});
-  y+=18;
+  y+=altoFila+9;
 
   // ── Totales (alineados a la derecha) ────────────────────
   const tCol=W-mg-50;
@@ -8837,79 +9098,183 @@ function generateTicketPDF(rec){
   return doc.output('arraybuffer');
 }
 
+// Fecha de hoy en hora local (toISOString da el día anterior entre las 00:00 y las 02:00)
+function hoyLocal(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// Trimestre de una fecha AAAA-MM-DD (leída como texto: no depende de la zona horaria)
 function getQuarterFromDate(fecha){
-  if(!fecha) return null;
-  const d=new Date(fecha);
-  if(isNaN(d)) return null;
-  const m=d.getMonth()+1;
-  const y=d.getFullYear();
-  const qt=m<=3?'1T':m<=6?'2T':m<=9?'3T':'4T';
-  return qt+' '+y;
+  const m=/^(\d{4})-(\d{2})-\d{2}/.exec(String(fecha||''));
+  if(!m) return null;
+  const mes=+m[2]; if(mes<1||mes>12) return null;
+  return (mes<=3?'1T':mes<=6?'2T':mes<=9?'3T':'4T')+' '+m[1];
+}
+function quarterOrd(q){ const m=/^([1-4])T (\d{4})$/.exec(q||''); return m?(+m[2])*4+(+m[1]-1):null; }
+// ¿Ese trimestre ya terminó? (entonces puede que ya esté presentado)
+function quarterYaCerrado(q){ const a=quarterOrd(q), b=quarterOrd(getQuarterFromDate(hoyLocal())); return a!==null&&b!==null&&a<b; }
+// Una factura simplificada vale hasta 400 € (3.000 € en ventas al por menor, art. 4 RD 1619/2012)
+function limiteSimplificada(t){ return /venta de pieza|merchandising/i.test(String(t&&t.categoria_ing||''))?3000:400; }
+function avisoLimiteSimplificada(t){
+  const lim=limiteSimplificada(t);
+  if(!((t.importe||0)>lim)) return true;
+  return confirm('Este cobro es de '+fmt(t.importe)+' y una factura simplificada solo vale hasta '+fmt(lim)+(lim===400?' (3.000 € si es venta al por menor)':'')+'.\n\nPara más importe hace falta una factura completa con el NIF y el domicilio del cliente.\n\n¿Crear el ticket igualmente?');
+}
+// Ticket ya existente con el mismo cliente, fecha e importe (si los dos tienen pagoId de Flama, tiene que coincidir)
+function buscarTicketIgual(t){
+  const cli=(t.cliente||'').trim().toLowerCase();
+  return Object.values(data).flat().find(f=>f&&!f._processing&&f.doc_type==='ticket'&&f.fecha===t.fecha&&
+    Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01&&
+    (cli===''||(f.proveedor_cliente||'').trim().toLowerCase()===cli)&&
+    (!t._pagoId||!f._pagoId||f._pagoId===t._pagoId));
+}
+function quitarDePendientes(t){
+  let k=ticketsPendientes.indexOf(t);
+  if(k<0&&t&&t._fsId) k=ticketsPendientes.findIndex(x=>x&&x._fsId===t._fsId);
+  if(k>=0) ticketsPendientes.splice(k,1);
 }
 
-async function approveEditTicket(i){
-  const t=ticketsPendientes[i];
-  if(!t||t._type!=='edit') return;
-
-  const allQ=Object.keys(data);
-  let origRec=null, origQ=null;
-  for(const q of allQ){
-    const found=(data[q]||[]).find(f=>f._id===t.originalTicketId||f.num_factura===t.originalTicketId);
-    if(found){ origRec=found; origQ=q; break; }
+// Sube el PDF de un ticket: si ya tiene fichero en Drive lo sustituye (mismo enlace); si no, lo crea en tickets/<trimestre>
+async function subirPdfTicket(rec,q){
+  if(!token||!ticketsFId) throw new Error('Drive no está conectado');
+  if(!window.jspdf) throw new Error('No se ha cargado el generador de PDF');
+  const blob=new Blob([generateTicketPDF(rec)],{type:'application/pdf'});
+  const fid=rec._driveFileId||driveIdFromLink(rec._driveLink);
+  if(fid){
+    await driveReq(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(fid)}?uploadType=media&fields=id`,{method:'PATCH',headers:{'Content-Type':'application/pdf'},body:blob});
+    if(!rec._driveFileId) rec._driveFileId=fid;
+    delete rec._driveError;
+    return fid;
   }
-  if(!origRec){ showToast('Ticket original no encontrado','error'); return; }
-  if(!confirm('¿Aplicar edición al ticket '+(origRec.num_factura||'—')+'?\n\nSe actualizarán los datos y se regenerará el PDF en Drive.')) return;
-
-  const btn=document.querySelector('[onclick="approveEditTicket('+i+')"]');
-  if(btn){ btn.disabled=true; btn.style.opacity='0.5'; btn.textContent='Aplicando...'; }
-
-  try{
-    showToast('1/4 Actualizando datos...');
-    if(t.importe){ origRec.ingresos_brutos=t.importe; origRec.base_iva=parseFloat((t.importe/1.21).toFixed(2)); origRec.cuota_iva=parseFloat((t.importe-origRec.base_iva).toFixed(2)); }
-    if(t.metodo) origRec.metodo_pago=t.metodo;
-    if(t.fecha) origRec.fecha=t.fecha;
-    if(t.concepto) origRec.concepto=t.concepto;
-    if(t.nota) origRec.notas=t.nota;
-    classifyRecord(origRec);
-    saveLocal(); renderAll();
-
-    showToast('2/4 Guardando en Drive...');
-    if(token) await saveDataToDrive(origQ).catch(()=>{});
-
-    if(token&&origRec._driveFileId){
-      showToast('3/4 Regenerando PDF...');
-      try{
-        const pdfBlob=new Blob([generateTicketPDF(origRec)],{type:'application/pdf'});
-        if(pdfBlob) await uploadTicketPDFToDrive(pdfBlob, origRec._driveFileId);
-      }catch(e){ showToast('⚠️ PDF no actualizado: '+e.message,'error'); }
-    }
-
-    showToast('4/4 Finalizando...');
-    ticketsPendientes.splice(i,1);
-    await saveTicketsPending();
-    if(t._flamaDocId) await markFlamaPaymentStatus(t._flamaDocId,'approved');
-
-    renderAll(); renderTicketsSubtab();
-    showToast('✓ Edición aplicada a '+(origRec.num_factura||'ticket'),'success');
-    haptic('success');
-  }catch(e){
-    showToast('Error: '+e.message,'error');
-    if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.textContent='✓ Aplicar edición'; }
-  }
+  const qFolderId=await findOrCreate(q||getQuarterFromDate(rec.fecha)||Q,ticketsFId);
+  const fileName=(rec.num_factura||'ticket')+'_'+String(rec.fecha||'').replace(/-/g,'')+'_'+String(rec.proveedor_cliente||'venta').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20)+'.pdf';
+  const form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify({name:fileName,parents:[qFolderId]})],{type:'application/json'}));
+  form.append('file',new File([blob],fileName,{type:'application/pdf'}));
+  const r=await driveReq('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',{method:'POST',body:form});
+  const created=await r.json();
+  if(!created||!created.id) throw new Error('Drive no devolvió el PDF');
+  rec._driveFileId=created.id;
+  if(created.webViewLink) rec._driveLink=created.webViewLink;
+  delete rec._driveError;
+  return created.id;
+}
+// Mueve el PDF de un ticket a la carpeta tickets/<trimestre>
+async function moverPdfTicket(fid,newQ){
+  if(!token||!ticketsFId||!fid) return;
+  const r1=await driveReq(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fid)}?fields=parents`);
+  const info=await r1.json();
+  const dest=await findOrCreate(newQ,ticketsFId);
+  const parents=info.parents||[];
+  const quitar=parents.filter(p=>p!==dest);
+  if(parents.includes(dest)&&!quitar.length) return;
+  await driveReq(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fid)}?addParents=${encodeURIComponent(dest)}${quitar.length?'&removeParents='+encodeURIComponent(quitar.join(',')):''}&fields=id`,{method:'PATCH'});
 }
 async function uploadTicketPDFToDrive(blob, fileId){
   if(!token||!fileId) return;
-  const url=`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`;
-  await fetch(url,{
-    method:'PATCH',
-    headers:{'Authorization':'Bearer '+token,'Content-Type':'application/pdf'},
+  await driveReq(`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(fileId)}?uploadType=media`,{
+    method:'PATCH',headers:{'Content-Type':'application/pdf'},
     body:(blob instanceof Blob)?blob:new Blob([blob],{type:'application/pdf'})
   });
 }
 
+// ── Correcciones de Flama (pagos que ya estaban aprobados) ──
+// Busca el ticket al que se refiere una corrección: por número, por pagoId, por el envío original o por los datos de antes
+function buscarTicketDeCorreccion(t,orig){
+  const todos=[];
+  Object.keys(data).forEach(q=>(data[q]||[]).forEach(r=>{ if(r&&r.doc_type==='ticket'&&!r._processing) todos.push({r,q}); }));
+  if(t.originalTicketId){ const x=todos.find(o=>o.r.num_factura===t.originalTicketId); if(x) return x; }
+  if(t._pagoId){ const x=todos.filter(o=>o.r._pagoId===t._pagoId); if(x.length===1) return x[0]; if(x.length>1) return {varios:x}; }
+  if(t.originalFlamaDocId){ const x=todos.find(o=>o.r._flamaDocId===t.originalFlamaDocId); if(x) return x; }
+  orig=orig||{importe:t.origImporte,fecha:t.origFecha};
+  if(!(orig.importe>0)||!orig.fecha) return null;
+  const cli=(t.cliente||'').trim().toLowerCase();
+  const cand=todos.filter(o=>(o.r.proveedor_cliente||'').trim().toLowerCase()===cli&&o.r.fecha===orig.fecha&&
+    Math.abs((o.r.ingresos_brutos||0)-orig.importe)<0.01&&(!o.r._pagoId||o.r._pagoId===t._pagoId));
+  if(cand.length===1) return cand[0];
+  if(cand.length>1) return {varios:cand};
+  return null;
+}
+async function buscarTicketDeCorreccionAsync(t){
+  let x=buscarTicketDeCorreccion(t);
+  if(x||!t.originalFlamaDocId) return x;
+  // Correcciones antiguas sin los datos de antes: se leen del envío original en Flama
+  try{
+    const r=await flamaFetch(`${FLAMA_PAYMENTS_URL}/${encodeURIComponent(t.originalFlamaDocId)}?key=${FLAMA_API_KEY}`);
+    if(r.ok){ const d=await r.json(); const f=d.fields||{}; x=buscarTicketDeCorreccion(t,{importe:+flamaVal(f,'importe')||0,fecha:String(flamaVal(f,'fecha')||'')}); }
+  }catch(e){ console.warn('No se pudo leer el envío original de Flama',e); }
+  return x;
+}
+// Aplica una corrección de Flama al ticket que ya existe: mismo número, ingreso y PDF actualizados.
+// Nunca crea otro ingreso (antes, corregir 60 € a 80 € acababa en 140 € declarados).
+async function approveEditTicket(i){
+  const t=ticketsPendientes[i];
+  if(!t||t._type!=='edit') return;
+  if(window._approvingTicket){ showToast('Espera: se está aprobando otro ticket','info'); return; }
+  if(!requireQuarterWritable(null,'aplicar correcciones')) return;
+  window._approvingTicket=true;
+  try{
+    const rel=await releerEnvioFlama(t);
+    if(rel.estado==='procesado'){ quitarDePendientes(t); markFlamaLocalProcessed(t._flamaDocId); renderTicketsSubtab(); alert('Esta corrección ya no está pendiente en Flama (se aplicó o se descartó en otro dispositivo).'); return; }
+    const found=await buscarTicketDeCorreccionAsync(t);
+    if(!found){ alert('No encuentro en MiGestor el ticket de este pago.\n\nSi ese pago nunca se aprobó aquí, descarta la corrección y vuelve a enviar el pago desde Flama.'); return; }
+    if(found.varios){ alert('Hay '+found.varios.length+' tickets que encajan ('+found.varios.map(o=>o.r.num_factura||'sin número').join(', ')+').\n\nCorrige el que toque desde Facturas y descarta esta corrección.'); return; }
+    const rec=found.r, oldQ=found.q;
+    const nuevoImporte=t.importe>0?Math.round(t.importe*100)/100:(rec.ingresos_brutos||0);
+    const nuevaFecha=t.fecha||rec.fecha;
+    const newQ=getQuarterFromDate(nuevaFecha)||oldQ;
+    if(!requireQuarterWritable(oldQ,'aplicar correcciones')||!requireQuarterWritable(newQ,'aplicar correcciones')) return;
+    const metodoAntes=((String(rec.notas||'')).match(/^Pago (\w+)/)||[])[1]||'';
+    const cambios=[];
+    if(Math.abs((rec.ingresos_brutos||0)-nuevoImporte)>=0.005) cambios.push('Importe: '+fmt(rec.ingresos_brutos||0)+' → '+fmt(nuevoImporte));
+    if(nuevaFecha!==rec.fecha) cambios.push('Fecha: '+fmtFecha(rec.fecha)+' → '+fmtFecha(nuevaFecha)+(newQ!==oldQ?' (pasa a '+newQ+')':''));
+    if(t.concepto&&t.concepto!==rec.concepto) cambios.push('Concepto: '+(rec.concepto||'—')+' → '+t.concepto);
+    if(t.metodo&&metodoAntes&&t.metodo!==metodoAntes) cambios.push('Método: '+metodoAntes+' → '+t.metodo);
+    const cerrados=[oldQ,newQ].filter((q,k,a)=>a.indexOf(q)===k&&quarterYaCerrado(q));
+    let msg='Corregir el ticket '+(rec.num_factura||'')+' con lo que llega de Flama:\n\n'+(cambios.length?cambios.join('\n'):'(no cambia el importe, la fecha, el concepto ni el método)')+'\n\nSe actualizarán el ingreso y su PDF, con el mismo número.';
+    if(cerrados.length) msg+='\n\nOjo: '+cerrados.join(' y ')+' ya terminó. Si ya lo presentaste, tendrás que corregir esa declaración.';
+    if(!confirm(msg)) return;
+    if(nuevoImporte!==(rec.ingresos_brutos||0)&&!avisoLimiteSimplificada({importe:nuevoImporte,categoria_ing:rec.categoria_ing})) return;
+    const antes={importe:rec.ingresos_brutos||0,fecha:rec.fecha};
+    const pct=parseFloat(rec.pct_iva||21);
+    const base=Math.round(nuevoImporte/(1+pct/100)*100)/100;
+    rec.ingresos_brutos=nuevoImporte; rec.base_iva=base; rec.base_irpf=base; rec.cuota_iva=Math.round((nuevoImporte-base)*100)/100;
+    rec.fecha=nuevaFecha;
+    if(t.concepto) rec.concepto=t.concepto;
+    if(t.metodo&&t.metodo!==metodoAntes) rec.notas=metodoAntes?String(rec.notas).replace(/^Pago \w+/,'Pago '+t.metodo):('Pago '+t.metodo+(rec.notas?' · '+rec.notas:''));
+    if(cambios.length) rec.notas=(rec.notas?rec.notas+' · ':'')+'Corregido desde Flama el '+fmtFecha(hoyLocal())+' (antes '+fmt(antes.importe)+(antes.fecha!==nuevaFecha?', '+fmtFecha(antes.fecha):'')+')';
+    if(t._pagoId&&!rec._pagoId) rec._pagoId=t._pagoId;
+    classifyRecord(rec);
+    if(newQ!==oldQ){ data[oldQ]=(data[oldQ]||[]).filter(x=>x!==rec); rec._quarter=newQ; (data[newQ]=data[newQ]||[]).push(rec); }
+    saveLocal(); renderAll();
+    quitarDePendientes(t);
+    renderTicketsSubtab();
+    queueFlamaMark(t,'approved',newQ,{ticketId:rec.num_factura||'',recId:rec._id,aprob:aprobDe(rec,t)});
+    let okDrive=true, okPdf=true;
+    if(token){
+      okDrive=await saveDataToDrive(newQ);
+      if(newQ!==oldQ) okDrive=(await saveDataToDrive(oldQ))&&okDrive;
+      if(ticketsFId){
+        const fidAntes=rec._driveFileId||driveIdFromLink(rec._driveLink)||'';
+        try{
+          const fid=await subirPdfTicket(rec,newQ);
+          if(newQ!==oldQ&&fidAntes) await moverPdfTicket(fid,newQ);
+          if(fid!==fidAntes) okDrive=(await saveDataToDrive(newQ))&&okDrive; // PDF nuevo: guardar su enlace
+        }catch(e){ okPdf=false; console.warn('PDF de la corrección:',e); }
+      }
+      if(okDrive) await flushFlamaOutbox();
+    }
+    renderAll(); renderTicketsSubtab();
+    if(!okDrive) showToast('Corrección aplicada en este dispositivo, pero aún no está guardada en Drive. Se reintentará.','error');
+    else if(!okPdf) showToast('Corrección aplicada a '+esc(rec.num_factura||'ticket')+', pero no se pudo rehacer su PDF','error');
+    else showToast('Corrección aplicada a '+esc(rec.num_factura||'ticket'),'success');
+    haptic('success');
+  }catch(e){
+    showToast('Error: '+esc(e.message),'error');
+  }finally{ window._approvingTicket=false; }
+}
+
 async function approveTicketWithDrive(t){
-  const numFact=await getNextTicketNum(t.fecha);
-  const bruto=t.importe||0;
+  const expedicion=hoyLocal();
+  const numFact=await getNextTicketNum(expedicion); // la serie va por el año en que se expide
+  const bruto=Math.round((t.importe||0)*100)/100;
   const pctIva=parseFloat(t.pct_iva||21);
   const base=Math.round(bruto/(1+pctIva/100)*100)/100;
   const iva=Math.round((bruto-base)*100)/100;
@@ -8919,6 +9284,7 @@ async function approveTicketWithDrive(t){
     proveedor_cliente:t.cliente||'Venta directa',
     nif:t.cliente_nif||'',
     fecha:t.fecha||'',
+    fecha_expedicion:expedicion,
     concepto:t.concepto||'Venta / servicio de cerámica',
     num_factura:numFact,
     operacion:'INT',
@@ -8932,188 +9298,137 @@ async function approveTicketWithDrive(t){
     notas:'Pago '+(t.metodo||''),
     justificacion:t.justificacion||'',
     categoria_ing:t.categoria_ing||autoCategoria({tipo:'ingreso',concepto:t.concepto||'',proveedor_cliente:t.cliente||''})||'Clase',
-    _id:Date.now()+Math.random()
+    _id:newRecId()
   };
+  if(t.domicilio_cliente) rec.domicilio_cliente=t.domicilio_cliente;
+  if(t._pagoId) rec._pagoId=t._pagoId;         // para reconocer después sus correcciones
+  if(t._flamaDocId) rec._flamaDocId=t._flamaDocId;
   classifyRecord(rec);
-  // Generate PDF and upload to Drive
+  // PDF en Drive (tickets/<trimestre>). Si falla, el ingreso se crea igual y el PDF se puede rehacer luego.
   if(token&&ticketsFId){
-    try{
-      const pdfBuffer=generateTicketPDF(rec);
-      const blob=new Blob([pdfBuffer],{type:'application/pdf'});
-      const fileName=numFact+'_'+(rec.fecha||'').replace(/-/g,'')+'_'+(t.cliente||'venta').replace(/[^a-zA-Z0-9]/g,'_').slice(0,20)+'.pdf';
-      const file=new File([blob],fileName,{type:'application/pdf'});
-      // Crear subcarpeta por trimestre
-      const ticketQ=getQuarterFromDate(t.fecha)||Q;
-      const qFolderId=await findOrCreate(ticketQ,ticketsFId);
-      const meta=JSON.stringify({name:fileName,parents:[qFolderId]});
-      const form=new FormData();
-      form.append('metadata',new Blob([meta],{type:'application/json'}));
-      form.append('file',file);
-      const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token},body:form});
-      const created=await r.json();
-      if(created.webViewLink) rec._driveLink=created.webViewLink;
-      if(created.id) rec._driveFileId=created.id;
-    }catch(e){ console.warn('Error subiendo ticket a Drive:',e); }
+    try{ await subirPdfTicket(rec,getQuarterFromDate(t.fecha)||Q); }
+    catch(e){ console.warn('Error subiendo ticket a Drive:',e); rec._driveError=true; }
   }
-  return rec;
-}
-
-function ticketToRecord(t){
-  // Sync fallback (used by approveAllTickets for non-async path)
-  const bruto=t.importe||0;
-  const base=Math.round(bruto/1.21*100)/100;
-  const iva=Math.round((bruto-base)*100)/100;
-  const rec={
-    tipo:'ingreso',
-    doc_type:'ticket',
-    proveedor_cliente:t.cliente||'Venta directa',
-    nif:'',
-    fecha:t.fecha||'',
-    concepto:'Venta / servicio de cerámica',
-    num_factura:'',
-    operacion:'INT',
-    base_iva:base,
-    pct_iva:21,
-    cuota_iva:iva,
-    base_irpf:base,
-    retencion_pct:0,
-    retencion_importe:0,
-    ingresos_brutos:bruto,
-    notas:'Pago '+(t.metodo||''),
-    _id:Date.now()+Math.random()
-  };
-  classifyRecord(rec);
   return rec;
 }
 
 async function approveAllChronological(){
   if(!ticketsPendientes.length) return;
-  if(window._approvingTicket) return;
+  if(window._approvingTicket){ showToast('Espera: se está aprobando otro ticket','info'); return; }
   if(!requireQuarterWritable(null,'aprobar tickets')) return;
-  if(!confirm(`¿Aprobar los ${ticketsPendientes.length} tickets en orden cronológico?\n\nSi alguno está duplicado te preguntaré antes de crearlo.`)) return;
+  const normales=ticketsPendientes.filter(t=>t._type!=='edit');
+  const nCorr=ticketsPendientes.length-normales.length;
+  if(!normales.length){ alert('Solo hay correcciones de Flama: se aplican una a una con su botón.'); return; }
+  if(!confirm(`¿Aprobar los ${normales.length} pagos en orden cronológico?\n\nSi alguno está duplicado te preguntaré antes de crearlo.`+(nCorr?`\n\n${nCorr===1?'La corrección':'Las '+nCorr+' correcciones'} de Flama no se toca${nCorr===1?'':'n'}: se aplican una a una.`:''))) return;
 
   window._approvingTicket=true;
   const btn=document.getElementById('approve-all-btn');
-  // Bloquear botón y mostrar estado "Guardando..."
+  const btnHtml=btn?btn.innerHTML:'';
   const restoreBtn=()=>{
     if(!btn) return;
-    btn.disabled=false;
-    btn.style.opacity='1';
-    btn.style.cursor='pointer';
-    btn.style.pointerEvents='auto';
-    btn.innerHTML='✓✓';
+    btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; btn.style.pointerEvents='auto';
+    btn.innerHTML=btnHtml;
   };
-  if(btn){
-    btn.disabled=true;
-    btn.style.opacity='0.55';
-    btn.style.cursor='not-allowed';
-    btn.style.pointerEvents='none';
-  }
+  if(btn){ btn.disabled=true; btn.style.opacity='0.55'; btn.style.cursor='not-allowed'; btn.style.pointerEvents='none'; }
 
-  // Ordenar por fecha ascendente
-  const sorted=[...ticketsPendientes].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
+  const sorted=[...normales].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
   switchSubTab('facturas');
-
-  let aprobados=0;
-  let omitidos=0;
-  let cancelado=false;
+  let aprobados=0, omitidos=0, cancelado=false, yaNoEstan=0, sinComprobar=false;
   const trimestresTocados=new Set();
-
-  for(let idx=0;idx<sorted.length;idx++){
-    const t=sorted[idx];
-    if(btn) btn.innerHTML=`⏳ ${idx+1}/${sorted.length}`;
-
-    // Re-comprobar duplicado en tiempo real (data puede haber cambiado en iteraciones previas)
-    const allFacts=Object.values(data).flat();
-    const cliMatch=(t.cliente||'').trim().toLowerCase();
-    const existing=allFacts.find(f=>
-      f.doc_type==='ticket' &&
-      f.fecha===t.fecha &&
-      Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01 &&
-      (cliMatch===''||(f.proveedor_cliente||'').trim().toLowerCase()===cliMatch)
-    );
-
-    if(existing){
-      const choice=window.confirm(
-        `⚠️ DUPLICADO en ticket ${idx+1}/${sorted.length}\n\n` +
-        `Pago entrante:\n` +
-        `  • ${t.cliente||'—'}\n` +
-        `  • ${fmtFecha(t.fecha)}  ·  ${fmt(t.importe||0)}\n\n` +
-        `Ya existe:\n` +
-        `  • Nº ${existing.num_factura||'(sin nº)'}\n` +
-        `  • ${existing.proveedor_cliente||'—'}\n` +
-        `  • ${fmtFecha(existing.fecha)}  ·  ${fmt(existing.ingresos_brutos||0)}\n\n` +
-        `Aceptar = Crear igualmente   |   Cancelar = Omitir este\n\n` +
-        `(Si quieres detener todo el proceso, pulsa Cancelar y luego confirma en el siguiente diálogo)`
-      );
-      if(!choice){
-        // Omitir este: si viene de Flama, marcarlo como procesado (también sus duplicados)
-        if(t._source==='flama'&&t._flamaDocId){
-          await markFlamaTicketAndDups(t,'approved').catch(()=>{});
-        }
-        omitidos++;
-        // Preguntar si quiere cancelar todo el proceso restante
-        if(idx<sorted.length-1){
-          const stopAll=window.confirm(`¿Quieres CANCELAR todo el proceso?\n\nAceptar = Cancelar todo (quedan ${sorted.length-idx-1} pendientes)\nCancelar = Continuar con el siguiente`);
-          if(stopAll){ cancelado=true; break; }
-        }
-        continue;
-      }
-      // Si dijo aceptar: crear igualmente, sigue al flujo normal
-    }
-
-    // Insertar placeholder y procesar
-    const ticketQ=getQuarterFromDate(t.fecha)||Q;
-    const tempId='processing_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    const placeholder={_id:tempId,_quarter:ticketQ,_processing:true,tipo:'ingreso',doc_type:'ticket',
-      proveedor_cliente:t.cliente||'Venta directa',fecha:t.fecha||'',
-      concepto:t.concepto||'Venta / servicio de cerámica',
-      base_iva:0,cuota_iva:0,ingresos_brutos:t.importe||0,operacion:'INT'};
-    if(!data[ticketQ]) data[ticketQ]=[];
-    data[ticketQ].push(placeholder);
-    renderAll();
-
-    try{
-      const rec=await approveTicketWithDrive(t);
-      if(data[ticketQ]) data[ticketQ]=data[ticketQ].filter(x=>x._id!==tempId);
-      rec._quarter=ticketQ;
-      if(!data[ticketQ]) data[ticketQ]=[];
-      data[ticketQ].push(rec);
-      saveLocal(); renderAll();
-      if(token) saveDataToDrive(ticketQ);
-      trimestresTocados.add(ticketQ);
-      aprobados++;
-      // Quitar de pendientes; en Flama (con sus duplicados) se marca cuando esté guardado en Drive
-      const idxInPending=ticketsPendientes.findIndex(x=>x._fsId===t._fsId);
-      if(idxInPending>=0) ticketsPendientes.splice(idxInPending,1);
-      if(t._source==='flama') queueFlamaMark(t,'approved',ticketQ);
-    }catch(e){
-      if(data[ticketQ]) data[ticketQ]=data[ticketQ].filter(x=>x._id!==tempId);
-      renderAll();
-      omitidos++;
-    }
-  }
-
-  await saveTicketsPending();
-  // Esperar a que los ingresos estén en Drive y entonces marcar en Flama
   let sinGuardar=[];
-  if(token&&trimestresTocados.size){
-    const qs=[...trimestresTocados];
-    const res=await Promise.all(qs.map(q=>saveDataToDrive(q)));
-    sinGuardar=qs.filter((q,k)=>!res[k]);
+  try{
+    for(let idx=0;idx<sorted.length;idx++){
+      const t=sorted[idx];
+      if(btn) btn.textContent=`${idx+1}/${sorted.length}`;
+      // ¿Ha cambiado o se ha borrado en Flama desde que se cargó Pendientes?
+      if(t._source==='flama'&&!sinComprobar){
+        const rel=await releerEnvioFlama(t);
+        if(rel.estado==='procesado'){ quitarDePendientes(t); markFlamaLocalProcessed(t._flamaDocId); yaNoEstan++; continue; }
+        if(rel.estado==='cambiado'){
+          aplicarCambiosFlama(t,rel);
+          if(!confirm(`Pago ${idx+1}/${sorted.length}: ${t.cliente||'—'}\n\nHa cambiado en Flama:\n${rel.cambios.join('\n')}\n\nAceptar = aprobarlo con los datos nuevos\nCancelar = saltarlo (sigue en Pendientes)`)){ omitidos++; continue; }
+          if(!requireQuarterWritable(getQuarterFromDate(t.fecha)||Q,'aprobar tickets')){ omitidos++; continue; }
+        }
+        if(rel.estado==='sinconexion'){
+          if(!confirm('No se ha podido comprobar en Flama si los pagos han cambiado.\n\nAceptar = seguir sin comprobar\nCancelar = detener')){ cancelado=true; break; }
+          sinComprobar=true;
+        }
+      }
+      const cab=`Pago ${idx+1}/${sorted.length}: ${t.cliente||'—'} · ${fmtFecha(t.fecha)} · ${fmt(t.importe||0)}\n\n`;
+      if(t._reenvio&&!confirm(cab+`Este pago de Flama ya se aprobó antes (${t._reenvio}).\n\nAceptar = crear otro ingreso igualmente\nCancelar = saltarlo (sigue en Pendientes)`)){ omitidos++; continue; }
+      const existing=buscarTicketIgual(t);
+      if(existing){
+        const crear=confirm(
+          `Posible DUPLICADO en el pago ${idx+1}/${sorted.length}\n\n`+
+          `Pago entrante:\n  • ${t.cliente||'—'}\n  • ${fmtFecha(t.fecha)}  ·  ${fmt(t.importe||0)}\n\n`+
+          `Ya existe:\n  • Nº ${existing.num_factura||'(sin nº)'}\n  • ${existing.proveedor_cliente||'—'}\n  • ${fmtFecha(existing.fecha)}  ·  ${fmt(existing.ingresos_brutos||0)}\n\n`+
+          `Aceptar = crear igualmente   |   Cancelar = omitir este\n\n`+
+          `(Para detener todo el proceso, pulsa Cancelar y confírmalo en el siguiente aviso)`
+        );
+        if(!crear){
+          // Omitido por duplicado: en Flama queda enlazado al ticket que ya existe
+          if(t._source==='flama'){ queueFlamaMark(t,'duplicate',null,{ticketId:existing.num_factura||'',recId:existing._id,aprob:aprobDe(existing,t)}); quitarDePendientes(t); }
+          omitidos++;
+          if(idx<sorted.length-1){
+            const parar=confirm(`¿Detener el proceso?\n\nAceptar = detener (quedan ${sorted.length-idx-1})\nCancelar = seguir con el siguiente`);
+            if(parar){ cancelado=true; break; }
+          }
+          continue;
+        }
+      }
+      if(!avisoLimiteSimplificada(t)){ omitidos++; continue; }
+      // Insertar placeholder y procesar
+      const ticketQ=getQuarterFromDate(t.fecha)||Q;
+      const tempId='processing_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+      const placeholder={_id:tempId,_quarter:ticketQ,_processing:true,tipo:'ingreso',doc_type:'ticket',
+        proveedor_cliente:t.cliente||'Venta directa',fecha:t.fecha||'',
+        concepto:t.concepto||'Venta / servicio de cerámica',
+        base_iva:0,cuota_iva:0,ingresos_brutos:t.importe||0,operacion:'INT'};
+      if(!data[ticketQ]) data[ticketQ]=[];
+      data[ticketQ].push(placeholder);
+      renderAll();
+      try{
+        const rec=await approveTicketWithDrive(t);
+        if(data[ticketQ]) data[ticketQ]=data[ticketQ].filter(x=>x._id!==tempId);
+        rec._quarter=ticketQ;
+        if(!data[ticketQ]) data[ticketQ]=[];
+        data[ticketQ].push(rec);
+        saveLocal(); renderAll();
+        if(token) saveDataToDrive(ticketQ);
+        trimestresTocados.add(ticketQ);
+        aprobados++;
+        // Quitar de pendientes; en Flama (con sus duplicados) se marca cuando esté guardado en Drive
+        quitarDePendientes(t);
+        if(t._source==='flama') queueFlamaMark(t,'approved',ticketQ,{ticketId:rec.num_factura,recId:rec._id,aprob:aprobDe(rec,t)});
+      }catch(e){
+        if(data[ticketQ]) data[ticketQ]=data[ticketQ].filter(x=>x._id!==tempId);
+        renderAll();
+        omitidos++;
+        showToast('No se pudo aprobar '+esc(t.cliente||'un pago')+': '+esc(e.message),'error');
+      }
+    }
+    await saveTicketsPending();
+    // Esperar a que los ingresos estén en Drive y entonces marcar en Flama
+    if(token&&trimestresTocados.size){
+      const qs=[...trimestresTocados];
+      const res=await Promise.all(qs.map(q=>saveDataToDrive(q)));
+      sinGuardar=qs.filter((q,k)=>!res[k]);
+    }
     await flushFlamaOutbox();
+  }finally{
+    window._approvingTicket=false;
+    restoreBtn();
+    renderTicketsSubtab();
   }
-  window._approvingTicket=false;
-  restoreBtn();
-  renderTicketsSubtab();
-  if(sinGuardar.length) showToast('Aprobados, pero '+sinGuardar.join(', ')+' aún no está guardado en Drive. Se reintentará.','error');
-
+  if(sinGuardar.length){ showToast('Aprobados, pero '+sinGuardar.join(', ')+' aún no está guardado en Drive. Se reintentará.','error'); return; }
   // Resumen final
   const partes=[];
   if(aprobados>0) partes.push(`${aprobados} aprobado${aprobados===1?'':'s'}`);
   if(omitidos>0) partes.push(`${omitidos} omitido${omitidos===1?'':'s'}`);
+  if(yaNoEstan>0) partes.push(`${yaNoEstan} ya no estaba${yaNoEstan===1?'':'n'} en Flama`);
+  if(nCorr>0) partes.push(`${nCorr} corrección${nCorr===1?'':'es'} sin aplicar`);
   let resumen=partes.join(' · ');
-  if(cancelado) resumen='⛔ Cancelado · '+resumen;
+  if(cancelado) resumen='Detenido · '+resumen;
   if(!resumen) resumen='Sin cambios';
   showToast(resumen, aprobados>0?'success':'info');
   haptic(aprobados>0?'success':'warning');
@@ -9122,147 +9437,102 @@ async function approveAllChronological(){
 async function clearAllTicketsPending(){
   const total=ticketsPendientes.length;
   if(!total) return;
-  if(!confirm(`¿Vaciar los ${total} tickets pendientes?`)) return;
-
-  window._clearingTickets=true; // bloquear recargas mientras vaciamos
-
+  const nFlama=ticketsPendientes.filter(t=>t._source==='flama').length;
+  if(!confirm(`¿Vaciar los ${total} pendientes?`+(nFlama?`\n\n${nFlama} vienen de Flama y allí quedarán como rechazados.`:''))) return;
+  window._clearingTickets=true; // bloquear recargas mientras se vacía
   const btn=document.querySelector('[onclick*="clearAllTicketsPending"]');
   if(btn){ btn.disabled=true; btn.style.opacity='0.5'; btn.style.pointerEvents='none'; }
-
-  // Snapshot de los tickets antes de vaciar
-  const snapshot=[...ticketsPendientes];
-  const flamaTickets=snapshot.filter(t=>t._source==='flama'&&t._flamaDocId);
-
-  // Vaciar lista local PRIMERO — así renderTicketsSubtab muestra vacío
-  ticketsPendientes=[];
-  renderTicketsSubtab();
-
-  // Marcar Flama como processed uno a uno
-  for(let i=0;i<flamaTickets.length;i++){
-    const t=flamaTickets[i];
-    showToast(`Marcando en Flama ${i+1}/${flamaTickets.length}...`);
-    markFlamaLocalProcessed(t._flamaDocId);
-    try{ await markFlamaTicketAndDups(t, 'rejected'); }catch(e){}
+  try{
+    const snapshot=[...ticketsPendientes];
+    ticketsPendientes=[];
+    renderTicketsSubtab();
+    snapshot.filter(t=>t._source==='flama').forEach(t=>queueFlamaMark(t,'rejected'));
+    await flushFlamaOutbox();
+    await saveTicketsPending();
+    haptic('success');
+    showToast(`${total} pendientes descartados`,'success');
+  }finally{
+    window._clearingTickets=false;
+    if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.pointerEvents='auto'; }
   }
-
-  // Guardar en Firestore de MiGestor
-  await saveTicketsPending();
-  showToast(`Limpiando Firestore...`);
-  if(token&&getSafeUid()){
-    try{ await deleteAllFsTickets(getSafeUid()); }catch(e){}
-  }
-
-  // Esperar un momento para asegurar que Firebase procese los PATCHes
-  await new Promise(r=>setTimeout(r,1500));
-
-  window._clearingTickets=false;
-  if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.pointerEvents='auto'; }
-  haptic('success');
-  showToast(`✓ ${total} tickets descartados`,'success');
 }
 
 async function discardTicket(i){
   const t=ticketsPendientes[i];
   if(!t) return;
+  if(t._type==='edit'&&!confirm('¿Descartar esta corrección?\n\nEl ticket se queda como está y en Flama se verá como corrección rechazada.')) return;
   ticketsPendientes.splice(i,1);
-  await saveTicketsPending();
-  // Si viene de Flama, marcarlo (y sus duplicados) como procesado+rechazado
-  if(t._source==='flama'&&t._flamaDocId){
-    await markFlamaTicketAndDups(t, 'rejected');
-  }
+  saveTicketsPending();
+  // Si viene de Flama, marcarlo (y sus duplicados) como rechazado; si falla, se reintenta
+  if(t._source==='flama'){ queueFlamaMark(t,'rejected'); flushFlamaOutbox().catch(()=>{}); }
   haptic('delete');
   renderTicketsSubtab();
-  showToast('Pago descartado');
+  showToast(t._type==='edit'?'Corrección descartada':'Pago descartado');
 }
 
 async function approveTicket(i){
-  if(window._approvingTicket) return;
-  const t0=ticketsPendientes[i];
-  if(!t0) return;
-  if(!requireQuarterWritable(getQuarterFromDate(t0.fecha)||Q,'aprobar tickets')) return;
-  window._approvingTicket=true;
   const t=ticketsPendientes[i];
-  if(!t){ window._approvingTicket=false; return; }
-
+  if(!t) return;
+  if(t._type==='edit') return approveEditTicket(i);
+  if(window._approvingTicket){ showToast('Espera: se está aprobando otro ticket','info'); return; }
+  if(!requireQuarterWritable(getQuarterFromDate(t.fecha)||Q,'aprobar tickets')) return;
+  window._approvingTicket=true;
+  try{ await approveTicketCore(t); }
+  finally{ window._approvingTicket=false; }
+}
+async function approveTicketCore(t){
+  // ¿Ha cambiado o se ha borrado en Flama desde que se cargó Pendientes?
+  if(!(await comprobarEnvioFlama(t))){ renderTicketsSubtab(); return; }
+  // ¿Flama ha vuelto a enviar un pago que ya se aprobó?
+  if(t._reenvio&&!confirm(`Este pago de Flama ya se aprobó antes (${t._reenvio}).\n\nSi lo apruebas otra vez se creará OTRO ingreso. Si solo cambió el importe o la fecha, corrígelo en Flama y llegará como corrección.\n\n¿Crear otro ingreso igualmente?`)) return;
   // Re-comprobar duplicados en el momento real de aprobar (más fiable que el flag _dup)
-  const allFacts=Object.values(data).flat();
-  const cliMatch=(t.cliente||'').trim().toLowerCase();
-  const existing=allFacts.find(f=>
-    f.doc_type==='ticket' &&
-    f.fecha===t.fecha &&
-    Math.abs((f.ingresos_brutos||0)-(t.importe||0))<0.01 &&
-    (cliMatch===''||(f.proveedor_cliente||'').trim().toLowerCase()===cliMatch)
-  );
+  const existing=buscarTicketIgual(t);
   if(existing){
-    const msg = `⚠️ DUPLICADO DETECTADO\n\n` +
-      `Ya existe esta factura:\n` +
-      `• Nº: ${existing.num_factura||'(sin nº)'}\n` +
-      `• Cliente: ${existing.proveedor_cliente||'—'}\n` +
-      `• Fecha: ${fmtFecha(existing.fecha)}\n` +
-      `• Importe: ${fmt(existing.ingresos_brutos||0)}\n\n` +
-      `¿Aprobar igualmente y crear OTRO ticket?`;
-    const ok=confirm(msg);
-    if(!ok){
-      window._approvingTicket=false;
-      // Si viene de Flama, marcarlo como procesado para que no reaparezca
-      if(t._source==='flama'&&t._flamaDocId){
-        markFlamaTicketAndDups(t, 'approved');
-        ticketsPendientes.splice(i,1);
+    const crear=confirm(`Posible DUPLICADO\n\nYa existe este ticket:\n• Nº: ${existing.num_factura||'(sin nº)'}\n• Cliente: ${existing.proveedor_cliente||'—'}\n• Fecha: ${fmtFecha(existing.fecha)}\n• Importe: ${fmt(existing.ingresos_brutos||0)}\n\n¿Crear OTRO ticket igualmente?`);
+    if(!crear){
+      // No se crea nada; si viene de Flama, allí queda enlazado al ticket que ya existe
+      if(t._source==='flama'){
+        queueFlamaMark(t,'duplicate',null,{ticketId:existing.num_factura||'',recId:existing._id,aprob:aprobDe(existing,t)});
+        flushFlamaOutbox().catch(()=>{});
+        quitarDePendientes(t);
         saveTicketsPending();
       }
       renderTicketsSubtab();
       return;
     }
   } else if(t._dup){
-    // Fallback al flag (poco probable que llegue aquí)
-    const ok=confirm(`⚠️ Posible duplicado\n\nYa existe una factura similar.\n\n¿Aprobar igualmente?`);
-    if(!ok){ window._approvingTicket=false; renderTicketsSubtab(); return; }
+    if(!confirm('Posible duplicado: ya hay un pago parecido.\n\n¿Aprobar igualmente?')){ renderTicketsSubtab(); return; }
   }
-
+  if(!avisoLimiteSimplificada(t)) return;
   // 1. Quitar de pendientes y navegar a Historial INMEDIATAMENTE
   // (en Flama se marcará cuando el ingreso esté guardado en Drive)
-  ticketsPendientes.splice(i,1);
+  quitarDePendientes(t);
   saveTicketsPending();
   switchSubTab('facturas');
   haptic('success');
-
   // 2. Insertar placeholder con estado "procesando" en data
   const ticketQ=getQuarterFromDate(t.fecha)||Q;
-  const tempId='processing_'+Date.now();
-  const placeholder={
-    _id:tempId,
-    _quarter:ticketQ,
-    _processing:true,
-    tipo:'ingreso',
-    doc_type:'ticket',
-    proveedor_cliente:t.cliente||'Venta directa',
-    fecha:t.fecha||'',
-    concepto:t.concepto||'Venta / servicio de cerámica',
-    base_iva:0, cuota_iva:0, ingresos_brutos:t.importe||0,
-    operacion:'INT'
-  };
+  const tempId='processing_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  const placeholder={_id:tempId,_quarter:ticketQ,_processing:true,tipo:'ingreso',doc_type:'ticket',
+    proveedor_cliente:t.cliente||'Venta directa',fecha:t.fecha||'',concepto:t.concepto||'Venta / servicio de cerámica',
+    base_iva:0,cuota_iva:0,ingresos_brutos:t.importe||0,operacion:'INT'};
   if(!data[ticketQ]) data[ticketQ]=[];
   data[ticketQ].push(placeholder);
   renderAll();
   renderTicketsSubtab();
-
-  // 3. Procesar en background
+  // 3. Procesar
   try{
     const rec=await approveTicketWithDrive(t);
-    // Reemplazar placeholder con el registro real
-    if(data[ticketQ]){
-      const idx=data[ticketQ].findIndex(x=>x._id===tempId);
-      if(idx>=0) data[ticketQ].splice(idx,1);
-    }
+    if(data[ticketQ]){ const idx=data[ticketQ].findIndex(x=>x._id===tempId); if(idx>=0) data[ticketQ].splice(idx,1); }
     rec._quarter=ticketQ;
     if(!data[ticketQ]) data[ticketQ]=[];
     data[ticketQ].push(rec);
     saveLocal(); renderAll();
-    if(t._source==='flama') queueFlamaMark(t,'approved',ticketQ);
+    if(t._source==='flama') queueFlamaMark(t,'approved',ticketQ,{ticketId:rec.num_factura,recId:rec._id,aprob:aprobDe(rec,t)});
     const guardado=token?await saveDataToDrive(ticketQ):false;
     if(guardado){
       await flushFlamaOutbox(ticketQ);
-      showToast('Ticket '+(rec.num_factura||'')+' aprobado y guardado','success');
+      showToast('Ticket '+esc(rec.num_factura||'')+' aprobado y guardado'+(rec._driveError?' (sin PDF: se puede rehacer en Config)':''),rec._driveError?'error':'success');
     } else {
       showToast('Ticket aprobado en este dispositivo, pero aún no está guardado en Drive. Se reintentará; en Flama se marcará al guardarse.','error');
     }
@@ -9273,32 +9543,100 @@ async function approveTicket(i){
     saveTicketsPending();
     renderAll();
     renderTicketsSubtab();
-    showToast('❌ Error al aprobar: '+e.message,'error');
+    showToast('Error al aprobar: '+esc(e.message),'error');
   }
-  window._approvingTicket=false;
 }
 
-async function approveAllTickets(){
-  if(!ticketsPendientes.length) return;
-  const saved=[...ticketsPendientes];
-  for(const t of saved){
-    const rec=await approveTicketWithDrive(t);
-    const ticketQ=getQuarterFromDate(t.fecha)||Q;
-    rec._quarter=ticketQ;
-    if(!data[ticketQ]) data[ticketQ]=[];
-    data[ticketQ].push(rec);
-    if(token) saveDataToDrive(ticketQ).catch(()=>{});
-  }
-  saveLocal(); renderAll();
-  ticketsPendientes=[];
-  await saveTicketsPending();
+// Restos de la pestaña antigua de tickets: ahora hacen lo mismo que los botones de Pendientes
+async function approveAllTickets(){ return approveAllChronological(); }
+function discardAllTickets(){ return clearAllTicketsPending(); }
+
+// ── PDF de tickets rotos ──
+// Una versión anterior subía a Drive "PDF" de 16 bytes con el texto [object Promise].
+// Esto los busca entre los tickets enlazados y los vuelve a generar en el mismo fichero (mismo enlace).
+let _repararPdfsEnCurso=false;
+async function repararPdfsTickets(manual){
+  if(_repararPdfsEnCurso) return null;
+  if(!token||!ticketsFId||!driveListOk||driveLoading){ if(manual) alert('Espera a que termine de cargar Drive.'); return null; }
+  if(!window.jspdf){ if(manual) alert('No se ha cargado el generador de PDF. Recarga la app.'); return null; }
+  _repararPdfsEnCurso=true;
+  try{
+    const FOLDER='application/vnd.google-apps.folder';
+    const ficheros=new Map();
+    const recorrer=async(id,prof)=>{
+      const items=await driveListAll(`'${id}' in parents and trashed=false`,'id,name,mimeType,size');
+      for(const it of items){
+        if(it.mimeType===FOLDER){ if(prof<2) await recorrer(it.id,prof+1); }
+        else ficheros.set(it.id,it);
+      }
+    };
+    await recorrer(ticketsFId,0);
+    const rotos=[];
+    Object.keys(data).forEach(q=>(data[q]||[]).forEach(r=>{
+      if(!r||r._processing||r.doc_type!=='ticket') return;
+      const fid=r._driveFileId||driveIdFromLink(r._driveLink);
+      const f=fid?ficheros.get(fid):null;
+      if(f&&(+f.size||0)<1000) rotos.push({r,q,fid});
+    }));
+    let ok=0, fallos=0;
+    const tocados=new Set();
+    for(const x of rotos){
+      const teniaId=!!x.r._driveFileId;
+      try{ await subirPdfTicket(x.r,x.q); ok++; if(!teniaId) tocados.add(x.q); }
+      catch(e){ fallos++; console.warn('No se pudo rehacer el PDF de',x.r.num_factura,e); }
+    }
+    for(const q of tocados) await saveDataToDrive(q);
+    if(!fallos) try{ localStorage.setItem('mg_tickets_pdf_v479','1'); }catch(e){}
+    if(manual) alert(rotos.length?('PDF de tickets vacíos: '+rotos.length+'.\nRehechos: '+ok+(fallos?'\nCon error: '+fallos+' (vuelve a intentarlo luego)':'')):'Todos los PDF de los tickets están bien.');
+    else if(ok) showToast('Se han rehecho '+ok+' PDF de tickets que estaban vacíos','success');
+    return {rotos:rotos.length,ok,fallos};
+  }catch(e){
+    console.warn('repararPdfsTickets:',e);
+    if(manual) alert('No se pudo revisar: '+e.message);
+    return null;
+  }finally{ _repararPdfsEnCurso=false; }
+}
+// NIF y domicilio del cliente para un ticket pendiente (art. 7.2 RD 1619/2012: si lo pide una empresa o un profesional)
+function pedirNifTicket(i){
+  const t=ticketsPendientes[i]; if(!t) return;
+  const nif=prompt('NIF del cliente (solo si lo pide para su contabilidad).\nDéjalo vacío para quitarlo.',t.cliente_nif||'');
+  if(nif===null) return;
+  const n=nif.trim().toUpperCase().replace(/\s+/g,'').slice(0,20);
+  let dom='';
+  if(n){ const d=prompt('Domicilio del cliente:',t.domicilio_cliente||''); if(d===null) return; dom=d.trim().slice(0,200); }
+  t.cliente_nif=n; t.domicilio_cliente=dom;
+  if(t._source!=='flama') saveTicketsPending();
   renderTicketsSubtab();
 }
-
-function discardAllTickets(){
-  ticketsPendientes=[];
-  saveTicketsPending();
-  renderTicketsPendientes();
+// NIF y domicilio del cliente de un ticket ya creado: se guardan y se rehace su PDF
+async function editarClienteTicketModal(){
+  const f=Object.values(data).flat().find(x=>x&&String(x._id)===String(modalFacturaId));
+  if(!f||f.doc_type!=='ticket') return;
+  const q=Object.keys(data).find(k=>(data[k]||[]).includes(f));
+  if(!requireQuarterWritable(q,'cambiar los datos del cliente')) return;
+  const nif=prompt('NIF del cliente:',f.nif||''); if(nif===null) return;
+  const dom=prompt('Domicilio del cliente:',f.domicilio_cliente||''); if(dom===null) return;
+  f.nif=nif.trim().toUpperCase().replace(/\s+/g,'').slice(0,20);
+  f.domicilio_cliente=dom.trim().slice(0,200);
+  if(!f.domicilio_cliente) delete f.domicilio_cliente;
+  classifyRecord(f);
+  saveLocal(); renderAll();
+  if(token) await saveDataToDrive(q);
+  await regenerarPdfTicketModal();
+  openModal(f._id);
+}
+// Vuelve a generar el PDF del ticket abierto (p. ej. tras añadir el NIF del cliente)
+async function regenerarPdfTicketModal(){
+  const f=Object.values(data).flat().find(x=>x&&String(x._id)===String(modalFacturaId));
+  if(!f||f.doc_type!=='ticket') return;
+  const q=Object.keys(data).find(k=>(data[k]||[]).includes(f));
+  if(!requireQuarterWritable(q,'rehacer el PDF')) return;
+  try{
+    const teniaId=!!f._driveFileId, antes=f._driveFileId||driveIdFromLink(f._driveLink)||'';
+    const fid=await subirPdfTicket(f,q);
+    if(!teniaId||fid!==antes){ saveLocal(); await saveDataToDrive(q); }
+    showToast('PDF de '+esc(f.num_factura||'ticket')+' generado de nuevo','success');
+  }catch(e){ showToast('No se pudo rehacer el PDF: '+esc(e.message),'error'); }
 }
 
 async function refreshFromDrive(){
@@ -9427,7 +9765,7 @@ async function refreshFromDrive(){
   });
 })();
 function updateSheetDisplay(){ const el=document.getElementById('sheet-id-display'); if(el) el.textContent=sheetId?'ID: '+sheetId.slice(0,20)+'...':'Sin crear'; }
-function loadDemo(){ const demo=[{tipo:'ingreso',proveedor_cliente:'SumUp enero 2026',nif:'IE9813461A',fecha:'2026-02-01',concepto:'Ventas tarjeta enero 2026',operacion:'INT',base_iva:790.08,pct_iva:21,cuota_iva:165.92,base_irpf:790.08,ingresos_brutos:956,retencion_pct:0,retencion_importe:0,justificacion:'Ingresos por ventas de ceramica y talleres'},{tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-02-01',concepto:'Comision TPV enero 2026',operacion:'EXENTO',base_iva:14.34,pct_iva:0,cuota_iva:0,base_irpf:14.34,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-01-01',concepto:'Alquiler local enero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-02-01',concepto:'Alquiler local febrero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-03-01',concepto:'Alquiler local marzo',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'OpenAI Ireland Limited',fecha:'2026-02-15',concepto:'Suscripcion OpenAI',operacion:'INTRA_S',base_iva:57.03,pct_iva:0,cuota_iva:0,base_irpf:57.03,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'}]; if(!data['1T 2026']) data['1T 2026']=[]; demo.forEach(f=>{f._quarter='1T 2026';f._id=Date.now()+Math.random();data['1T 2026'].push(f);}); saveLocal();Q='1T 2026'; document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); document.getElementById('qbadge').textContent='1T 2026'; renderAll(); }
+function loadDemo(){ const demo=[{tipo:'ingreso',proveedor_cliente:'SumUp enero 2026',nif:'IE9813461A',fecha:'2026-02-01',concepto:'Ventas tarjeta enero 2026',operacion:'INT',base_iva:790.08,pct_iva:21,cuota_iva:165.92,base_irpf:790.08,ingresos_brutos:956,retencion_pct:0,retencion_importe:0,justificacion:'Ingresos por ventas de ceramica y talleres'},{tipo:'gasto',proveedor_cliente:'SumUp Limited',fecha:'2026-02-01',concepto:'Comision TPV enero 2026',operacion:'EXENTO',base_iva:14.34,pct_iva:0,cuota_iva:0,base_irpf:14.34,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-01-01',concepto:'Alquiler local enero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-02-01',concepto:'Alquiler local febrero',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'Alibau Gestio CB',fecha:'2026-03-01',concepto:'Alquiler local marzo',operacion:'ALQUILER',base_iva:900,pct_iva:21,cuota_iva:189,base_irpf:900,retencion_pct:19,retencion_importe:171,justificacion:'Alquiler local de actividad'},{tipo:'gasto',proveedor_cliente:'OpenAI Ireland Limited',fecha:'2026-02-15',concepto:'Suscripcion OpenAI',operacion:'INTRA_S',base_iva:57.03,pct_iva:0,cuota_iva:0,base_irpf:57.03,retencion_pct:0,retencion_importe:0,justificacion:'Servicio digital para la actividad'}]; if(!data['1T 2026']) data['1T 2026']=[]; demo.forEach(f=>{f._quarter='1T 2026';f._id=newRecId();data['1T 2026'].push(f);}); saveLocal();Q='1T 2026'; document.querySelectorAll('#qs-f .q-pill,#qs-m .q-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); document.getElementById('qbadge').textContent='1T 2026'; renderAll(); }
 
 </script>
 
